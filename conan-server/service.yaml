@@ -5,6 +5,5 @@ metadata:
 spec:
   selector:
     app: conan-server
-  type: NodePort 
   ports:
     - port: 9300

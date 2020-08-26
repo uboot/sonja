@@ -15,10 +15,24 @@ spec:
       containers:
       - name: conan-server
         image: conanio/conan_server:1.28.1
+        volumeMounts:
+        - name: server-config
+          mountPath: /root/.conan_server
+        - name: conan-server-storage
+          mountPath: /data
         env:
         - name: CONAN_SERVER_PORT
           value: "9300"
       initContainers:
       - name: init-conan-server
         image: busybox:1.28
-        command: ['sh', '-c', "echo hello"]
+        command: ['wget', '-P', '/config', 'https://raw.githubusercontent.com/uboot/conan-ci/master/conan-server/server.conf']
+        volumeMounts:
+        - name: server-config
+          mountPath: /config
+      volumes:
+      - name: server-config
+        emptyDir: {}
+      - name: conan-server-storage
+        persistentVolumeClaim:
+          claimName: conan-server-pvc
