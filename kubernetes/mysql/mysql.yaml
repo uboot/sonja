@@ -1,0 +1,63 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: mysql
+spec:
+  selector:
+    app: mysql
+  ports:
+    - port: 3306
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+  labels:
+    app: mysql
+spec:
+  replicas: 1
+  serviceName: mysql
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - name: mysql
+        image: mysql
+        ports:
+          - containerPort: 3306
+        volumeMounts:
+        - name: initdb
+          mountPath: /docker-entrypoint-initdb.d
+        - mountPath: "/var/lib/mysql"
+          subPath: "mysql"
+          name: mysql-data
+        env:
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: secrets
+                key: mysql-password 
+      initContainers:
+      - name: download-initdb
+        image: busybox:1.28
+        command: ['wget', '-O', '/initdb/initialize-database.sql', 'https://raw.githubusercontent.com/uboot/conan-ci/master/kubernetes/mysql/initialize-database.sql']
+        volumeMounts:
+        - name: initdb
+          mountPath: /initdb
+      volumes:
+      - name: initdb
+        emptyDir: {}
+  volumeClaimTemplates:
+  - metadata:
+      name: mysql-data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 100M

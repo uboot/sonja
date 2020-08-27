@@ -1,8 +1,19 @@
-apiVersion: apps/v1
-kind: Deployment
+kind: Service
+apiVersion: v1
 metadata:
   name: conan-server
 spec:
+  selector:
+    app: conan-server
+  ports:
+    - port: 9300
+---
+apiVersion: apps/v1
+kind: StatefulSet 
+metadata:
+  name: conan-server
+spec:
+  serviceName: conan-server
   replicas: 1
   selector:
     matchLabels:
@@ -21,12 +32,13 @@ spec:
         - name: conan-server-storage
           mountPath: /data
         env:
+        # For some reason the environment variable is set to a wrong value. Here we overwrite it.
         - name: CONAN_SERVER_PORT
           value: "9300"
       initContainers:
       - name: download-server-config
         image: busybox:1.28
-        command: ['wget', '-O', '/config/server.conf', 'https://raw.githubusercontent.com/uboot/conan-ci/master/conan-server/server.conf']
+        command: ['wget', '-O', '/config/server.conf', 'https://github.com/uboot/conan-ci/blob/master/kubernetes/conan-server/server.conf']
         volumeMounts:
         - name: server-config
           mountPath: /config
@@ -39,11 +51,18 @@ spec:
         - name: conan-server-storage
           mountPath: /data
         env:
+        # For some reason the environment variable is set to a wrong value. Here we overwrite it.
         - name: CONAN_SERVER_PORT
           value: "9300"
       volumes:
       - name: server-config
         emptyDir: {}
-      - name: conan-server-storage
-        persistentVolumeClaim:
-          claimName: conan-server-pvc
+  volumeClaimTemplates:
+  - metadata:
+      name: conan-server-storage
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 100M

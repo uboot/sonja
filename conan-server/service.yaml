@@ -1,9 +1,0 @@
-kind: Service
-apiVersion: v1
-metadata:
-  name: conan-server
-spec:
-  selector:
-    app: conan-server
-  ports:
-    - port: 9300

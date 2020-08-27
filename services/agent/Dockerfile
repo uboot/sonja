@@ -1,0 +1,22 @@
+FROM docker:19.03.12-dind
+
+RUN apk add --no-cache \
+		git \
+		py3-pip \
+		py3-wheel \
+		py3-mysqlclient
+
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+
+COPY requirements.txt /usr/src/app/
+
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+COPY . /usr/src/app
+
+EXPOSE 8080
+
+ENTRYPOINT ["python3"]
+
+CMD ["-m", "swagger_server"]

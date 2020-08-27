@@ -1,0 +1,71 @@
+openapi: 3.0.0
+info:
+  title: Conan-CI Build Agent API
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+- url: /
+paths:
+  /build:
+    post:
+      summary: schedule a build
+      operationId: schedule_build
+      requestBody:
+        description: build to schedule
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Build'
+      responses:
+        "201":
+          description: build scheduled
+        "400":
+          description: invalid input
+        "409":
+          description: the build queue is full
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+components:
+  schemas:
+    Build:
+      required:
+      - commit
+      - container
+      - id
+      - repo
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 1
+        url:
+          type: string
+          example: https://github.com/uboot/conan-ci.git
+        commit:
+          type: string
+          example: 2777a37dc82e296d55c23f738b79f139e627920c
+        path:
+          type: string
+          example: packages/hello
+        container:
+          type: string
+          example: conanio/gcc9
+        settings:
+          type: array
+          items:
+            $ref: '#/components/schemas/Setting'
+    Setting:
+      required:
+      - key
+      - value
+      type: object
+      properties:
+        key:
+          type: string
+          example: build_type
+        value:
+          type: string
+          example: Debug
+
