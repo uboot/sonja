@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: agent
+spec:
+  containers:
+    - name:  linux-agent
+      image: linux-agent:local
+      imagePullPolicy: Never
+      securityContext:
+        privileged: true
