@@ -4,7 +4,7 @@ metadata:
   name: http-ingress
 spec:
   rules:
-  - host: localhost
+  - host: conan.localhost
     http:
       paths:
       - path: /
