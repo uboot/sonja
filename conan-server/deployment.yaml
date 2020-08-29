@@ -24,12 +24,23 @@ spec:
         - name: CONAN_SERVER_PORT
           value: "9300"
       initContainers:
-      - name: init-conan-server
+      - name: download-server-config
         image: busybox:1.28
-        command: ['wget', '-P', '/config', 'https://raw.githubusercontent.com/uboot/conan-ci/master/conan-server/server.conf']
+        command: ['wget', '-O', '/config/server.conf', 'https://raw.githubusercontent.com/uboot/conan-ci/master/conan-server/server.conf']
         volumeMounts:
         - name: server-config
           mountPath: /config
+      - name: migrate-conan-data
+        image: conanio/conan_server:1.28.1
+        command: ['python', '-m', 'conans.conan_server', '--migrate']
+        volumeMounts:
+        - name: server-config
+          mountPath: /root/.conan_server
+        - name: conan-server-storage
+          mountPath: /data
+        env:
+        - name: CONAN_SERVER_PORT
+          value: "9300"
       volumes:
       - name: server-config
         emptyDir: {}
