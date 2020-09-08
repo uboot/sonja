@@ -14,7 +14,7 @@ class Repo(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: int=None, url: str=None, path: str=None, branch_specs: List[str]=None):  # noqa: E501
+    def __init__(self, id: int=None, url: str=None, path: str=None):  # noqa: E501
         """Repo - a model defined in Swagger
 
         :param id: The id of this Repo.  # noqa: E501
@@ -23,26 +23,21 @@ class Repo(Model):
         :type url: str
         :param path: The path of this Repo.  # noqa: E501
         :type path: str
-        :param branch_specs: The branch_specs of this Repo.  # noqa: E501
-        :type branch_specs: List[str]
         """
         self.swagger_types = {
             'id': int,
             'url': str,
-            'path': str,
-            'branch_specs': List[str]
+            'path': str
         }
 
         self.attribute_map = {
             'id': 'id',
             'url': 'url',
-            'path': 'path',
-            'branch_specs': 'branch-specs'
+            'path': 'path'
         }
         self._id = id
         self._url = url
         self._path = path
-        self._branch_specs = branch_specs
 
     @classmethod
     def from_dict(cls, dikt) -> 'Repo':
@@ -121,26 +116,3 @@ class Repo(Model):
         """
 
         self._path = path
-
-    @property
-    def branch_specs(self) -> List[str]:
-        """Gets the branch_specs of this Repo.
-
-
-        :return: The branch_specs of this Repo.
-        :rtype: List[str]
-        """
-        return self._branch_specs
-
-    @branch_specs.setter
-    def branch_specs(self, branch_specs: List[str]):
-        """Sets the branch_specs of this Repo.
-
-
-        :param branch_specs: The branch_specs of this Repo.
-        :type branch_specs: List[str]
-        """
-        if branch_specs is None:
-            raise ValueError("Invalid value for `branch_specs`, must not be `None`")  # noqa: E501
-
-        self._branch_specs = branch_specs

@@ -1,9 +1,25 @@
 import connexion
 import six
 
+from swagger_server.models.channel import Channel  # noqa: E501
 from swagger_server.models.profile import Profile  # noqa: E501
 from swagger_server.models.repo import Repo  # noqa: E501
 from swagger_server import util
+
+
+def add_channel(body=None):  # noqa: E501
+    """add a new channel
+
+     # noqa: E501
+
+    :param body: channel to add
+    :type body: dict | bytes
+
+    :rtype: None
+    """
+    if connexion.request.is_json:
+        body = Channel.from_dict(connexion.request.get_json())  # noqa: E501
+    return 'do some magic!'
 
 
 def add_profile(body=None):  # noqa: E501
@@ -36,6 +52,19 @@ def add_repo(body=None):  # noqa: E501
     return 'do some magic!'
 
 
+def delete_channel(channel_id):  # noqa: E501
+    """delete a channel
+
+     # noqa: E501
+
+    :param channel_id: channel id to delete
+    :type channel_id: int
+
+    :rtype: None
+    """
+    return 'do some magic!'
+
+
 def delete_profile(profile_id):  # noqa: E501
     """delete a profile
 
@@ -62,6 +91,17 @@ def delete_repo(repo_id):  # noqa: E501
     return 'do some magic!'
 
 
+def get_channels():  # noqa: E501
+    """get all channels
+
+     # noqa: E501
+
+
+    :rtype: List[Channel]
+    """
+    return 'do some magic!'
+
+
 def get_profiles():  # noqa: E501
     """get all active profiles
 
@@ -81,34 +121,4 @@ def get_repos():  # noqa: E501
 
     :rtype: List[Repo]
     """
-    return 'do some magic!'
-
-
-def update_profile(body=None):  # noqa: E501
-    """update an existing profile
-
-     # noqa: E501
-
-    :param body: 
-    :type body: dict | bytes
-
-    :rtype: Profile
-    """
-    if connexion.request.is_json:
-        body = Profile.from_dict(connexion.request.get_json())  # noqa: E501
-    return 'do some magic!'
-
-
-def update_repo(body=None):  # noqa: E501
-    """update an existing repo
-
-     # noqa: E501
-
-    :param body: 
-    :type body: dict | bytes
-
-    :rtype: Repo
-    """
-    if connexion.request.is_json:
-        body = Repo.from_dict(connexion.request.get_json())  # noqa: E501
     return 'do some magic!'

@@ -25,26 +25,6 @@ paths:
         "400":
           description: bad input parameter
       x-openapi-router-controller: swagger_server.controllers.default_controller
-    put:
-      summary: update an existing repo
-      operationId: update_repo
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Repo'
-      responses:
-        "200":
-          description: repo updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Repo'
-        "400":
-          description: invalid repo supplied
-        "404":
-          description: repo not found
-      x-openapi-router-controller: swagger_server.controllers.default_controller
     post:
       summary: add a new repo
       operationId: add_repo
@@ -105,26 +85,6 @@ paths:
         "400":
           description: bad input parameter
       x-openapi-router-controller: swagger_server.controllers.default_controller
-    put:
-      summary: update an existing profile
-      operationId: update_profile
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Profile'
-      responses:
-        "200":
-          description: profile updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Profile'
-        "400":
-          description: invalid profile supplied
-        "404":
-          description: profile not found
-      x-openapi-router-controller: swagger_server.controllers.default_controller
     post:
       summary: add a new profile
       operationId: add_profile
@@ -164,6 +124,62 @@ paths:
         "404":
           description: profile not found
       x-openapi-router-controller: swagger_server.controllers.default_controller
+  /channel:
+    get:
+      summary: get all channels
+      operationId: get_channels
+      responses:
+        "200":
+          description: list of channels
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Channel'
+                x-content-type: application/json
+        "400":
+          description: bad input parameter
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+    post:
+      summary: add a new channel
+      operationId: add_channel
+      requestBody:
+        description: channel to add
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Channel'
+      responses:
+        "201":
+          description: channel created
+        "400":
+          description: invalid input, object invalid
+        "409":
+          description: an existing item already exists
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /channel/{channelId}:
+    delete:
+      summary: delete a channel
+      operationId: delete_channel
+      parameters:
+      - name: channelId
+        in: path
+        description: channel id to delete
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: channel deleted
+        "400":
+          description: invalid ID supplied
+        "404":
+          description: channel not found
+      x-openapi-router-controller: swagger_server.controllers.default_controller
 components:
   schemas:
     Repo:
@@ -183,21 +199,10 @@ components:
         path:
           type: string
           example: packages/hello
-        branch-specs:
-          minItems: 1
-          type: array
-          example:
-          - master
-          - stable-*
-          items:
-            type: string
       example:
         path: packages/hello
         id: 1
         url: https://github.com/uboot/conan-ci.git
-        branch-specs:
-        - master
-        - stable-*
     Profile:
       required:
       - container
@@ -208,6 +213,9 @@ components:
           type: integer
           format: int32
           example: 1
+        name:
+          type: string
+          example: GCC 9
         container:
           type: string
           example: conanio/gcc9
@@ -218,10 +226,15 @@ components:
       example:
         container: conanio/gcc9
         settings:
-        - value: Debug
+        - value:
+          - Release
+          - Debug
           key: build_type
-        - value: Debug
+        - value:
+          - Release
+          - Debug
           key: build_type
+        name: GCC 9
         id: 1
     Setting:
       required:
@@ -233,9 +246,37 @@ components:
           type: string
           example: build_type
         value:
-          type: string
-          example: Debug
+          minItems: 1
+          type: array
+          example:
+          - Release
+          - Debug
+          items:
+            type: string
       example:
-        value: Debug
+        value:
+        - Release
+        - Debug
         key: build_type
+    Channel:
+      required:
+      - branch
+      - id
+      - name
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 1
+        name:
+          type: string
+          example: stable
+        branch:
+          type: string
+          example: master
+      example:
+        name: stable
+        id: 1
+        branch: master
 

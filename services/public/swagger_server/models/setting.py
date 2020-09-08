@@ -14,17 +14,17 @@ class Setting(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, key: str=None, value: str=None):  # noqa: E501
+    def __init__(self, key: str=None, value: List[str]=None):  # noqa: E501
         """Setting - a model defined in Swagger
 
         :param key: The key of this Setting.  # noqa: E501
         :type key: str
         :param value: The value of this Setting.  # noqa: E501
-        :type value: str
+        :type value: List[str]
         """
         self.swagger_types = {
             'key': str,
-            'value': str
+            'value': List[str]
         }
 
         self.attribute_map = {
@@ -69,22 +69,22 @@ class Setting(Model):
         self._key = key
 
     @property
-    def value(self) -> str:
+    def value(self) -> List[str]:
         """Gets the value of this Setting.
 
 
         :return: The value of this Setting.
-        :rtype: str
+        :rtype: List[str]
         """
         return self._value
 
     @value.setter
-    def value(self, value: str):
+    def value(self, value: List[str]):
         """Sets the value of this Setting.
 
 
         :param value: The value of this Setting.
-        :type value: str
+        :type value: List[str]
         """
         if value is None:
             raise ValueError("Invalid value for `value`, must not be `None`")  # noqa: E501

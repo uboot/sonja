@@ -15,11 +15,13 @@ class Profile(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: int=None, container: str=None, settings: List[Setting]=None):  # noqa: E501
+    def __init__(self, id: int=None, name: str=None, container: str=None, settings: List[Setting]=None):  # noqa: E501
         """Profile - a model defined in Swagger
 
         :param id: The id of this Profile.  # noqa: E501
         :type id: int
+        :param name: The name of this Profile.  # noqa: E501
+        :type name: str
         :param container: The container of this Profile.  # noqa: E501
         :type container: str
         :param settings: The settings of this Profile.  # noqa: E501
@@ -27,16 +29,19 @@ class Profile(Model):
         """
         self.swagger_types = {
             'id': int,
+            'name': str,
             'container': str,
             'settings': List[Setting]
         }
 
         self.attribute_map = {
             'id': 'id',
+            'name': 'name',
             'container': 'container',
             'settings': 'settings'
         }
         self._id = id
+        self._name = name
         self._container = container
         self._settings = settings
 
@@ -73,6 +78,27 @@ class Profile(Model):
             raise ValueError("Invalid value for `id`, must not be `None`")  # noqa: E501
 
         self._id = id
+
+    @property
+    def name(self) -> str:
+        """Gets the name of this Profile.
+
+
+        :return: The name of this Profile.
+        :rtype: str
+        """
+        return self._name
+
+    @name.setter
+    def name(self, name: str):
+        """Sets the name of this Profile.
+
+
+        :param name: The name of this Profile.
+        :type name: str
+        """
+
+        self._name = name
 
     @property
     def container(self) -> str:
