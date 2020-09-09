@@ -184,7 +184,6 @@ components:
   schemas:
     Repo:
       required:
-      - branch-specs
       - id
       - url
       type: object
@@ -207,6 +206,7 @@ components:
       required:
       - container
       - id
+      - name
       type: object
       properties:
         id:
