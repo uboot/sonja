@@ -9,7 +9,8 @@
             "type": "python",
             "request": "launch",
             "module": "swagger_server",
-            "cwd": "${workspaceFolder}/services/public"
+            "cwd": "${workspaceFolder}/services/public",
+            "env": {"MYSQL_ROOT_PASSWORD": "secret"}
         }
     ]
 }

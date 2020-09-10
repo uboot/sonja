@@ -1,11 +1,13 @@
 import connexion
 import six
 
+from flask import abort
+from swagger_server.config import db
+from swagger_server import database
 from swagger_server.models.channel import Channel  # noqa: E501
 from swagger_server.models.profile import Profile  # noqa: E501
 from swagger_server.models.repo import Repo  # noqa: E501
 from swagger_server import util
-
 
 def add_channel(body=None):  # noqa: E501
     """add a new channel
@@ -49,7 +51,14 @@ def add_repo(body=None):  # noqa: E501
     """
     if connexion.request.is_json:
         body = Repo.from_dict(connexion.request.get_json())  # noqa: E501
-    return 'do some magic!'
+        repo = database.Repo()
+        repo.path = body.path
+        repo.url = body.url
+        db.session.add(repo)
+        db.session.commit()
+        body.id = repo.id
+
+    return body
 
 
 def delete_channel(channel_id):  # noqa: E501
@@ -88,7 +97,12 @@ def delete_repo(repo_id):  # noqa: E501
 
     :rtype: None
     """
-    return 'do some magic!'
+    repo = database.Repo.query.filter_by(id=repo_id).first()
+    if not repo:
+        abort(404)
+    db.session.delete(repo)
+    db.session.commit()
+    return None
 
 
 def get_channels():  # noqa: E501
@@ -121,4 +135,5 @@ def get_repos():  # noqa: E501
 
     :rtype: List[Repo]
     """
-    return 'do some magic!'
+
+    return [Repo(r.id, r.url, r.path) for r in database.Repo.query.all()]

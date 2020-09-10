@@ -61,7 +61,7 @@ paths:
           type: integer
           format: int32
       responses:
-        "200":
+        "204":
           description: repo deleted
         "400":
           description: invalid ID supplied
@@ -97,6 +97,10 @@ paths:
       responses:
         "201":
           description: profile created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
         "400":
           description: invalid input, object invalid
         "409":
@@ -117,7 +121,7 @@ paths:
           type: integer
           format: int32
       responses:
-        "200":
+        "204":
           description: profile deleted
         "400":
           description: invalid ID supplied
@@ -153,6 +157,10 @@ paths:
       responses:
         "201":
           description: channel created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Channel'
         "400":
           description: invalid input, object invalid
         "409":
@@ -173,7 +181,7 @@ paths:
           type: integer
           format: int32
       responses:
-        "200":
+        "204":
           description: channel deleted
         "400":
           description: invalid ID supplied
@@ -184,7 +192,6 @@ components:
   schemas:
     Repo:
       required:
-      - id
       - url
       type: object
       properties:
@@ -205,7 +212,6 @@ components:
     Profile:
       required:
       - container
-      - id
       - name
       type: object
       properties:
@@ -226,13 +232,9 @@ components:
       example:
         container: conanio/gcc9
         settings:
-        - value:
-          - Release
-          - Debug
+        - value: Release
           key: build_type
-        - value:
-          - Release
-          - Debug
+        - value: Release
           key: build_type
         name: GCC 9
         id: 1
@@ -246,22 +248,14 @@ components:
           type: string
           example: build_type
         value:
-          minItems: 1
-          type: array
-          example:
-          - Release
-          - Debug
-          items:
-            type: string
+          type: string
+          example: Release
       example:
-        value:
-        - Release
-        - Debug
+        value: Release
         key: build_type
     Channel:
       required:
       - branch
-      - id
       - name
       type: object
       properties:
