@@ -6,6 +6,7 @@ from swagger_server.config import db
 from swagger_server import database
 from swagger_server.models.channel import Channel  # noqa: E501
 from swagger_server.models.profile import Profile  # noqa: E501
+from swagger_server.models.setting import Setting  # noqa: E501
 from swagger_server.models.repo import Repo  # noqa: E501
 from swagger_server import util
 
@@ -36,7 +37,15 @@ def add_profile(body=None):  # noqa: E501
     """
     if connexion.request.is_json:
         body = Profile.from_dict(connexion.request.get_json())  # noqa: E501
-    return 'do some magic!'
+        profile = database.Profile()
+        profile.name = body.name
+        profile.container = body.container
+        profile.settings = [database.Setting(s.key, s.value) for s in body.settings]
+        db.session.add(profile)
+        db.session.commit()
+        body.id = profile.id
+
+    return body
 
 
 def add_repo(body=None):  # noqa: E501
@@ -84,7 +93,12 @@ def delete_profile(profile_id):  # noqa: E501
 
     :rtype: None
     """
-    return 'do some magic!'
+    profile = database.Profile.query.filter_by(id=profile_id).first()
+    if not profile:
+        abort(404)
+    db.session.delete(profile)
+    db.session.commit()
+    return None
 
 
 def delete_repo(repo_id):  # noqa: E501
@@ -124,7 +138,8 @@ def get_profiles():  # noqa: E501
 
     :rtype: List[Profile]
     """
-    return 'do some magic!'
+
+    return [Profile(p.id, p.name, p.container, [Setting(s.key, s.value) for s in p.settings]) for p in database.Profile.query.all()]
 
 
 def get_repos():  # noqa: E501
