@@ -22,8 +22,14 @@ def add_channel(body=None):  # noqa: E501
     """
     if connexion.request.is_json:
         body = Channel.from_dict(connexion.request.get_json())  # noqa: E501
-    return 'do some magic!'
+        channel = database.Channel()
+        channel.name = body.name
+        channel.branch = body.branch
+        db.session.add(channel)
+        db.session.commit()
+        body.id = channel.id
 
+    return body, 201
 
 def add_profile(body=None):  # noqa: E501
     """add a new profile
@@ -45,7 +51,7 @@ def add_profile(body=None):  # noqa: E501
         db.session.commit()
         body.id = profile.id
 
-    return body
+    return body, 201
 
 
 def add_repo(body=None):  # noqa: E501
@@ -67,7 +73,7 @@ def add_repo(body=None):  # noqa: E501
         db.session.commit()
         body.id = repo.id
 
-    return body
+    return body, 201
 
 
 def delete_channel(channel_id):  # noqa: E501
@@ -80,7 +86,12 @@ def delete_channel(channel_id):  # noqa: E501
 
     :rtype: None
     """
-    return 'do some magic!'
+    channel = database.Channel.query.filter_by(id=channel_id).first()
+    if not channel:
+        abort(404)
+    db.session.delete(channel)
+    db.session.commit()
+    return None
 
 
 def delete_profile(profile_id):  # noqa: E501
@@ -127,7 +138,8 @@ def get_channels():  # noqa: E501
 
     :rtype: List[Channel]
     """
-    return 'do some magic!'
+    return [Channel(c.id, c.name, c.branch) for c in database.Channel.query.all()]
+
 
 
 def get_profiles():  # noqa: E501
@@ -138,7 +150,6 @@ def get_profiles():  # noqa: E501
 
     :rtype: List[Profile]
     """
-
     return [Profile(p.id, p.name, p.container, [Setting(s.key, s.value) for s in p.settings]) for p in database.Profile.query.all()]
 
 
@@ -150,5 +161,4 @@ def get_repos():  # noqa: E501
 
     :rtype: List[Repo]
     """
-
     return [Repo(r.id, r.url, r.path) for r in database.Repo.query.all()]

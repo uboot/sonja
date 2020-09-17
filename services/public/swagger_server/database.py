@@ -5,6 +5,11 @@ class Repo(db.Model):
     url = db.Column(db.String(255), nullable=False)
     path = db.Column(db.String(255))
 
+class Channel(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    branch = db.Column(db.String(255), nullable=False)
+
 class Profile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
