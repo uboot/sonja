@@ -1,8 +1,5 @@
 FROM python:3.6-alpine
 
-RUN apk add --no-cache \
-		git
-
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 

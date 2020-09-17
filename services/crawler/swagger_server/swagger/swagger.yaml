@@ -1,0 +1,20 @@
+openapi: 3.0.0
+info:
+  title: Conan CI Crawler
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+- url: /
+paths:
+  /process-repos:
+    get:
+      summary: scan repos for new commits
+      operationId: process_repos
+      responses:
+        "200":
+          description: success
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+components: {}
+
