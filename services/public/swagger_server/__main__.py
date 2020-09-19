@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 from swagger_server.config import app, db
-from swagger_server import database
 from swagger_server import encoder
 
 def main():

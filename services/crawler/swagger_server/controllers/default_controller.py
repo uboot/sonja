@@ -2,6 +2,7 @@ import connexion
 import six
 
 from swagger_server import util
+from swagger_server.crawler import process
 
 
 def process_repos():  # noqa: E501
@@ -12,4 +13,6 @@ def process_repos():  # noqa: E501
 
     :rtype: None
     """
-    return 'do some magic!'
+
+    process.trigger()
+    return 'success'
