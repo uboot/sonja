@@ -38,7 +38,7 @@ spec:
       initContainers:
       - name: download-server-config
         image: busybox:1.28
-        command: ['wget', '-O', '/config/server.conf', 'https://github.com/uboot/conan-ci/blob/master/kubernetes/conan-server/server.conf']
+        command: ['wget', '-P', '/config', 'https://raw.githubusercontent.com/uboot/conan-ci/master/kubernetes/conan-server/server.conf']
         volumeMounts:
         - name: server-config
           mountPath: /config
