@@ -4,21 +4,21 @@ metadata:
   name: http-ingress
 spec:
   rules:
-  - host: conan.localhost
+  - host: conan.conan-ci
     http:
       paths:
       - path: /
         backend:
           serviceName: conan-server
           servicePort: 9300
-  - host: agent.localhost
+  - host: public.conan-ci
     http:
       paths:
       - path: /
         backend:
-          serviceName: agent
-          servicePort: 5000
-  - host: phpmyadmin.localhost
+          serviceName: public
+          servicePort: 8080
+  - host: phpmyadmin.conan-ci
     http:
       paths:
       - path: /
