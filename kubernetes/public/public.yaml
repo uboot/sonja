@@ -1,0 +1,37 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: public
+spec:
+  selector:
+    app: public
+  ports:
+    - port: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: public
+  labels:
+    app: public
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: public
+  template:
+    metadata:
+      labels:
+        app: public
+    spec:
+      containers:
+      - name:  public
+        image: public:local
+        imagePullPolicy: Never
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: secrets
+              key: mysql-password 
+

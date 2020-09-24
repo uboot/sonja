@@ -1,7 +1,10 @@
-FROM python:3.6-alpine
+FROM alpine:3.12
 
 RUN apk add --no-cache \
-		git
+		git \
+		py3-pip \
+		py3-wheel \
+		py3-mysqlclient
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
