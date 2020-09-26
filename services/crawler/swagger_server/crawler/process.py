@@ -1,4 +1,4 @@
-from swagger_server.config import app
+from swagger_server.config import app, db
 from swagger_server import database
 import git
 import os.path
@@ -29,7 +29,7 @@ class RepoController(object):
 
     def create_new_clone(self, url):
         shutil.rmtree(self.repo_dir, ignore_errors=True)
-        repo = git.Repo.clone_from(url=url, to_path=self.repo_dir)
+        git.Repo.clone_from(url=url, to_path=self.repo_dir)
 
     def fetch(self):
         repo = git.Repo(self.repo_dir)
@@ -38,14 +38,20 @@ class RepoController(object):
     def get_remote_branches(self):
         repo = git.Repo(self.repo_dir)
         branches = [b.strip() for b in repo.git.branch('-r').split()]
-        pattern = 'origin/([/\-\\w]+)'
+        pattern = 'origin/([/\\-\\w]+)'
         matches = [re.match(pattern, b) for b in branches]
-        return list(set(m.group(1) for m in matches if m and m.group(1) != 'HEAD'))
+        return list(set(m.group(1) for m in matches
+                    if m and m.group(1) != 'HEAD'))
 
     def checkout_and_update(self, branch):
         repo = git.Repo(self.repo_dir)
         repo.git.checkout(branch)
         repo.git.pull()
+
+    def get_sha(self):
+        repo = git.Repo(self.repo_dir)
+        return repo.head.commit.hexsha
+
 
 def trigger():
     logger.info("start crawling")
@@ -65,11 +71,23 @@ def trigger():
         else:
             controller.fetch()
             logger.info("fetch existing repo '%s' for URL '%s'",
-                         repo_dir, repo.url)
+                        repo_dir, repo.url)
 
         branches = controller.get_remote_branches()
         for channel in channels:
             if channel.branch in branches:
                 controller.checkout_and_update(channel.branch)
                 logger.info("checkout and update branch '%s'", channel.branch)
+                sha = controller.get_sha()
+
+                commits = database.Commit.query.filter_by(repo=repo, sha=sha,
+                                                          channel=channel)
+                if not list(commits):
+                    commit = database.Commit()
+                    commit.sha = sha
+                    commit.repo = repo
+                    commit.channel = channel
+                    db.session.add(commit)
+                    db.session.commit()
+
 

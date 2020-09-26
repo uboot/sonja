@@ -18,6 +18,13 @@ spec:
         backend:
           serviceName: public
           servicePort: 8080
+  - host: crawler.conan-ci
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: crawler
+          servicePort: 8080
   - host: phpmyadmin.conan-ci
     http:
       paths:

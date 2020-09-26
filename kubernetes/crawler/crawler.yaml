@@ -1,0 +1,37 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: crawler
+spec:
+  selector:
+    app: crawler
+  ports:
+    - port: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crawler
+  labels:
+    app: publcrawleric
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: crawler
+  template:
+    metadata:
+      labels:
+        app: crawler
+    spec:
+      containers:
+      - name:  crawler
+        image: crawler:local
+        imagePullPolicy: Never
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: secrets
+              key: mysql-password 
+

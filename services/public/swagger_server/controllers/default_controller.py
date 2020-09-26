@@ -86,9 +86,7 @@ def delete_channel(channel_id):  # noqa: E501
 
     :rtype: None
     """
-    channel = database.Channel.query.filter_by(id=channel_id).first()
-    if not channel:
-        abort(404)
+    channel = database.Channel.query.filter_by(id=channel_id).first_or_404()
     db.session.delete(channel)
     db.session.commit()
     return None
@@ -104,9 +102,7 @@ def delete_profile(profile_id):  # noqa: E501
 
     :rtype: None
     """
-    profile = database.Profile.query.filter_by(id=profile_id).first()
-    if not profile:
-        abort(404)
+    profile = database.Profile.query.filter_by(id=profile_id).first_or_404()
     db.session.delete(profile)
     db.session.commit()
     return None
@@ -122,9 +118,7 @@ def delete_repo(repo_id):  # noqa: E501
 
     :rtype: None
     """
-    repo = database.Repo.query.filter_by(id=repo_id).first()
-    if not repo:
-        abort(404)
+    repo = database.Repo.query.filter_by(id=repo_id).first_or_404()
     db.session.delete(repo)
     db.session.commit()
     return None

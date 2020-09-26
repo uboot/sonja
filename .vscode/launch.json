@@ -10,7 +10,10 @@
             "request": "launch",
             "module": "swagger_server",
             "cwd": "${workspaceFolder}/services/public",
-            "env": {"MYSQL_ROOT_PASSWORD": "secret"}
+            "env": {
+                "MYSQL_ROOT_PASSWORD": "secret",
+                "MYSQL_URL": "127.0.0.1"
+            }
         },
         {
             "name": "Flask: crawler",
@@ -18,7 +21,11 @@
             "request": "launch",
             "module": "swagger_server",
             "cwd": "${workspaceFolder}/services/crawler",
-            "env": {"MYSQL_ROOT_PASSWORD": "secret"}
+            "env": {
+                "MYSQL_ROOT_PASSWORD": "secret",
+                "MYSQL_URL": "127.0.0.1",
+                "CRAWLER_REPO_DIR": "/home/matz/Projects/temp"
+            }
         }
     ]
 }
