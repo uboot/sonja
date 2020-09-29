@@ -28,15 +28,20 @@ class Setting(db.Model):
         self.key = key
         self.value = value
 
+class CommitStatus(enum.Enum):
+    new = 1
+    building = 2
+
 class Commit(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    status = db.Column(db.Enum(CommitStatus))
     sha = db.Column(db.String(255), nullable=False)
     repo_id = db.Column(db.Integer, db.ForeignKey('repo.id'), nullable=False)
     repo = db.relationship('Repo', backref='commits')
     channel_id = db.Column(db.Integer, db.ForeignKey('channel.id'), nullable=False)
     channel = db.relationship('Channel', backref='commits')
 
-class Status(enum.Enum):
+class BuildStatus(enum.Enum):
     new = 1
     active = 2
     error = 3
@@ -54,7 +59,7 @@ missing = db.Table('missing',
 
 class Build(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    status = db.Column(db.Enum(Status))
+    status = db.Column(db.Enum(BuildStatus))
     package_id = db.Column(db.Integer, db.ForeignKey('package.id'))
     package = db.relationship("Package", backref="builds")
     profile_id = db.Column(db.Integer, db.ForeignKey('profile.id'), nullable=False)

@@ -43,10 +43,9 @@ class RepoController(object):
         return list(set(m.group(1) for m in matches
                     if m and m.group(1) != 'HEAD'))
 
-    def checkout_and_update(self, branch):
+    def checkout(self, branch):
         repo = git.Repo(self.repo_dir)
-        repo.git.checkout(branch)
-        repo.git.pull()
+        repo.git.reset('--hard', 'origin/{}'.format(branch))
 
     def get_sha(self):
         repo = git.Repo(self.repo_dir)
@@ -76,8 +75,8 @@ def trigger():
         branches = controller.get_remote_branches()
         for channel in channels:
             if channel.branch in branches:
-                controller.checkout_and_update(channel.branch)
-                logger.info("checkout and update branch '%s'", channel.branch)
+                controller.checkout(channel.branch)
+                logger.info("checkout branch '%s'", channel.branch)
                 sha = controller.get_sha()
 
                 commits = database.Commit.query.filter_by(repo=repo, sha=sha,
@@ -87,6 +86,7 @@ def trigger():
                     commit.sha = sha
                     commit.repo = repo
                     commit.channel = channel
+                    commit.status = database.CommitStatus.new
                     db.session.add(commit)
                     db.session.commit()
 
