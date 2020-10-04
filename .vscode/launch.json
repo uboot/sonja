@@ -35,7 +35,7 @@
             "env": {
                 "MYSQL_ROOT_PASSWORD": "secret",
                 "MYSQL_URL": "127.0.0.1",
-                "CRAWLER_REPO_DIR": "/home/matz/Projects/temp"
+                "VCS_DATA_DIR": "/home/matz/Projects/temp"
             }
         },
         {
@@ -57,7 +57,8 @@
             "cwd": "${workspaceFolder}/services/linux-agent",
             "env": {
                 "MYSQL_ROOT_PASSWORD": "secret",
-                "MYSQL_URL": "127.0.0.1"
+                "MYSQL_URL": "127.0.0.1",
+                "VCS_DATA_DIR": "/home/matz/Projects/temp"
             }
         }
     ]

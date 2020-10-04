@@ -5,7 +5,7 @@ import os.path
 import re
 import shutil
 
-data_dir = os.environ.get("CRAWLER_REPO_DIR", "/data")
+data_dir = os.environ.get("VCS_DATA_DIR", "/data")
 logger = app.app.logger
 
 

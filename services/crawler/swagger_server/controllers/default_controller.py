@@ -2,8 +2,8 @@ import connexion
 import six
 
 import swagger_client
-from swagger_server import util
 from swagger_server import crawler
+from swagger_server import util
 from swagger_server.config import app
 
 logger = app.app.logger

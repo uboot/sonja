@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
 
-import connexion
-
+from swagger_server.config import app, db
 from swagger_server import encoder
 
-
 def main():
-    app = connexion.App(__name__, specification_dir='./swagger/')
+    app.add_api('swagger.yaml', arguments={'title': 'Conan CI Linux Agent'}, pythonic_params=True)
     app.app.json_encoder = encoder.JSONEncoder
-    app.add_api('swagger.yaml', arguments={'title': 'Conan CI Agent'}, pythonic_params=True)
+    db.create_all()
     app.run(port=8080)
-
 
 if __name__ == '__main__':
     main()

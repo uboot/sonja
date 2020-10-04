@@ -42,7 +42,7 @@ class CommitStatus(enum.Enum):
 
 class Commit(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    status = db.Column(db.Enum(CommitStatus))
+    status = db.Column(db.Enum(CommitStatus), nullable=False)
     sha = db.Column(db.String(255), nullable=False)
     repo_id = db.Column(db.Integer, db.ForeignKey('repo.id'),
                         nullable=False)
@@ -71,7 +71,7 @@ missing = db.Table('missing',
 
 class Build(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    status = db.Column(db.Enum(BuildStatus))
+    status = db.Column(db.Enum(BuildStatus), nullable=False)
     commit_id = db.Column(db.Integer, db.ForeignKey('commit.id'),
                           nullable=False)
     commit = db.relationship('Commit', backref='builds')
@@ -83,6 +83,7 @@ class Build(db.Model):
         backref=db.backref('dependencies'))
     missing = db.relationship('Pattern', secondary=missing,
         backref=db.backref('missing'))
+
 
 class Package(db.Model):
     id = db.Column(db.Integer, primary_key=True)
