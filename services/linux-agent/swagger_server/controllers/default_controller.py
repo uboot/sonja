@@ -26,6 +26,6 @@ def process_builds():  # noqa: E501
 
     :rtype: None
     """
-    logger.info('process builds')
+    logger.info('Process builds')
     linux_agent.process_builds()
     return 'success'

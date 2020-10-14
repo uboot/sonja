@@ -8,8 +8,8 @@ import os
 
 app = connexion.App(__name__, specification_dir='./swagger/')
 connection_string = 'mysql+mysqldb://root:{0}@{1}/conan-ci'.format(
-    os.environ.get('MYSQL_ROOT_PASSWORD', ''),
-    os.environ.get('MYSQL_URL', 'mysql')
+    os.environ.get('MYSQL_ROOT_PASSWORD', 'secret'),
+    os.environ.get('MYSQL_URL', '127.0.0.1')
 )
 app.app.config['SQLALCHEMY_DATABASE_URI'] = connection_string
 app.app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False

@@ -29,6 +29,6 @@ def process_repos():  # noqa: E501
     :rtype: None
     """
     if crawler.process_repos():
-        logger.info('trigger scheduler: process commits')
+        logger.info('Trigger scheduler: process commits')
         scheduler.process_commits()
     return 'success'

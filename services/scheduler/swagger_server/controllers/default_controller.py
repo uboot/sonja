@@ -29,7 +29,7 @@ def process_commits():  # noqa: E501
     :rtype: None
     """
     if scheduler.process_commits():
-        logger.info('trigger linux agent: process builds')
+        logger.info('Trigger linux agent: process builds')
         linux_agent.process_builds()
     return 'success'
 

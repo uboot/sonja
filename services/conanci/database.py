@@ -107,7 +107,7 @@ def populate_database():
 
     profile = Profile()
     profile.name = "GCC 9"
-    profile.container = "conanio/gcc9"
+    profile.container = "conanio/gcc9:1.29.2"
     profile.settings = [Setting("build_type", "Release")]
     db.session.add(profile)
 
@@ -116,15 +116,15 @@ def populate_database():
     channel.name = "stable"
     db.session.add(channel)
 
-    # commit = Commit()
-    # commit.repo = repo
-    # commit.sha = "2777a37dc82e296d55c23f738b79f139e627920c"
-    # commit.channel = channel
-    # commit.status = CommitStatus.new
-    # build = Build()
-    # build.commit = commit
-    # build.profile = profile
-    # build.status = BuildStatus.new
-    # db.session.add(build)
+    commit = Commit()
+    commit.repo = repo
+    commit.sha = "2777a37dc82e296d55c23f738b79f139e627920c"
+    commit.channel = channel
+    commit.status = CommitStatus.new
+    build = Build()
+    build.commit = commit
+    build.profile = profile
+    build.status = BuildStatus.new
+    db.session.add(build)
     
     db.session.commit()

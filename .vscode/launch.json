@@ -11,7 +11,6 @@
             "module": "swagger_server",
             "cwd": "${workspaceFolder}/services/scheduler",
             "env": {
-                "MYSQL_ROOT_PASSWORD": "secret",
                 "PYTHONPATH": "${workspaceFolder}/services"
             },
             "preLaunchTask": "bridge-to-kubernetes.service"
@@ -23,8 +22,6 @@
             "module": "swagger_server",
             "cwd": "${workspaceFolder}/services/public",
             "env": {
-                "MYSQL_ROOT_PASSWORD": "secret",
-                "MYSQL_URL": "127.0.0.1",
                 "PYTHONPATH": "${workspaceFolder}/services"
             }
         },
@@ -35,8 +32,6 @@
             "module": "swagger_server",
             "cwd": "${workspaceFolder}/services/crawler",
             "env": {
-                "MYSQL_ROOT_PASSWORD": "secret",
-                "MYSQL_URL": "127.0.0.1",
                 "VCS_DATA_DIR": "/home/matz/Projects/temp",
                 "PYTHONPATH": "${workspaceFolder}/services"
             }
@@ -48,8 +43,6 @@
             "module": "swagger_server",
             "cwd": "${workspaceFolder}/services/scheduler",
             "env": {
-                "MYSQL_ROOT_PASSWORD": "secret",
-                "MYSQL_URL": "127.0.0.1",
                 "PYTHONPATH": "${workspaceFolder}/services"
             }
         },
@@ -60,8 +53,6 @@
             "module": "swagger_server",
             "cwd": "${workspaceFolder}/services/linux-agent",
             "env": {
-                "MYSQL_ROOT_PASSWORD": "secret",
-                "MYSQL_URL": "127.0.0.1",
                 "VCS_DATA_DIR": "/home/matz/Projects/temp",
                 "PYTHONPATH": "${workspaceFolder}/services"
             }
