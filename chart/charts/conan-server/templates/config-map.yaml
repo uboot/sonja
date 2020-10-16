@@ -70,4 +70,4 @@ data:
 
     [users]
     #default_user: defaultpass
-    agent: {{ .Values.conanPassword }}
+    {{ .Values.user }}: {{ .Values.password }}

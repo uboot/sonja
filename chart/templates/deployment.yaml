@@ -32,5 +32,11 @@ spec:
           value: {{ template "conan-ci.fullname" $ }}-scheduler
         - name: CONANCI_LINUXAGENT_URL
           value: {{ template "conan-ci.fullname" $ }}-linux-agent
+        - name: CONAN_SERVER_USER
+          value: {{ index $.Values "conan-server" "user" }}
+        - name: CONAN_SERVER_PASSWORD
+          value: {{ index $.Values "conan-server" "password" }}
+        - name: CONANCI_CHANNEL
+          value: {{ $.Values.channel }}
 ---
 {{- end }}

@@ -4,8 +4,11 @@
 
 host: conan-ci
 
+channel: conanci
+
 conan-server:
-  conanPassword: demo
+  user: agent
+  password: demo
 
 mysql:
   imageTag: 8.0.21
