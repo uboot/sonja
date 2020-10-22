@@ -13,7 +13,7 @@ COPY requirements.txt /usr/src/app/
 
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-COPY linux-agent /usr/src/app
+COPY agent /usr/src/app
 COPY conanci /usr/src/app/conanci
 
 EXPOSE 8080

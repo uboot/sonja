@@ -1,7 +1,7 @@
 import connexion
 import six
 
-from conanci import linux_agent
+from conanci import agent
 from conanci.config import app
 from swagger_server import util
 
@@ -27,5 +27,5 @@ def process_builds():  # noqa: E501
     :rtype: None
     """
     logger.info('Process builds')
-    linux_agent.process_builds()
+    agent.process_builds()
     return 'success'

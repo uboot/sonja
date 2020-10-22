@@ -47,11 +47,11 @@
             }
         },
         {
-            "name": "Flask: linux-agent",
+            "name": "Flask: agent",
             "type": "python",
             "request": "launch",
             "module": "swagger_server",
-            "cwd": "${workspaceFolder}/services/linux-agent",
+            "cwd": "${workspaceFolder}/services/agent",
             "env": {
                 "VCS_DATA_DIR": "/home/matz/Projects/temp",
                 "PYTHONPATH": "${workspaceFolder}/services"
