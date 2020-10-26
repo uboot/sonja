@@ -36,7 +36,7 @@ spec:
           value: {{ index $.Values "conan-server" "user" }}
         - name: CONAN_SERVER_PASSWORD
           value: {{ index $.Values "conan-server" "password" }}
-        - name: CONANCI_CHANNEL
-          value: {{ $.Values.channel }}
+        - name: CONANCI_USER
+          value: {{ $.Values.user }}
 ---
 {{- end }}

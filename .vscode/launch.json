@@ -53,7 +53,6 @@
             "module": "swagger_server",
             "cwd": "${workspaceFolder}/services/agent",
             "env": {
-                "VCS_DATA_DIR": "/home/matz/Projects/temp",
                 "PYTHONPATH": "${workspaceFolder}/services"
             }
         }

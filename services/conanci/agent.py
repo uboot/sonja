@@ -3,72 +3,104 @@ from conanci import database
 import docker
 import os
 import re
-from string import Template
+import string
 
-data_dir = os.environ.get("VCS_DATA_DIR", "/data")
 logger = app.app.logger
-docker_image_pattern = "([a-z0-9\\.-]+(:[0-9]+)?)?[a-z0-9\\.-/]+[:@]([a-z0-9\\.-]+)$"
+docker_image_pattern = ("([a-z0-9\\.-]+(:[0-9]+)?)?"
+                        "[a-z0-9\\.-/]+[:@]([a-z0-9\\.-]+)$")
 conan_server = os.environ.get("CONAN_SERVER_URL", "127.0.0.1")
 conan_user = os.environ.get("CONAN_SERVER_USER", "agent")
 conan_password = os.environ.get("CONAN_SERVER_PASSWORD", "demo")
-conan_channel = os.environ.get("CONANCI_CHANNEL", "conanci")
-script_template = Template(
+conanci_user = os.environ.get("CONANCI_USER", "conanci")
+
+setup_template = string.Template(
 """sh -c \" \
-git init . \
+conan remote clean \
+&& conan remote add server $conan_url \
+&& conan user -r server -p $conan_password $conan_user \
+\"
+"""
+)
+
+source_template = string.Template(
+"""sh -c \" \
+mkdir conanci \
+&& cd conanci \
+&& git init \
 && git remote add origin $git_url \
 && git fetch origin $git_sha \
 && git checkout FETCH_HEAD \
-&& conan remote clean \
-&& conan remote add server $conan_url \
-&& conan user -r server -p $conan_password agent
+\"
+"""
+)
+
+build_template = string.Template(
+"""sh -c \" \
+conan create $package_path $channel
 \"
 """
 )
 
 
 class Builder(object):
-    def pull(self, image):
+    def __init__(self, image):
+        if not re.match(docker_image_pattern, image):
+            raise Exception("The image '{0}' is not a valid "
+                            "docker image name".format(image))
+
         self.image = image
+        self.client = docker.from_env()
         client = docker.from_env()
         client.images.pull(image)
 
-    def run(self, script):
-        client = docker.from_env()
-        return client.containers.run(image=self.image, command=script, remove=True)
+    def __enter__(self):
+        return self
+
+    def setup(self, url, user, password):
+        setup_script = setup_template.substitute(conan_url=url,
+                                                 conan_user=user,
+                                                 conan_password=password)
+        setup = self.client.containers.create(image=self.image,
+                                              command=setup_script)
+        try:
+            setup.start()
+            setup.wait()
+            setup.commit(repository="setup", tag="local")
+        finally:
+            setup.remove()
+
+    def __exit__(self, type, value, traceback):
+        try:
+            logger.info("Remove all temporary docker images")
+            self.client.images.remove("setup:local")
+        except docker.errors.ImageNotFound:
+            pass
 
 
 def process_builds():
-    # setup_database()
+    # database.populate_database()
     # return
 
-    #build = database.Build.query.filter_by(status=database.BuildStatus.new)\
-    build = database.Build.query\
+    # build = database.Build.query\
+    build = database.Build.query.filter_by(status=database.BuildStatus.new)\
             .populate_existing()\
             .with_for_update(skip_locked=True, of=database.Build)\
             .first()
-    
+
     if not build:
         return
 
     logger.info("Set status of build '%d' to 'active'", build.id)
     build.status = database.BuildStatus.active
     db.session.commit()
-    
-    container = build.profile.container
-    if not re.match(docker_image_pattern, build.profile.container):
-        logger.error("The image '%s' is not a valid docker image name",
-                     container)
-        return
 
-    builder = Builder()
+    container = build.profile.container
+
     logger.info("Pull docker image '%s'", container)
-    builder.pull(container)
-    
-    script = script_template.substitute(
-        git_url=build.commit.repo.url,
-        git_sha=build.commit.sha,
-        conan_url=conan_server,
-        conan_password=conan_password
-    )
-    print(builder.run(script))
-    
+    try:
+        with Builder(container) as builder:
+            logger.info("Setup conan")
+            builder.setup(url=conan_server, user=conan_user,
+                          password=conan_password)
+    except Exception as e:
+        logger.error(e)

@@ -1,6 +1,8 @@
 from conanci.config import db
 import enum
 
+# start MySQL:
+# docker run --rm -d -p 3306:3306 -e MYSQL_DATABASE=conan-ci -e MYSQL_ROOT_PASSWORD=secret mysql:8.0.21
 
 class Repo(db.Model):
     id = db.Column(db.Integer, primary_key=True)

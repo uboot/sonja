@@ -38,15 +38,19 @@ docker_image_pattern = "([a-z0-9\\.-]+(:[0-9]+)?)?[a-z0-9\\.-/]+[:@]([a-z0-9\\.-
 git_url = "https://github.com/uboot/conan-ci.git"
 git_sha = "ce8ad84282be5583989bdbdf0c42e95a53527657"
 package_path = "./conanci/packages/hello/"
+package = "hello"
 channel = "@user/latest"
 
 image = "conanio/gcc9:1.29.2"
 if not re.match(docker_image_pattern, image):
     print("The image '%s' is not a valid docker image name", image)
 
-setup_script = setup_template.substitute(conan_url=conan_url, conan_user=conan_user, conan_password=conan_password)
+setup_script = setup_template.substitute(conan_url=conan_url,
+                                         conan_user=conan_user,
+                                         conan_password=conan_password)
 source_script = source_template.substitute(git_url=git_url, git_sha=git_sha)
-build_script = build_template.substitute(package_path=package_path, channel=channel)
+build_script = build_template.substitute(package_path=package_path,
+                                         channel=channel)
 
 client = docker.from_env()
 client.images.pull(image)
@@ -78,7 +82,7 @@ try:
 
     reply = client.containers.run(
         image="build:local",
-        command="conan upload --confirm {0}".format("hello"), remove=True)
+        command="conan upload --confirm {0}".format("package"), remove=True)
     print(reply)
 
 except Exception as e:
