@@ -26,4 +26,5 @@ services:
   - name: crawler
     public: true
   - name: linux-agent
+    docker: true
     replicas: 1

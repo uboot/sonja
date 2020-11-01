@@ -1,7 +1,7 @@
-FROM docker:19.03.12-dind
+FROM alpine:3.12
 
 RUN apk add --no-cache \
-		git \
+		docker \
 		py3-pip \
 		py3-wheel \
 		py3-mysqlclient

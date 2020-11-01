@@ -38,5 +38,16 @@ spec:
           value: {{ index $.Values "conan-server" "password" }}
         - name: CONANCI_USER
           value: {{ $.Values.user }}
+{{- if .docker }}
+        - name: DOCKER_HOST
+          value: 127.0.0.1:2375
+{{- end }}
+{{- if .docker }}
+      - name: docker
+        image: docker:19.03.12-dind
+        command: ["dockerd", "-H", "tcp://"]
+        securityContext:
+          privileged: true
+{{- end }}
 ---
 {{- end }}
