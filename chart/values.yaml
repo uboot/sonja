@@ -27,4 +27,9 @@ services:
     public: true
   - name: linux-agent
     docker: true
+    image: agent
     replicas: 1
+
+windows:
+  - name: one
+    image: agent

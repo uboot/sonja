@@ -1,0 +1,45 @@
+{{- range .Values.windows }}
+apiVersion: kubevirt.io/v1alpha3
+kind: VirtualMachineInstanceReplicaSet
+metadata:
+  name: {{ template "conan-ci.fullname" $ }}-windows-docker-{{ .name }}
+  labels:
+    app: {{ template "conan-ci.fullname" $ }}-windows-docker-{{ .name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ template "conan-ci.fullname" $ }}-windows-docker-{{ .name }}
+  template:
+    metadata:
+      labels:
+        kubevirt.io/os: win2k19
+        app: {{ template "conan-ci.fullname" $ }}-windows-docker-{{ .name }}
+    spec:
+      terminationGracePeriodSeconds: 30
+      domain:
+        resources:
+          requests:
+            memory: 2048M
+        devices:
+          disks:
+          - name: windows-server-1909
+            disk:
+              bus: virtio
+      volumes:
+# https://kubevirt.io/user-guide/#/installation/image-upload
+# export VERSION=$(curl -s https://github.com/kubevirt/containerized-data-importer/releases/latest | grep -o "v[0-9]\.[0-9]*\.[0-9]*")
+# minikube kubectl -- create -f https://github.com/kubevirt/containerized-data-importer/releases/download/$VERSION/cdi-operator.yaml
+# minikube kubectl -- create -f https://github.com/kubevirt/containerized-data-importer/releases/download/$VERSION/cdi-cr.yaml
+#
+# https://kubevirt.io/2020/KubeVirt-VM-Image-Usage-Patterns.html
+# minikube kubectl -- port-forward -n cdi service/cdi-uploadproxy 18443:443
+# virtctl image-upload dv windows-server-1909 --size=90Gi --image-path WindowsServer1909Docker --uploadproxy-url=https://127.0.0.1:18443 --insecure
+#
+# https://kubevirt.io/user-guide/#/creation/disks-and-volumes?id=ephemeral
+      - name: windows-server-1909
+        ephemeral:
+          persistentVolumeClaim:
+            claimName: windows-server-1909
+---
+{{- end }}

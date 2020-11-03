@@ -10,3 +10,25 @@ spec:
     - port: 8080
 ---
 {{- end }}
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ template "conan-ci.fullname" $ }}-windows-agent
+spec:
+  selector:
+    app: {{ template "conan-ci.fullname" $ }}-windows-agent
+  ports:
+    - port: 8080
+---
+{{- range .Values.windows }}
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ template "conan-ci.fullname" $ }}-windows-docker-{{ .name }}
+spec:
+  selector:
+    app: {{ template "conan-ci.fullname" $ }}-windows-docker-{{ .name }}
+  ports:
+    - port: 2375
+---
+{{- end }}

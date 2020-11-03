@@ -17,7 +17,11 @@ spec:
     spec:
       containers:
       - name:  {{ .name }}
+{{- if .image }}
+        image: {{ .image }}:local
+{{- else }}
         image: {{ .name }}:local
+{{- end }}
         imagePullPolicy: Never
         livenessProbe:
           httpGet:
@@ -32,6 +36,8 @@ spec:
           value: {{ template "conan-ci.fullname" $ }}-scheduler
         - name: CONANCI_LINUXAGENT_URL
           value: {{ template "conan-ci.fullname" $ }}-linux-agent
+        - name: CONANCI_WINDOWSAGENT_URL
+          value: {{ template "conan-ci.fullname" $ }}-windows-agent
         - name: CONAN_SERVER_USER
           value: {{ index $.Values "conan-server" "user" }}
         - name: CONAN_SERVER_PASSWORD
@@ -49,5 +55,57 @@ spec:
         securityContext:
           privileged: true
 {{- end }}
+---
+{{- end }}
+{{- range .Values.windows }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "conan-ci.fullname" $ }}-windows-agent-{{ .name }}
+  labels:
+    app: {{ template "conan-ci.fullname" $ }}-windows-agent
+spec:
+  replicas: {{ .replicas | default 1 }}
+  selector:
+    matchLabels:
+      app: {{ template "conan-ci.fullname" $ }}-windows-agent
+      deployment: {{ template "conan-ci.fullname" $ }}-windows-agent-{{ .name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "conan-ci.fullname" $ }}-windows-agent
+        deployment: {{ template "conan-ci.fullname" $ }}-windows-agent-{{ .name }}
+    spec:
+      containers:
+      - name:  windows-agent
+{{- if .image }}
+        image: {{ .image }}:local
+{{- else }}
+        image: {{ .name }}:local
+{{- end }}
+        imagePullPolicy: Never
+        livenessProbe:
+          httpGet:
+            path: /ping
+            port: 8080
+        env:
+        - name: MYSQL_URL
+          value: {{ $.Release.Name }}-mysql
+        - name: MYSQL_ROOT_PASSWORD
+          value: {{ $.Values.mysql.mysqlRootPassword }}
+        - name: CONANCI_SCHEDULER_URL
+          value: {{ template "conan-ci.fullname" $ }}-scheduler
+        - name: CONANCI_LINUXAGENT_URL
+          value: {{ template "conan-ci.fullname" $ }}-linux-agent
+        - name: CONANCI_WINDOWSAGENT_URL
+          value: {{ template "conan-ci.fullname" $ }}-windows-agent
+        - name: CONAN_SERVER_USER
+          value: {{ index $.Values "conan-server" "user" }}
+        - name: CONAN_SERVER_PASSWORD
+          value: {{ index $.Values "conan-server" "password" }}
+        - name: CONANCI_USER
+          value: {{ $.Values.user }}
+        - name: DOCKER_HOST
+          value: {{ template "conan-ci.fullname" $ }}-windows-docker-{{ .name }}:2375
 ---
 {{- end }}

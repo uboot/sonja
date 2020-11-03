@@ -107,11 +107,23 @@ def populate_database():
     repo.path = "packages/hello"
     db.session.add(repo)
 
-    profile = Profile()
-    profile.name = "GCC 9"
-    profile.container = "conanio/gcc9:1.29.2"
-    profile.settings = [Setting("build_type", "Release")]
-    db.session.add(profile)
+    linux = Profile()
+    linux.name = "GCC 9"
+    linux.container = "conanio/gcc9:1.29.2"
+    linux.settings = [
+        Setting("os", "Linux"),
+        Setting("build_type", "Release")
+    ]
+    db.session.add(linux)
+
+    windows = Profile()
+    windows.name = "MSVC 15"
+    windows.container = "msvc15:local"
+    windows.settings = [
+        Setting("os", "Windows"),
+        Setting("build_type", "Release")
+    ]
+    db.session.add(windows)
 
     channel = Channel()
     channel.branch = "master"
@@ -125,7 +137,7 @@ def populate_database():
     commit.status = CommitStatus.new
     build = Build()
     build.commit = commit
-    build.profile = profile
+    build.profile = linux
     build.status = BuildStatus.new
     db.session.add(build)
     
