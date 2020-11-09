@@ -12,6 +12,7 @@ conan_server = os.environ.get("CONAN_SERVER_URL", "127.0.0.1")
 conan_user = os.environ.get("CONAN_SERVER_USER", "agent")
 conan_password = os.environ.get("CONAN_SERVER_PASSWORD", "demo")
 conanci_user = os.environ.get("CONANCI_USER", "conanci")
+conanci_os = os.environ.get("CONANCI_AGENT_OS", "Linux")
 
 setup_template = string.Template(
 """sh -c \" \
@@ -89,13 +90,27 @@ def process_builds():
 
     if not build:
         return
+    
+    os_settings = [s for s in build.profile.settings if s.key == "os"]
+    if not os_settings:
+        logger.warn(
+            "Ignore build because its profile '%s' has no 'os' setting",
+            build.profile.name)
+        return
+    if len(os_settings) > 1:
+        logger.warn(
+            "Ignore build because its profile '%s' has more than one 'os' setting",
+            build.profile.name)
+        return
 
+    if os_settings[0].value != conanci_os:
+        return
+    
     logger.info("Set status of build '%d' to 'active'", build.id)
     build.status = database.BuildStatus.active
     db.session.commit()
 
     container = build.profile.container
-
     logger.info("Pull docker image '%s'", container)
     try:
         with Builder(container) as builder:

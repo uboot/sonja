@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 import sqlalchemy
 import logging
 import os
-#import signal
+import signal
 
 
 app = connexion.App(__name__, specification_dir='./swagger/')
@@ -23,6 +23,6 @@ def connect_to_database():
     except sqlalchemy.exc.OperationalError:
         logger.warn("failed to connect to database")
         logger.warn("exit with 1")
+        os.kill(os.getpid(), signal.SIGKILL)
         exit(1)
-        #os.kill(os.getpid(),signal.SIGKILL)
     

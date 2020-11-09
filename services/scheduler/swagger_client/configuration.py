@@ -15,14 +15,11 @@ from __future__ import absolute_import
 import copy
 import logging
 import multiprocessing
-import os
 import sys
 import urllib3
 
 import six
 from six.moves import http_client as httplib
-
-linux_agent_url = os.environ.get('CONANCI_LINUXAGENT_URL', '')
 
 
 class TypeWithDefault(type):
@@ -49,7 +46,7 @@ class Configuration(six.with_metaclass(TypeWithDefault, object)):
     def __init__(self):
         """Constructor"""
         # Default Base url
-        self.host = "http://{0}:8080".format(linux_agent_url)
+        self.host = "/"
         # Temp file folder for downloading files
         self.temp_folder_path = None
 
