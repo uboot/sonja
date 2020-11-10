@@ -1,6 +1,7 @@
 FROM alpine:3.12
 
 RUN apk add --no-cache \
+		docker \
 		git \
 		py3-pip \
 		py3-wheel \
@@ -13,8 +14,8 @@ COPY requirements.txt /usr/src/app/
 
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-COPY crawler /usr/src/app
 COPY conanci /usr/src/app/conanci
+COPY crawler /usr/src/app
 
 EXPOSE 8080
 

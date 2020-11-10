@@ -30,6 +30,6 @@ services:
     image: agent
     replicas: 1
 
-windows:
-  - name: one
-    image: agent
+# windows:
+#   - name: one
+#     image: agent
