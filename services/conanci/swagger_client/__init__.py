@@ -1,6 +1,7 @@
 # coding: utf-8
 
 # flake8: noqa
+
 """
     Conan CI Agent
 
@@ -13,4 +14,10 @@
 
 from __future__ import absolute_import
 
-# import models into model package
+# import apis into sdk package
+from conanci.swagger_client.agent_api import AgentApi
+from conanci.swagger_client.scheduler_api import SchedulerApi
+# import ApiClient
+from conanci.swagger_client.api_client import ApiClient
+from conanci.swagger_client.configuration import Configuration
+# import models into sdk package

@@ -1,5 +1,6 @@
-from conanci.config import app, db
 from conanci import database
+from conanci.config import app, db
+from conanci.swagger_client import SchedulerApi, ApiClient, Configuration
 import git
 import os.path
 import re
@@ -7,6 +8,11 @@ import shutil
 
 data_dir = os.environ.get("VCS_DATA_DIR", "/data")
 logger = app.app.logger
+
+scheduler_url = os.environ.get('CONANCI_SCHEDULER_URL', '127.0.0.1')
+configuration = Configuration()
+configuration.host = "http://{0}:8080".format(scheduler_url)
+scheduler = SchedulerApi(ApiClient(configuration))
 
 
 class RepoController(object):
@@ -110,7 +116,7 @@ def process_repos():
 
     if new_commits:
         logger.info("Finish crawling with *new* commits")
+        logger.info('Trigger scheduler: process commits')
+        scheduler.process_commits()
     else:
         logger.info("Finish crawling with *no* new commits")
-
-    return new_commits
