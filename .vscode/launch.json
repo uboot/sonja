@@ -5,6 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python: tests",
+            "type": "python",
+            "request": "launch",
+            "module": "unittest",
+            "cwd": "${workspaceFolder}/services",
+            "args": ["conanci.test"],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/services",
+                "MYSQL_URL": "mysql.conan-ci"
+            }
+        },
+        {
             "name": "Flask: public",
             "type": "python",
             "request": "launch",
