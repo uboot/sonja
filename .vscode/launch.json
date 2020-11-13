@@ -5,24 +5,14 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Flask: scheduler with Kubernetes",
-            "type": "python",
-            "request": "launch",
-            "module": "swagger_server",
-            "cwd": "${workspaceFolder}/services/scheduler",
-            "env": {
-                "PYTHONPATH": "${workspaceFolder}/services"
-            },
-            "preLaunchTask": "bridge-to-kubernetes.service"
-        },
-        {
             "name": "Flask: public",
             "type": "python",
             "request": "launch",
             "module": "swagger_server",
             "cwd": "${workspaceFolder}/services/public",
             "env": {
-                "PYTHONPATH": "${workspaceFolder}/services"
+                "PYTHONPATH": "${workspaceFolder}/services",
+                "MYSQL_URL": "mysql.conan-ci"
             }
         },
         {
@@ -33,7 +23,8 @@
             "cwd": "${workspaceFolder}/services/crawler",
             "env": {
                 "VCS_DATA_DIR": "/home/matz/Projects/temp",
-                "PYTHONPATH": "${workspaceFolder}/services"
+                "PYTHONPATH": "${workspaceFolder}/services",
+                "MYSQL_URL": "mysql.conan-ci"
             }
         },
         {
@@ -43,7 +34,8 @@
             "module": "swagger_server",
             "cwd": "${workspaceFolder}/services/scheduler",
             "env": {
-                "PYTHONPATH": "${workspaceFolder}/services"
+                "PYTHONPATH": "${workspaceFolder}/services",
+                "MYSQL_URL": "mysql.conan-ci"
             }
         },
         {
@@ -53,7 +45,8 @@
             "module": "swagger_server",
             "cwd": "${workspaceFolder}/services/agent",
             "env": {
-                "PYTHONPATH": "${workspaceFolder}/services"
+                "PYTHONPATH": "${workspaceFolder}/services",
+                "MYSQL_URL": "mysql.conan-ci"
             }
         }
     ]

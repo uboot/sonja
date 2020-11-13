@@ -2,10 +2,17 @@ import connexion
 import os
 import six
 
-from conanci import crawler
+from conanci.crawler import Crawler
 from conanci.config import app
+from conanci.swagger_client import SchedulerApi, ApiClient, Configuration
 from swagger_server import util
 
+scheduler_url = os.environ.get('CONANCI_SCHEDULER_URL', '127.0.0.1')
+configuration = Configuration()
+configuration.host = "http://{0}:8080".format(scheduler_url)
+scheduler = SchedulerApi(ApiClient(configuration))
+
+crawler = Crawler(scheduler)
 logger = app.app.logger
 
 

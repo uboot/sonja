@@ -77,45 +77,45 @@ class Builder(object):
         except docker.errors.ImageNotFound:
             pass
 
+class Agent(object):
+    def process_builds(self):
+        # database.populate_database()
+        # return
 
-def process_builds():
-    # database.populate_database()
-    # return
+        # build = database.Build.query\
+        build = database.Build.query.filter_by(status=database.BuildStatus.new)\
+                .populate_existing()\
+                .with_for_update(skip_locked=True, of=database.Build)\
+                .first()
 
-    # build = database.Build.query\
-    build = database.Build.query.filter_by(status=database.BuildStatus.new)\
-            .populate_existing()\
-            .with_for_update(skip_locked=True, of=database.Build)\
-            .first()
+        if not build:
+            return
+        
+        os_settings = [s for s in build.profile.settings if s.key == "os"]
+        if not os_settings:
+            logger.warn(
+                "Ignore build because its profile '%s' has no 'os' setting",
+                build.profile.name)
+            return
+        if len(os_settings) > 1:
+            logger.warn(
+                "Ignore build because its profile '%s' has more than one 'os' setting",
+                build.profile.name)
+            return
 
-    if not build:
-        return
-    
-    os_settings = [s for s in build.profile.settings if s.key == "os"]
-    if not os_settings:
-        logger.warn(
-            "Ignore build because its profile '%s' has no 'os' setting",
-            build.profile.name)
-        return
-    if len(os_settings) > 1:
-        logger.warn(
-            "Ignore build because its profile '%s' has more than one 'os' setting",
-            build.profile.name)
-        return
+        if os_settings[0].value != conanci_os:
+            return
+        
+        logger.info("Set status of build '%d' to 'active'", build.id)
+        build.status = database.BuildStatus.active
+        db.session.commit()
 
-    if os_settings[0].value != conanci_os:
-        return
-    
-    logger.info("Set status of build '%d' to 'active'", build.id)
-    build.status = database.BuildStatus.active
-    db.session.commit()
-
-    container = build.profile.container
-    logger.info("Pull docker image '%s'", container)
-    try:
-        with Builder(container) as builder:
-            logger.info("Setup conan")
-            builder.setup(url=conan_server, user=conan_user,
-                          password=conan_password)
-    except Exception as e:
-        logger.error(e)
+        container = build.profile.container
+        logger.info("Pull docker image '%s'", container)
+        try:
+            with Builder(container) as builder:
+                logger.info("Setup conan")
+                builder.setup(url=conan_server, user=conan_user,
+                            password=conan_password)
+        except Exception as e:
+            logger.error(e)

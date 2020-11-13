@@ -1,10 +1,11 @@
 import connexion
 import six
 
-from conanci import agent
+from conanci.agent import Agent
 from conanci.config import app
 from swagger_server import util
 
+agent = Agent()
 logger = app.app.logger
 
 
