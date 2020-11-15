@@ -1,4 +1,4 @@
-from conanci.config import app, db
+from conanci.config import app, connect_to_database, db
 from conanci import database
 import docker
 import os
@@ -77,7 +77,14 @@ class Builder(object):
         except docker.errors.ImageNotFound:
             pass
 
+
 class Agent(object):
+    def start(self):
+        connect_to_database()
+
+    def shutdown(self):
+        pass
+    
     def process_builds(self):
         # database.populate_database()
         # return
