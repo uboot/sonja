@@ -5,7 +5,6 @@ import six
 from conanci.crawler import Crawler
 from conanci.config import app
 from conanci.swagger_client import SchedulerApi, ApiClient, Configuration
-from swagger_server import util
 
 scheduler_url = os.environ.get('CONANCI_SCHEDULER_URL', '127.0.0.1')
 configuration = Configuration()
@@ -34,5 +33,5 @@ def process_repos():  # noqa: E501
 
     :rtype: None
     """
-    crawler.process_repos()
+    crawler.trigger()
     return 'success'

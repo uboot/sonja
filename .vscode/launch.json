@@ -13,7 +13,8 @@
             "args": ["conanci.test"],
             "env": {
                 "PYTHONPATH": "${workspaceFolder}/services",
-                "MYSQL_URL": "mysql.conan-ci"
+                "MYSQL_URL": "mysql.conan-ci",
+                "VCS_DATA_DIR": "./temp"
             }
         },
         {
@@ -34,7 +35,7 @@
             "module": "swagger_server",
             "cwd": "${workspaceFolder}/services/crawler",
             "env": {
-                "VCS_DATA_DIR": "/home/matz/Projects/temp",
+                "VCS_DATA_DIR": "./temp",
                 "PYTHONPATH": "${workspaceFolder}/services",
                 "MYSQL_URL": "mysql.conan-ci"
             }

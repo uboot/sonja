@@ -1,9 +1,9 @@
 import connexion
 import six
 
-from flask import abort
 from conanci import database
-from conanci.config import db
+
+from flask import abort
 from swagger_server.models.channel import Channel  # noqa: E501
 from swagger_server.models.profile import Profile  # noqa: E501
 from swagger_server.models.setting import Setting  # noqa: E501
@@ -36,9 +36,10 @@ def add_channel(body=None):  # noqa: E501
         channel = database.Channel()
         channel.name = body.name
         channel.branch = body.branch
-        db.session.add(channel)
-        db.session.commit()
-        body.id = channel.id
+        with database.session_scope() as session:
+            session.add(channel)
+            session.commit()
+            body.id = channel.id
 
     return body, 201
 
@@ -58,9 +59,10 @@ def add_profile(body=None):  # noqa: E501
         profile.name = body.name
         profile.container = body.container
         profile.settings = [database.Setting(s.key, s.value) for s in body.settings]
-        db.session.add(profile)
-        db.session.commit()
-        body.id = profile.id
+        with database.session_scope() as session:
+            session.add(profile)
+            session.commit()
+            body.id = profile.id
 
     return body, 201
 
@@ -80,9 +82,10 @@ def add_repo(body=None):  # noqa: E501
         repo = database.Repo()
         repo.path = body.path
         repo.url = body.url
-        db.session.add(repo)
-        db.session.commit()
-        body.id = repo.id
+        with database.session_scope() as session:
+            session.add(repo)
+            session.commit()
+            body.id = repo.id
 
     return body, 201
 
@@ -97,9 +100,11 @@ def delete_channel(channel_id):  # noqa: E501
 
     :rtype: None
     """
-    channel = database.Channel.query.filter_by(id=channel_id).first_or_404()
-    db.session.delete(channel)
-    db.session.commit()
+    with database.session_scope() as session:
+        channel = session.query(database.Channel).filter_by(id=channel_id).first()
+        if not channel:
+            abort(404)
+        session.delete(channel)
     return None
 
 
@@ -113,9 +118,11 @@ def delete_profile(profile_id):  # noqa: E501
 
     :rtype: None
     """
-    profile = database.Profile.query.filter_by(id=profile_id).first_or_404()
-    db.session.delete(profile)
-    db.session.commit()
+    with database.session_scope() as session:
+        profile = session.query(database.Profile).filter_by(id=profile_id).first()
+        if not profile:
+            abort(404)
+        session.delete(profile)
     return None
 
 
@@ -129,9 +136,11 @@ def delete_repo(repo_id):  # noqa: E501
 
     :rtype: None
     """
-    repo = database.Repo.query.filter_by(id=repo_id).first_or_404()
-    db.session.delete(repo)
-    db.session.commit()
+    with database.session_scope() as session:
+        repo = session.query(database.Repo).filter_by(id=repo_id).first()
+        if not repo:
+            abort(404)
+        session.delete(repo)
     return None
 
 
@@ -143,7 +152,8 @@ def get_channels():  # noqa: E501
 
     :rtype: List[Channel]
     """
-    return [Channel(c.id, c.name, c.branch) for c in database.Channel.query.all()]
+    with database.session_scope() as session:
+        return [Channel(c.id, c.name, c.branch) for c in session.query(database.Channel).all()]
 
 
 
@@ -155,7 +165,8 @@ def get_profiles():  # noqa: E501
 
     :rtype: List[Profile]
     """
-    return [Profile(p.id, p.name, p.container, [Setting(s.key, s.value) for s in p.settings]) for p in database.Profile.query.all()]
+    with database.session_scope() as session:
+        return [Profile(p.id, p.name, p.container, [Setting(s.key, s.value) for s in p.settings]) for p in session.query(database.Profile).all()]
 
 
 def get_repos():  # noqa: E501
@@ -166,7 +177,8 @@ def get_repos():  # noqa: E501
 
     :rtype: List[Repo]
     """
-    return [Repo(r.id, r.url, r.path) for r in database.Repo.query.all()]
+    with database.session_scope() as session:
+        return [Repo(r.id, r.url, r.path) for r in session.query(database.Repo).all()]
 
 
 def populate_database():  # noqa: E501

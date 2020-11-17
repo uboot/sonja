@@ -1,5 +1,8 @@
 from conanci import database
-from conanci.config import app, db
+from conanci.config import app, connect_to_database
+from conanci.worker import Worker
+from sqlalchemy.orm import sessionmaker
+import asyncio
 import git
 import os.path
 import re
@@ -51,69 +54,73 @@ class RepoController(object):
         repo = git.Repo(self.repo_dir)
         return repo.head.commit.hexsha
 
-class Crawler(object):
+
+class Crawler(Worker):
     def __init__(self, scheduler):
+        super().__init__()
+        connect_to_database()
         self.__scheduler = scheduler
 
-    def process_repos(self):
+    async def work(self):
         logger.info("Start crawling")
+        loop = asyncio.get_running_loop()
 
         if not os.path.exists(data_dir):
             os.makedirs(data_dir, exist_ok=True)
             logger.info("Created directory '%s'", data_dir)
 
-        new_commits = False
-        repos = database.Repo.query.all()
-        channels = database.Channel.query.all()
-        for repo in repos:
-            repo_dir = os.path.join(data_dir, str(repo.id))
-            controller = RepoController(repo_dir)
-            if not controller.is_clone_of(repo.url):
-                logger.info("Clone URL '%s' to '%s'", repo.url, repo_dir)
-                controller.create_new_clone(repo.url)
+        with database.session_scope() as session:
+            new_commits = False
+            repos = session.query(database.Repo).all()
+            channels = session.query(database.Channel).all()
+            for repo in repos:
+                repo_dir = os.path.join(data_dir, str(repo.id))
+                controller = RepoController(repo_dir)
+                if not controller.is_clone_of(repo.url):
+                    logger.info("Clone URL '%s' to '%s'", repo.url, repo_dir)
+                    await loop.run_in_executor(None, controller.create_new_clone, repo.url)
+                else:
+                    logger.info("Fetch existing repo '%s' for URL '%s'",
+                                repo_dir, repo.url)
+                    await loop.run_in_executor(None, controller.fetch)
+
+                branches = controller.get_remote_branches()
+                for channel in channels:
+                    if channel.branch in branches:
+                        logger.info("Checkout branch '%s'", channel.branch)
+                        controller.checkout(channel.branch)
+                        sha = controller.get_sha()
+
+                        commits = session.query(database.Commit).filter_by(repo=repo,
+                            sha=sha, channel=channel)
+
+                        # continue if this commit has already been stored
+                        if list(commits):
+                            logger.info("Commit '%s' exists", sha[:7])
+                            continue
+
+                        logger.info("Add commit '%s'", sha[:7])
+                        commit = database.Commit()
+                        commit.sha = sha
+                        commit.repo = repo
+                        commit.channel = channel
+                        commit.status = database.CommitStatus.new
+                        session.add(commit)
+                        new_commits = True
+
+                        old_commits = session.query(database.Commit).filter(
+                            database.Commit.repo == repo,
+                            database.Commit.channel == channel,
+                            database.Commit.sha != sha,
+                            database.Commit.status != database.CommitStatus.old
+                        )
+                        for c in old_commits:
+                            logger.info("Set status of '%s' to 'old'", c.sha[:7])
+                            c.status = database.CommitStatus.old
+
+            if new_commits:
+                logger.info("Finish crawling with *new* commits")
+                logger.info('Trigger scheduler: process commits')
+                self.__scheduler.process_commits()
             else:
-                logger.info("Fetch existing repo '%s' for URL '%s'",
-                            repo_dir, repo.url)
-                controller.fetch()
-
-            branches = controller.get_remote_branches()
-            for channel in channels:
-                if channel.branch in branches:
-                    logger.info("Checkout branch '%s'", channel.branch)
-                    controller.checkout(channel.branch)
-                    sha = controller.get_sha()
-
-                    commits = database.Commit.query.filter_by(repo=repo, sha=sha,
-                                                            channel=channel)
-
-                    # continue if this commit has already been stored
-                    if list(commits):
-                        logger.info("Commit '%s' exists", sha[:7])
-                        continue
-
-                    logger.info("Add commit '%s'", sha[:7])
-                    commit = database.Commit()
-                    commit.sha = sha
-                    commit.repo = repo
-                    commit.channel = channel
-                    commit.status = database.CommitStatus.new
-                    db.session.add(commit)
-                    new_commits = True
-
-                    old_commits = database.Commit.query.filter(
-                        database.Commit.repo == repo,
-                        database.Commit.channel == channel,
-                        database.Commit.sha != sha,
-                        database.Commit.status != database.CommitStatus.old
-                    )
-                    for c in old_commits:
-                        logger.info("Set status of '%s' to 'old'", c.sha[:7])
-                        c.status = database.CommitStatus.old
-                    db.session.commit()
-
-        if new_commits:
-            logger.info("Finish crawling with *new* commits")
-            logger.info('Trigger scheduler: process commits')
-            self.__scheduler.process_commits()
-        else:
-            logger.info("Finish crawling with *no* new commits")
+                logger.info("Finish crawling with *no* new commits")

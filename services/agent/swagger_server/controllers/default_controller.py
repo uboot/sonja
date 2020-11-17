@@ -3,7 +3,6 @@ import six
 
 from conanci.agent import Agent
 from conanci.config import app
-from swagger_server import util
 
 agent = Agent()
 logger = app.app.logger
@@ -28,5 +27,5 @@ def process_builds():  # noqa: E501
     :rtype: None
     """
     logger.info('Process builds')
-    agent.process_builds()
+    agent.trigger()
     return 'success'

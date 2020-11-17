@@ -6,7 +6,6 @@ clickclick==20.10.2
 connexion==2.7.0
 docker==4.3.1
 Flask==1.1.2
-Flask-SQLAlchemy==2.4.4
 gitdb==4.0.5
 GitPython==3.1.9
 idna==2.10

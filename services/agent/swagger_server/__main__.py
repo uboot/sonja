@@ -13,7 +13,8 @@ swagger_api = os.path.join(os.path.dirname(__file__), 'swagger', 'swagger.yaml')
 def handler(signum, frame):
     logger.info("Signal handler called with signal SIGTERM")
     logger.info("Shutdown agent")
-    agent.shutdown()
+    agent.cancel()
+    agent.join()
     signal.signal(signal.SIGTERM, signal.SIG_DFL)
     signal.raise_signal(signum)
 

@@ -40,7 +40,7 @@ def process_commits():  # noqa: E501
 
     :rtype: None
     """
-    scheduler.process_commits()
+    scheduler.trigger()
     return 'success'
 
 def process_packages():  # noqa: E501
