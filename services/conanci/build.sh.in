@@ -1,0 +1,7 @@
+#!/bin/bash
+echo '### Clean remotes ###'\
+&& conan remote clean\
+&& echo '### Add Conan server ###'\
+&& conan remote add server http://$conan_url:9300\
+&& echo '### Setup Conan user ###'\
+&& conan user -r server -p $conan_password $conan_user

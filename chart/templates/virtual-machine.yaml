@@ -18,9 +18,29 @@ spec:
     spec:
       terminationGracePeriodSeconds: 30
       domain:
+        cpu:
+          cores: 2
         resources:
           requests:
             memory: 2048M
+        features:
+          acpi: {}
+          apic: {}
+          hyperv:
+            relaxed: {}
+            vapic: {}
+            spinlocks:
+              spinlocks: 8191
+        clock:
+          utc: {}
+          timer:
+            hpet:
+              present: false
+            pit:
+              tickPolicy: delay
+            rtc:
+              tickPolicy: catchup
+            hyperv: {}
         devices:
           disks:
           - name: windows-server-1909

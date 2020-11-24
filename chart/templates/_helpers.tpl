@@ -23,6 +23,26 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 {{- end }}
 
+
+{{/*
+Create a default fully qualified app name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+If release name contains chart name it will be used as a full name.
+*/}}
+{{- define "conan-ci.conan-server-url" -}}
+{{- if index .Values "conan-server" "fullnameOverride" }}
+{{- index .Values "conan-server" "fullnameOverride" | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- $nameOverride := index .Values "conan-server" "nameOverride" }}
+{{- $name := default "conan-server" $nameOverride }}
+{{- if contains $name .Release.Name }}
+{{- .Release.Name | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
+{{- end }}
+{{- end }}
+{{- end }}
+
 {{/*
 Create chart name and version as used by the chart label.
 */}}

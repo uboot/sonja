@@ -1,48 +1,96 @@
 import docker
 import string
 import re
+import tarfile
 
+from io import BytesIO, StringIO
 
-setup_template = string.Template(
-"""sh -c \" \
-conan remote clean \
-&& conan remote add server $conan_url \
-&& conan user -r server -p $conan_password $conan_user \
-\"
-"""
-)
+windows = True
+if windows:
+    image = "msvc15:local"
 
-source_template = string.Template(
-"""sh -c \" \
-mkdir conanci \
-&& cd conanci \
-&& git init \
-&& git remote add origin $git_url \
-&& git fetch origin $git_sha \
-&& git checkout FETCH_HEAD \
-\"
-"""
-)
+    setup_template = string.Template(
+        """/s /c \" \
+        conan remote clean \
+        && conan remote add server $conan_url \
+        && conan user -r server -p $conan_password $conan_user \
+        \"
+        """
+    )
 
-build_template = string.Template(
-"""sh -c \" \
-conan create $package_path $channel
-\"
-"""
-)
+    source_template = string.Template(
+        """sh -c \" \
+        mkdir conanci \
+        && cd conanci \
+        && git init \
+        && git remote add origin $git_url \
+        && git fetch origin $git_sha \
+        && git checkout FETCH_HEAD \
+        \"
+        """
+    )
+
+    build_template = string.Template(
+        """sh -c \" \
+        conan create $package_path $channel
+        \"
+        """
+    )
+else:
+    image = "conanio/gcc9:1.29.2"
+
+    setup_template = string.Template(
+        """sh -c \" \
+        conan remote clean \
+        && conan remote add server $conan_url \
+        && conan user -r server -p $conan_password $conan_user \
+        \"
+        """
+    )
+
+    source_template = string.Template(
+        """sh -c \" \
+        mkdir conanci \
+        && cd conanci \
+        && git init \
+        && git remote add origin $git_url \
+        && git fetch origin $git_sha \
+        && git checkout FETCH_HEAD \
+        \"
+        """
+    )
+
+    build_template = string.Template(
+        """sh -c \" \
+        conan create $package_path $channel
+        \"
+        """
+    )
+
+f = BytesIO()
+tar = tarfile.open(mode = "w", fileobj = f)
+content = BytesIO(b"echo 1")
+tarinfo = tarfile.TarInfo("setup.py")
+tarinfo.size = len(content.getbuffer())
+tar.addfile(tarinfo, content)
+tar.close()
+
+with open("test.tar", "bw") as t:
+    t.write(f.getbuffer())
 
 conan_user = "agent"
 conan_url = "conan-server"
 conan_password = "demo"
-docker_image_pattern = "([a-z0-9\\.-]+(:[0-9]+)?)?[a-z0-9\\.-/]+[:@]([a-z0-9\\.-]+)$"
+docker_image_pattern = ("([a-z0-9\\.-]+(:[0-9]+)?/)?"
+                        "[a-z0-9\\.-/]+([:@][a-z0-9\\.-]+)$")
 git_url = "https://github.com/uboot/conan-ci.git"
 git_sha = "ce8ad84282be5583989bdbdf0c42e95a53527657"
 package_path = "./conanci/packages/hello/"
 package = "hello"
 channel = "@user/latest"
 
-image = "conanio/gcc9:1.29.2"
-if not re.match(docker_image_pattern, image):
+m = re.match(docker_image_pattern, image)
+if not m:
     print("The image '%s' is not a valid docker image name", image)
 
 setup_script = setup_template.substitute(conan_url=conan_url,
@@ -53,10 +101,15 @@ build_script = build_template.substitute(package_path=package_path,
                                          channel=channel)
 
 client = docker.from_env()
-client.images.pull(image)
 
+if not m.group(3) == ":local":
+    client.images.pull(image)
+
+
+f.seek(0)
 try:
-    setup = client.containers.create(image=image, command=setup_script)
+    setup = client.containers.create(image=image, command='/s /c "dir C:\\Users\\ContainerAdministrator"')
+    result = setup.put_archive("C:\\Users\\ContainerAdministrator", data=f)
     setup.start()
     setup.wait()
     setup.commit(repository="setup", tag="local")

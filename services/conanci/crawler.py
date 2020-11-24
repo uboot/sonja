@@ -1,5 +1,5 @@
 from conanci import database
-from conanci.config import app, connect_to_database
+from conanci.config import connect_to_database, logger
 from conanci.worker import Worker
 from sqlalchemy.orm import sessionmaker
 import asyncio
@@ -9,7 +9,6 @@ import re
 import shutil
 
 data_dir = os.environ.get("VCS_DATA_DIR", "/data")
-logger = app.app.logger
 
 
 class RepoController(object):

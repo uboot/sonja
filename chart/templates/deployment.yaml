@@ -40,6 +40,8 @@ spec:
           value: {{ template "conan-ci.fullname" $ }}-linux-agent
         - name: CONANCI_WINDOWSAGENT_URL
           value: {{ template "conan-ci.fullname" $ }}-windows-agent
+        - name: CONAN_SERVER_URL
+          value: {{ template "conan-ci.conan-server-url" $ }}
         - name: CONAN_SERVER_USER
           value: {{ index $.Values "conan-server" "user" }}
         - name: CONAN_SERVER_PASSWORD
@@ -103,6 +105,8 @@ spec:
           value: {{ template "conan-ci.fullname" $ }}-linux-agent
         - name: CONANCI_WINDOWSAGENT_URL
           value: {{ template "conan-ci.fullname" $ }}-windows-agent
+        - name: CONAN_SERVER_URL
+          value: {{ template "conan-ci.conan-server-url" $ }}
         - name: CONAN_SERVER_USER
           value: {{ index $.Values "conan-server" "user" }}
         - name: CONAN_SERVER_PASSWORD

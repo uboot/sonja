@@ -8,7 +8,7 @@ import sqlalchemy
 
 app = connexion.App(__name__, specification_dir='./swagger/')
 logging.basicConfig(level=logging.INFO)
-logger = app.app.logger
+logger = logging.getLogger("conanci")
 
 
 def connect_to_database():

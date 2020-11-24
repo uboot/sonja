@@ -1,0 +1,18 @@
+function ThrowOnNonZero {
+    if (-not $$?)
+    {
+        throw 'Last command failed'
+    }
+}
+
+echo '### Clean remotes ###'
+conan remote clean
+ThrowOnNonZero
+
+echo '### Add Conan server ###'
+conan remote add server http://$conan_url:9300
+ThrowOnNonZero
+
+echo '### Setup Conan user ###'
+conan user -r server -p $conan_password $conan_user
+ThrowOnNonZero

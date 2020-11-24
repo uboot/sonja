@@ -59,7 +59,9 @@
             "cwd": "${workspaceFolder}/services/agent",
             "env": {
                 "PYTHONPATH": "${workspaceFolder}/services",
-                "MYSQL_URL": "mysql.conan-ci"
+                "MYSQL_URL": "mysql.conan-ci",
+                "CONANCI_AGENT_OS": "Windows",
+                "DOCKER_HOST": "127.0.0.1:2375"
             }
         }
     ]
