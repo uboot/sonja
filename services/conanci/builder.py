@@ -2,7 +2,6 @@ import docker
 import os
 import re
 import string
-import sys
 import tarfile
 
 from conanci.config import logger
@@ -12,8 +11,9 @@ from io import BytesIO
 docker_image_pattern = ("([a-z0-9\\.-]+(:[0-9]+)?/)?"
                         "[a-z0-9\\.-/]+([:@][a-z0-9\\.-]+)$")
 
+# docker run --name conan -d --rm -p 9300:9300 conanio/conan_server:1.28.1
 
-def create_build_tar(build_os, url, user, password):
+def create_build_tar(build_os, parameters):
     if build_os == "Linux":
         script_template_name = "build.sh.in"
     else:
@@ -24,9 +24,7 @@ def create_build_tar(build_os, url, user, password):
     setup_file_path = os.path.join(os.path.dirname(__file__), script_template_name)
     with open(setup_file_path) as setup_template_file:
         template = string.Template(setup_template_file.read())
-    script = template.substitute(conan_url=url,
-                                 conan_user=user,
-                                 conan_password=password)
+    script = template.substitute(parameters)
 
     # place into archive
     f = BytesIO()
@@ -62,9 +60,9 @@ class Builder(object):
         logger.info("Pull docker image '%s'", self.__image)
         self.__client.images.pull(self.__image)
 
-    def setup(self, url, user, password):
+    def setup(self, parameters):
         logger.info("Setup docker container")
-        build_tar = create_build_tar(self.__build_os, url, user, password)
+        build_tar = create_build_tar(self.__build_os, parameters)
 
         if self.__build_os == "Linux":
             command = "sh /build.sh"

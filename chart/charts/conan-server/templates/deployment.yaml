@@ -40,7 +40,7 @@ spec:
         - name: config
           mountPath: /config
       - name: {{ .Chart.Name }}-migrate-data
-        image: conanio/conan_server:1.28.1
+        image: "conanio/conan_server:{{ .Values.tag | default "1.28.1" }}"
         command: ['python', '-m', 'conans.conan_server', '--migrate']
         volumeMounts:
         - name: config

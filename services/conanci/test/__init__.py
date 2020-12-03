@@ -106,19 +106,30 @@ class SchedulerTest(unittest.TestCase):
 
 class BuilderTest(unittest.TestCase):
     def test_run_linux(self):
-        conan_server = os.environ.get("CONAN_SERVER_URL", "127.0.0.1")
         docker_host = os.environ.get("LINUX_DOCKER_HOST", "")
+        parameters =  {
+            "conan_url": os.environ.get("CONAN_SERVER_URL", "127.0.0.1"),
+            "conan_user": "demo",
+            "conan_password": "demo",
+            "git_url": "https://github.com/uboot/conan-ci.git",
+            "git_sha": "2777a37dc82e296d55c23f738b79f139e627920c"
+        }
         with environment("DOCKER_HOST", docker_host), Builder("Linux", "conanio/gcc9:1.29.2") as builder:
             builder.pull()
-            builder.setup(conan_server, "agent", "demo")
-            with self.assertRaises(Exception):
-                builder.run()
+            builder.setup(parameters)
+            builder.run()
 
     def test_run_windows(self):
         docker_host = os.environ.get("WINDOWS_DOCKER_HOST", "")
+        parameters =  {
+            "conan_url": os.environ.get("CONAN_SERVER_URL", "127.0.0.1"),
+            "conan_user": "demo",
+            "conan_password": "demo",
+            "git_url": "https://github.com/uboot/conan-ci.git",
+            "git_sha": "2777a37dc82e296d55c23f738b79f139e627920c"
+        }
         conan_server = os.environ.get("CONAN_SERVER_URL", "127.0.0.1")
         with environment("DOCKER_HOST", docker_host), Builder("Windows", "msvc15:local") as builder:
             builder.pull()
-            builder.setup(conan_server, "agent", "demo")
-            with self.assertRaises(Exception):
-                builder.run()
+            builder.setup(parameters)
+            builder.run()

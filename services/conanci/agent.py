@@ -3,32 +3,16 @@ from conanci.builder import Builder
 from conanci.config import connect_to_database, logger
 from conanci.worker import Worker
 import asyncio
-import docker
 import os
-import re
 import string
 
 
-docker_image_pattern = ("([a-z0-9\\.-]+(:[0-9]+)?/)?"
-                        "[a-z0-9\\.-/]+([:@][a-z0-9\\.-]+)$")
 conan_server = os.environ.get("CONAN_SERVER_URL", "127.0.0.1")
-conan_user = os.environ.get("CONAN_SERVER_USER", "agent")
+conan_user = os.environ.get("CONAN_SERVER_USER", "demo")
 conan_password = os.environ.get("CONAN_SERVER_PASSWORD", "demo")
 conanci_user = os.environ.get("CONANCI_USER", "conanci")
 conanci_os = os.environ.get("CONANCI_AGENT_OS", "Linux")
 
-
-source_template = string.Template(
-"""sh -c \"\
-mkdir conanci \
-&& cd conanci \
-&& git init \
-&& git remote add origin $git_url \
-&& git fetch origin $git_sha \
-&& git checkout FETCH_HEAD\
-\"\
-"""
-)
 
 build_template = string.Template(
 """sh -c \" \
@@ -75,10 +59,17 @@ class Agent(Worker):
             session.commit()
 
             container = build.profile.container
+            parameters = {
+                "conan_url": conan_server,
+                "conan_user": conan_user,
+                "conan_password": conan_password,
+                "git_url": build.commit.repo.url,
+                "git_sha": build.commit.sha
+            }
             try:
                 with Builder(conanci_os, container) as builder:
                     await loop.run_in_executor(None, builder.pull)
-                    await loop.run_in_executor(None, builder.setup, conan_server, conan_user, conan_password)
+                    await loop.run_in_executor(None, builder.setup, parameters)
                     await loop.run_in_executor(None, builder.run)
 
                     logger.info("Set status of build '%d' to 'success'", build.id)

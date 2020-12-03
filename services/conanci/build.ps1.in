@@ -6,13 +6,18 @@ function ThrowOnNonZero {
 }
 
 echo '### Clean remotes ###'
-conan remote clean
-ThrowOnNonZero
+conan remote clean; ThrowOnNonZero
 
 echo '### Add Conan server ###'
-conan remote add server http://$conan_url:9300
-ThrowOnNonZero
+conan remote add server http://$conan_url:9300; ThrowOnNonZero
 
 echo '### Setup Conan user ###'
-conan user -r server -p $conan_password $conan_user
-ThrowOnNonZero
+conan user -r server -p $conan_password $conan_user; ThrowOnNonZero
+
+echo '### Clone repository ###'
+mkdir conanci; ThrowOnNonZero
+cd conanci; ThrowOnNonZero
+git init; ThrowOnNonZero
+git remote add origin $git_url; ThrowOnNonZero
+git fetch origin $git_sha; ThrowOnNonZero
+git checkout FETCH_HEAD; ThrowOnNonZero
