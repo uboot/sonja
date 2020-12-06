@@ -1,7 +1,7 @@
 from conanci import database
 from conanci.config import connect_to_database, logger
-from conanci.swagger_client.rest import ApiException
 from conanci.worker import Worker
+from urllib3.exceptions import MaxRetryError
 
 
 class Scheduler(Worker):
@@ -19,8 +19,8 @@ class Scheduler(Worker):
     async def __process_commits(self):
         logger.info("Start processing commits")
 
+        new_commits = False
         with database.session_scope() as session:
-            new_commits = False
             commits = session.query(database.Commit).filter_by(status=database.CommitStatus.new)
             profiles = session.query(database.Profile).all()
             for commit in commits:
@@ -36,20 +36,20 @@ class Scheduler(Worker):
                 logger.info("Set commit '%s' to 'building'", commit.sha[:7])
                 commit.status = database.CommitStatus.building
 
-            if new_commits:
-                logger.info("Finish processing commits with *new* builds")
-                logger.info('Trigger linux agent: process builds')
-                try:
-                    self.__linux_agent.process_builds()
-                except ApiException:
-                    logger.error("Failed to trigger Linux agent")
+        if new_commits:
+            logger.info("Finish processing commits with *new* builds")
+            logger.info('Trigger linux agent: process builds')
+            try:
+                self.__linux_agent.process_builds()
+            except MaxRetryError:
+                logger.error("Failed to trigger Linux agent")
 
-                logger.info('Trigger windows agent: process builds')
-                try:
-                    self.__windows_agent.process_builds()
-                except ApiException:
-                    logger.error("Failed to trigger Windows agent")
-            else:
-                logger.info("Finish processing commits with *no* builds")
+            logger.info('Trigger windows agent: process builds')
+            try:
+                self.__windows_agent.process_builds()
+            except MaxRetryError:
+                logger.error("Failed to trigger Windows agent")
+        else:
+            logger.info("Finish processing commits with *no* builds")
 
         return new_commits

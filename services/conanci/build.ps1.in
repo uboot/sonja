@@ -21,3 +21,6 @@ git init; ThrowOnNonZero
 git remote add origin $git_url; ThrowOnNonZero
 git fetch origin $git_sha; ThrowOnNonZero
 git checkout FETCH_HEAD; ThrowOnNonZero
+
+echo '### Build package ###'\
+conan create $path @$conanci_user/$channel; ThrowOnNonZero

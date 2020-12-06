@@ -68,8 +68,8 @@ class Crawler(Worker):
             os.makedirs(data_dir, exist_ok=True)
             logger.info("Created directory '%s'", data_dir)
 
+        new_commits = False
         with database.session_scope() as session:
-            new_commits = False
             repos = session.query(database.Repo).all()
             channels = session.query(database.Channel).all()
             for repo in repos:
@@ -117,9 +117,9 @@ class Crawler(Worker):
                             logger.info("Set status of '%s' to 'old'", c.sha[:7])
                             c.status = database.CommitStatus.old
 
-            if new_commits:
-                logger.info("Finish crawling with *new* commits")
-                logger.info('Trigger scheduler: process commits')
-                self.__scheduler.process_commits()
-            else:
-                logger.info("Finish crawling with *no* new commits")
+        if new_commits:
+            logger.info("Finish crawling with *new* commits")
+            logger.info('Trigger scheduler: process commits')
+            self.__scheduler.process_commits()
+        else:
+            logger.info("Finish crawling with *no* new commits")

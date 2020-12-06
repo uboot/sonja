@@ -64,7 +64,10 @@ class Agent(Worker):
                 "conan_user": conan_user,
                 "conan_password": conan_password,
                 "git_url": build.commit.repo.url,
-                "git_sha": build.commit.sha
+                "git_sha": build.commit.sha,
+                "conanci_user": conanci_user,
+                "channel": build.commit.channel.name,
+                "path": build.commit.repo.path if build.commit.repo.path != "" else "."
             }
             try:
                 with Builder(conanci_os, container) as builder:

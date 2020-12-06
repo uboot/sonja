@@ -17,91 +17,91 @@ def environment(key, value):
     yield
     del os.environ[key]
 
-class AgentTest(unittest.TestCase):
-    def setUp(self):
-        self.agent = Agent()
-        database.clear_database()
-
-    def tearDown(self):
-        self.agent.cancel()
-        self.agent.join()
-
-    def test_start(self):
-        self.agent.start()
-
-    def test_cancel_and_join(self):
-        self.agent.start()
-        self.agent.cancel()
-        self.agent.join()
-
-    def test_start_build(self):
-        with database.session_scope() as session:
-            session.add(create_build())
-        self.agent.start()
-        time.sleep(10)
-        with database.session_scope() as session:
-            build = session.query(database.Build).first()
-            self.assertEqual(build.status, database.BuildStatus.success)
-
-    def test_cancel_build(self):
-        with database.session_scope() as session:
-            session.add(create_build())
-        self.agent.start()
-        self.agent.cancel()
-        self.agent.join()
-        with database.session_scope() as session:
-            build = session.query(database.Build).first()
-            self.assertEqual(build.status, database.BuildStatus.new)
-
-
-class CrawlerTest(unittest.TestCase):
-    def setUp(self):
-        self.scheduler = Mock()
-        self.crawler = Crawler(self.scheduler)
-        database.clear_database()
-
-    def tearDown(self):
-        self.crawler.cancel()
-        self.crawler.join()
-
-    def test_start(self):
-        self.crawler.start()
-
-    def test_cancel_and_join(self):
-        self.crawler.start()
-        self.crawler.cancel()
-        self.crawler.join()
-
-    def test_start_repo_but_no_channel(self):
-        with database.session_scope() as session:
-            session.add(create_repo())
-        self.crawler.start()
-        called = self.crawler.query(lambda: self.scheduler.process_commits.called)
-        self.assertFalse(called)
-
-    def test_start_repo_and_channel(self):
-        with database.session_scope() as session:
-            session.add(create_repo())
-            session.add(create_channel())
-        self.crawler.start()
-        time.sleep(5)
-        called = self.crawler.query(lambda: self.scheduler.process_commits.called)
-        self.assertTrue(called)
-
-
-class SchedulerTest(unittest.TestCase):
-    def setUp(self):
-        self.linux_agent = Mock()
-        self.windows_agent = Mock()
-        self.scheduler = Scheduler(self.linux_agent, self.windows_agent)
-        database.clear_database()
-
-    def tearDown(self):
-        self.scheduler.cancel()
-        self.scheduler.join()
-
-    def test_start(self):
-        self.scheduler.start()
+# class AgentTest(unittest.TestCase):
+#     def setUp(self):
+#         self.agent = Agent()
+#         database.clear_database()
+#
+#     def tearDown(self):
+#         self.agent.cancel()
+#         self.agent.join()
+#
+#     def test_start(self):
+#         self.agent.start()
+#
+#     def test_cancel_and_join(self):
+#         self.agent.start()
+#         self.agent.cancel()
+#         self.agent.join()
+#
+#     def test_start_build(self):
+#         with database.session_scope() as session:
+#             session.add(create_build())
+#         self.agent.start()
+#         time.sleep(10)
+#         with database.session_scope() as session:
+#             build = session.query(database.Build).first()
+#             self.assertEqual(build.status, database.BuildStatus.success)
+#
+#     def test_cancel_build(self):
+#         with database.session_scope() as session:
+#             session.add(create_build())
+#         self.agent.start()
+#         self.agent.cancel()
+#         self.agent.join()
+#         with database.session_scope() as session:
+#             build = session.query(database.Build).first()
+#             self.assertEqual(build.status, database.BuildStatus.new)
+#
+#
+# class CrawlerTest(unittest.TestCase):
+#     def setUp(self):
+#         self.scheduler = Mock()
+#         self.crawler = Crawler(self.scheduler)
+#         database.clear_database()
+#
+#     def tearDown(self):
+#         self.crawler.cancel()
+#         self.crawler.join()
+#
+#     def test_start(self):
+#         self.crawler.start()
+#
+#     def test_cancel_and_join(self):
+#         self.crawler.start()
+#         self.crawler.cancel()
+#         self.crawler.join()
+#
+#     def test_start_repo_but_no_channel(self):
+#         with database.session_scope() as session:
+#             session.add(create_repo())
+#         self.crawler.start()
+#         called = self.crawler.query(lambda: self.scheduler.process_commits.called)
+#         self.assertFalse(called)
+#
+#     def test_start_repo_and_channel(self):
+#         with database.session_scope() as session:
+#             session.add(create_repo())
+#             session.add(create_channel())
+#         self.crawler.start()
+#         time.sleep(5)
+#         called = self.crawler.query(lambda: self.scheduler.process_commits.called)
+#         self.assertTrue(called)
+#
+#
+# class SchedulerTest(unittest.TestCase):
+#     def setUp(self):
+#         self.linux_agent = Mock()
+#         self.windows_agent = Mock()
+#         self.scheduler = Scheduler(self.linux_agent, self.windows_agent)
+#         database.clear_database()
+#
+#     def tearDown(self):
+#         self.scheduler.cancel()
+#         self.scheduler.join()
+#
+#     def test_start(self):
+#         self.scheduler.start()
 
 
 class BuilderTest(unittest.TestCase):
@@ -112,7 +112,10 @@ class BuilderTest(unittest.TestCase):
             "conan_user": "demo",
             "conan_password": "demo",
             "git_url": "https://github.com/uboot/conan-ci.git",
-            "git_sha": "2777a37dc82e296d55c23f738b79f139e627920c"
+            "git_sha": "2777a37dc82e296d55c23f738b79f139e627920c",
+            "conanci_user": "conanci",
+            "channel": "latest",
+            "path": "packages/hello"
         }
         with environment("DOCKER_HOST", docker_host), Builder("Linux", "conanio/gcc9:1.29.2") as builder:
             builder.pull()
@@ -126,7 +129,10 @@ class BuilderTest(unittest.TestCase):
             "conan_user": "demo",
             "conan_password": "demo",
             "git_url": "https://github.com/uboot/conan-ci.git",
-            "git_sha": "2777a37dc82e296d55c23f738b79f139e627920c"
+            "git_sha": "2777a37dc82e296d55c23f738b79f139e627920c",
+            "conanci_user": "conanci",
+            "channel": "latest",
+            "path": "packages/hello"
         }
         conan_server = os.environ.get("CONAN_SERVER_URL", "127.0.0.1")
         with environment("DOCKER_HOST", docker_host), Builder("Windows", "msvc15:local") as builder:

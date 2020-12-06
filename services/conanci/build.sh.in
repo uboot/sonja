@@ -11,4 +11,6 @@ echo '### Clean remotes ###'\
 && git init\
 && git remote add origin $git_url\
 && git fetch origin $git_sha\
-&& git checkout FETCH_HEAD
+&& git checkout FETCH_HEAD\
+&& echo '### Build package ###'\
+&& conan create $path @$conanci_user/$channel
