@@ -4,7 +4,12 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from contextlib import contextmanager
 import enum
+import logging
 import os
+
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("conanci")
 
 
 # start MySQL:
@@ -149,6 +154,7 @@ def session_scope():
 
 
 def populate_database():
+    logger.info("Populate database")
     with session_scope() as session:
         repo = Repo()
         repo.url = "https://github.com/uboot/conan-ci.git"
