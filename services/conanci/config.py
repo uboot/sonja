@@ -1,14 +1,26 @@
 from conanci.database import Base, engine, logger
 import connexion
 import logging
+import logging.config
 import os
 import signal
 import sqlalchemy
 import time
+import yaml
 
 
 app = connexion.App(__name__, specification_dir='./swagger/')
-logging.getLogger("werkzeug").setLevel(logging.WARN)
+
+
+class PingFilter(logging.Filter):
+    def filter(self, record):
+        return not "GET /ping" in record.msg
+
+
+def setup_logging():
+    with open(os.path.join(os.path.dirname(__file__), "logging.yaml")) as f:
+        config = yaml.load(f, Loader=yaml.FullLoader)
+    logging.config.dictConfig(config)
 
 
 def connect_to_database():
