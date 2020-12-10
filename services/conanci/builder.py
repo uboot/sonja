@@ -11,7 +11,8 @@ from io import BytesIO
 docker_image_pattern = ("([a-z0-9\\.-]+(:[0-9]+)?/)?"
                         "[a-z0-9\\.-/]+([:@][a-z0-9\\.-]+)$")
 
-# docker run --name conan -d --rm -p 9300:9300 conanio/conan_server:1.28.1
+# docker run --name conan -d --rm -p 9300:9300 -v /path-to-server-config:/root/.conan_server conanio/conan_server:1.28.1
+
 
 def create_build_tar(build_os, parameters):
     if build_os == "Linux":

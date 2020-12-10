@@ -1,16 +1,29 @@
 #!/bin/bash
-echo '### Clean remotes ###'\
-&& conan remote clean\
-&& echo '### Add Conan server ###'\
-&& conan remote add server http://$conan_url:9300\
-&& echo '### Setup Conan user ###'\
-&& conan user -r server -p $conan_password $conan_user\
-&& echo '### Clone repository ###'\
-&& mkdir conanci\
-&& cd conanci\
-&& git init\
-&& git remote add origin $git_url\
-&& git fetch origin $git_sha\
-&& git checkout FETCH_HEAD\
-&& echo '### Build package ###'\
-&& conan create $path @$conanci_user/$channel
+set -e
+
+echo '### Setup Conan ###'
+echo '# Clean remotes'
+conan remote clean
+
+echo '# Add Conan server'
+conan remote add server http://$conan_url:9300
+
+echo '# Setup Conan user'
+conan user -r server -p $conan_password $conan_user
+
+echo '# Enable Conan revisions'
+conan config set general.revisions_enabled=1
+
+echo '### Clone repository ###'
+mkdir conanci
+cd conanci
+git init
+git remote add origin $git_url
+git fetch origin $git_sha
+git checkout FETCH_HEAD
+
+echo '### Build package ###'
+package_name=$$(conan inspect --raw name $path)
+package_version=$$(conan inspect --raw version $path)
+conan create $path @$conanci_user/$channel
+conan upload $$package_name/$$package_version@$conanci_user/$channel --all --confirm -r server

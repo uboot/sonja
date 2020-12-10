@@ -5,14 +5,18 @@ function ThrowOnNonZero {
     }
 }
 
-echo '### Clean remotes ###'
+echo '### Setup Conan ###'
+echo '# Clean remotes'
 conan remote clean; ThrowOnNonZero
 
-echo '### Add Conan server ###'
+echo '# Add Conan server'
 conan remote add server http://$conan_url:9300; ThrowOnNonZero
 
-echo '### Setup Conan user ###'
+echo '# Setup Conan user'
 conan user -r server -p $conan_password $conan_user; ThrowOnNonZero
+
+echo '# Enable Conan revisions'
+conan config set general.revisions_enabled=1; ThrowOnNonZero
 
 echo '### Clone repository ###'
 mkdir conanci; ThrowOnNonZero
@@ -22,5 +26,8 @@ git remote add origin $git_url; ThrowOnNonZero
 git fetch origin $git_sha; ThrowOnNonZero
 git checkout FETCH_HEAD; ThrowOnNonZero
 
-echo '### Build package ###'\
+echo '### Build package ###'
+$$package_name=[string](conan inspect --raw name $path); ThrowOnNonZero
+$$package_version=[string](conan inspect --raw version $path); ThrowOnNonZero
 conan create $path @$conanci_user/$channel; ThrowOnNonZero
+conan upload $$package_name/$$package_version@$conanci_user/$channel --all --confirm -r server; ThrowOnNonZero

@@ -13,6 +13,7 @@ class HelloConan(ConanFile):
     options = {"shared": [True, False]}
     default_options = {"shared": False}
     generators = "cmake"
+    revision_mode = "scm"
 
     def source(self):
         self.run("git clone https://github.com/conan-io/hello.git")

@@ -115,7 +115,7 @@ class BuilderTest(unittest.TestCase):
             "git_sha": "2777a37dc82e296d55c23f738b79f139e627920c",
             "conanci_user": "conanci",
             "channel": "latest",
-            "path": "packages/hello"
+            "path": "packages/hello/conanfile.py"
         }
         with environment("DOCKER_HOST", docker_host), Builder("Linux", "conanio/gcc9:1.29.2") as builder:
             builder.pull()
@@ -132,9 +132,8 @@ class BuilderTest(unittest.TestCase):
             "git_sha": "2777a37dc82e296d55c23f738b79f139e627920c",
             "conanci_user": "conanci",
             "channel": "latest",
-            "path": "packages/hello"
+            "path": "packages/hello/conanfile.py"
         }
-        conan_server = os.environ.get("CONAN_SERVER_URL", "127.0.0.1")
         with environment("DOCKER_HOST", docker_host), Builder("Windows", "msvc15:local") as builder:
             builder.pull()
             builder.setup(parameters)
