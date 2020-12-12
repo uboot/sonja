@@ -31,6 +31,15 @@ services:
     image: agent
     replicas: 1
 
-# windows:
-#   - name: one
-#     image: agent
+windows:
+  - name: one
+    image: agent
+
+sshKey: |
+  -----BEGIN OPENSSH PRIVATE KEY-----
+  b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW
+  QyNTUxOQAAACD+hNcWoKOxi8XK4zeHuY04rCipe3NjVnZ7s0XNCs3bFAAAAKBgr5OBYK+T
+  gQAAAAtzc2gtZWQyNTUxOQAAACD+hNcWoKOxi8XK4zeHuY04rCipe3NjVnZ7s0XNCs3bFA
+  AAAECKBWevc6xFXBWX742soCr1zfdgE4ZXUE7Q4w9TvLnRDf6E1xago7GLxcrjN4e5jTis
+  KKl7c2NWdnuzRc0KzdsUAAAAF21hdHpAbWF0ei1UaGlua1BhZC1UNTMwAQIDBAUG
+  -----END OPENSSH PRIVATE KEY-----

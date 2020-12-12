@@ -4,7 +4,7 @@ kind: ConfigMap
 metadata:
   name: {{ include "conan-server.fullname" . }}
 data:
-  server.conf : |
+  server.conf: |
     [server]
     # WARNING! Change default variable of jwt_secret. You should change it periodically
     # It only affects to current authentication tokens, you can change safetely anytime

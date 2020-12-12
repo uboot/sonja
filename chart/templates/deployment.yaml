@@ -28,6 +28,9 @@ spec:
             path: /ping
             port: 8080
           initialDelaySeconds: 300
+        volumeMounts:
+        - name: config-map
+          mountPath: /config-map
         env:
         - name: MYSQL_URL
           value: {{ $.Release.Name }}-mysql
@@ -60,6 +63,10 @@ spec:
         securityContext:
           privileged: true
 {{- end }}
+      volumes:
+        - name: config-map
+          configMap:
+            name: {{ include "conan-ci.fullname" $ }}
 ---
 {{- end }}
 {{- range .Values.windows }}
@@ -94,6 +101,9 @@ spec:
             path: /ping
             port: 8080
           initialDelaySeconds: 300
+        volumeMounts:
+        - name: config-map
+          mountPath: /config-map
         env:
         - name: MYSQL_URL
           value: {{ $.Release.Name }}-mysql
@@ -117,5 +127,9 @@ spec:
           value: {{ $.Values.user }}
         - name: DOCKER_HOST
           value: {{ template "conan-ci.fullname" $ }}-windows-docker-{{ .name }}:2375
+      volumes:
+        - name: config-map
+          configMap:
+            name: {{ include "conan-ci.fullname" $ }}
 ---
 {{- end }}

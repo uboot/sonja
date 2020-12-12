@@ -1,0 +1,7 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "conan-ci.fullname" . }}
+data:
+  ssh-key: {{ toYaml $.Values.sshKey | indent 2 }}
