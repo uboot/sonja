@@ -4,4 +4,9 @@ kind: ConfigMap
 metadata:
   name: {{ include "conan-ci.fullname" . }}
 data:
-  ssh-key: {{ toYaml $.Values.sshKey | indent 2 }}
+  {{- with $.Values.sshKey }}
+  {{- $content := $.Files.Get . }}
+  {{ . }}: {{ toYaml $content | nindent 2 }}
+  {{- end }}
+  {{- $content := $.Files.Get "known_hosts" }}
+  known_hosts: {{ toYaml $content | nindent 2 }}

@@ -31,6 +31,10 @@ spec:
         volumeMounts:
         - name: config-map
           mountPath: /config-map
+{{- if .ssh }}
+        - name: root
+          mountPath: /root
+{{- end }}
         env:
         - name: MYSQL_URL
           value: {{ $.Release.Name }}-mysql
@@ -55,6 +59,8 @@ spec:
 {{- if .docker }}
         - name: DOCKER_HOST
           value: 127.0.0.1:2375
+        - name: SSH_KEY
+          value: {{ $.Values.sshKey }}
 {{- end }}
 {{- if .docker }}
       - name: docker
@@ -63,10 +69,29 @@ spec:
         securityContext:
           privileged: true
 {{- end }}
+{{- if .ssh }}
+      initContainers:
+      - name: {{ $.Chart.Name }}-setup
+        image: busybox:1.28
+        env:
+        - name: SSH_KEY
+          value: {{ $.Values.sshKey }}
+        command: ["/bin/sh"]
+        args: ["-c", "mkdir -p ~/.ssh;cp /config-map/known_hosts ~/.ssh;cp /config-map/\"$SSH_KEY\" ~/.ssh; chmod 600 ~/.ssh/\"$SSH_KEY\""]
+        volumeMounts:
+        - name: config-map
+          mountPath: /config-map
+        - name: root
+          mountPath: /root
+{{- end}}
       volumes:
         - name: config-map
           configMap:
             name: {{ include "conan-ci.fullname" $ }}
+{{- if .ssh }}
+        - name: root
+          emptyDir: {}
+{{- end }}
 ---
 {{- end }}
 {{- range .Values.windows }}
@@ -127,6 +152,8 @@ spec:
           value: {{ $.Values.user }}
         - name: DOCKER_HOST
           value: {{ template "conan-ci.fullname" $ }}-windows-docker-{{ .name }}:2375
+        - name: SSH_KEY
+          value: {{ $.Values.sshKey }}
       volumes:
         - name: config-map
           configMap:

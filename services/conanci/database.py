@@ -157,13 +157,13 @@ def populate_database():
     logger.info("Populate database")
     with session_scope() as session:
         repo = Repo()
-        repo.url = "https://github.com/uboot/conan-ci.git"
+        repo.url = "git@github.com:uboot/conan-ci.git"
         repo.path = "packages/hello"
         session.add(repo)
 
         linux = Profile()
         linux.name = "GCC 9"
-        linux.container = "conanio/gcc9:1.29.2"
+        linux.container = "uboot/gcc9:latest"
         linux.settings = [
             Setting("os", "Linux"),
             Setting("build_type", "Release")

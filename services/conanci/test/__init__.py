@@ -107,32 +107,38 @@ def environment(key, value):
 class BuilderTest(unittest.TestCase):
     def test_run_linux(self):
         docker_host = os.environ.get("LINUX_DOCKER_HOST", "")
+        ssh_key_path = os.environ.get("SSH_KEY_PATH", "")
         parameters =  {
             "conan_url": os.environ.get("CONAN_SERVER_URL", "127.0.0.1"),
             "conan_user": "demo",
             "conan_password": "demo",
-            "git_url": "https://github.com/uboot/conan-ci.git",
-            "git_sha": "2777a37dc82e296d55c23f738b79f139e627920c",
+            "git_url": "git@github.com:uboot/conan-ci.git",
+            "git_sha": "ca8ac0c42b0487a160ef3ac8200de0053b27716c",
             "conanci_user": "conanci",
             "channel": "latest",
-            "path": "packages/hello/conanfile.py"
+            "path": "packages/hello/conanfile.py",
+            "ssh_dir": os.path.dirname(ssh_key_path),
+            "ssh_key": os.path.basename(ssh_key_path)
         }
-        with environment("DOCKER_HOST", docker_host), Builder("Linux", "conanio/gcc9:1.29.2") as builder:
+        with environment("DOCKER_HOST", docker_host), Builder("Linux", "uboot/gcc9:latest") as builder:
             builder.pull()
             builder.setup(parameters)
             builder.run()
 
     def test_run_windows(self):
         docker_host = os.environ.get("WINDOWS_DOCKER_HOST", "")
+        ssh_key_path = os.environ.get("SSH_KEY_PATH", "")
         parameters =  {
             "conan_url": os.environ.get("CONAN_SERVER_URL", "127.0.0.1"),
             "conan_user": "demo",
             "conan_password": "demo",
-            "git_url": "https://github.com/uboot/conan-ci.git",
-            "git_sha": "2777a37dc82e296d55c23f738b79f139e627920c",
+            "git_url": "git@github.com:uboot/conan-ci.git",
+            "git_sha": "ca8ac0c42b0487a160ef3ac8200de0053b27716c",
             "conanci_user": "conanci",
             "channel": "latest",
-            "path": "packages/hello/conanfile.py"
+            "path": "packages/hello/conanfile.py",
+            "ssh_dir": os.path.dirname(ssh_key_path),
+            "ssh_key": os.path.basename(ssh_key_path)
         }
         with environment("DOCKER_HOST", docker_host), Builder("Windows", "msvc15:local") as builder:
             builder.pull()

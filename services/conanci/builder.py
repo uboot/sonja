@@ -29,11 +29,15 @@ def create_build_tar(build_os, parameters):
 
     # place into archive
     f = BytesIO()
-    tar = tarfile.open(mode="w", fileobj=f)
+    tar = tarfile.open(mode="w", fileobj=f, dereference=True)
     tarinfo = tarfile.TarInfo(script_name)
     content = BytesIO(bytes(script, "utf-8"))
     tarinfo.size = len(content.getbuffer())
     tar.addfile(tarinfo, content)
+    ssh_key_path = os.path.join(parameters["ssh_dir"], parameters["ssh_key"])
+    tar.add(name=ssh_key_path, arcname=parameters["ssh_key"])
+    known_hosts_path = os.path.join(parameters["ssh_dir"], "known_hosts")
+    tar.add(name=known_hosts_path, arcname="known_hosts")
     tar.close()
     f.seek(0)
     return f
@@ -65,6 +69,10 @@ class Builder(object):
         logger.info("Setup docker container")
         build_tar = create_build_tar(self.__build_os, parameters)
 
+        # with open("build.tar", "wb") as f:
+        #     f.write(build_tar.read())
+        # build_tar.seek(0)
+
         if self.__build_os == "Linux":
             command = "sh /build.sh"
         else:
@@ -94,15 +102,18 @@ class Builder(object):
             raise Exception("Build in container '{0}' failed with status '{1}'".format(
                             self.__container.short_id, result.get("StatusCode")))
 
-    def remove(self):
-        self.__container.remove()
-
     def __exit__(self, type, value, traceback):
         if not self.__container:
             return
 
         try:
-            logger.info("Remove all temporary docker containers")
+            logger.info("Stop temporary docker containers")
+            self.__container.stop()
+        except docker.errors.APIError:
+            pass
+
+        try:
+            logger.info("Remove temporary docker containers")
             self.__container.remove()
-        except docker.errors.ImageNotFound:
+        except docker.errors.APIError:
             pass

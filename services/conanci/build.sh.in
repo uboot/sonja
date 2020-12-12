@@ -1,6 +1,12 @@
 #!/bin/bash
 set -e
 
+echo '### Setup SSH ###'
+mkdir -p ~/.ssh
+cp "/$ssh_key" ~/.ssh
+chmod 600 ~/.ssh/"$ssh_key"
+cp /known_hosts ~/.ssh
+
 echo '### Setup Conan ###'
 echo '# Clean remotes'
 conan remote clean

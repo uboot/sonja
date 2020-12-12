@@ -2,6 +2,7 @@ FROM alpine:3.12
 
 RUN apk add --no-cache \
 		docker \
+		openssh-client \
 		git \
 		py3-pip \
 		py3-wheel \

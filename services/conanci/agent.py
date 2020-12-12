@@ -12,6 +12,7 @@ conan_user = os.environ.get("CONAN_SERVER_USER", "demo")
 conan_password = os.environ.get("CONAN_SERVER_PASSWORD", "demo")
 conanci_user = os.environ.get("CONANCI_USER", "conanci")
 conanci_os = os.environ.get("CONANCI_AGENT_OS", "Linux")
+ssh_key = os.environ.get("SSH_KEY", "")
 
 
 build_template = string.Template(
@@ -68,7 +69,9 @@ class Agent(Worker):
                 "conanci_user": conanci_user,
                 "channel": build.commit.channel.name,
                 "path": os.path.join(build.commit.repo.path, "conanfile.py")
-                        if build.commit.repo.path != "" else "conanfile.py"
+                        if build.commit.repo.path != "" else "conanfile.py",
+                "ssh_dir": "/config-map",
+                "ssh_key": ssh_key
             }
             try:
                 with Builder(conanci_os, container) as builder:

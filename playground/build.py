@@ -37,7 +37,7 @@ if windows:
         """
     )
 else:
-    image = "conanio/gcc9:1.29.2"
+    image = "uboot/gcc9:latest"
 
     setup_template = string.Template(
         """sh -c \" \

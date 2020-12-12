@@ -21,7 +21,7 @@ def create_build():
 
     linux = database.Profile()
     linux.name = "GCC 9"
-    linux.container = "conanio/gcc9:1.29.2"
+    linux.container = "uboot/gcc9:latest"
     linux.settings = [
         database.Setting("os", "Linux"),
         database.Setting("build_type", "Release")
