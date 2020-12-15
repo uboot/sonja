@@ -8,6 +8,21 @@ def create_repo():
     return repo
 
 
+def create_commit():
+    commit = database.Commit()
+    commit.repo = create_repo()
+    commit.channel = create_channel()
+    commit.sha = "2777a37dc82e296d55c23f738b79f139e627920c" # first commit
+    commit.status = database.CommitStatus.building
+    return commit
+
+
+def create_invalid_repo():
+    repo = database.Repo()
+    repo.url = "https://github.com/uboot/nonsense.git"
+    return repo
+
+
 def create_channel():
     channel = database.Channel()
     channel.branch = "master"

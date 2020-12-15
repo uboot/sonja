@@ -26,6 +26,7 @@ services:
   - name: scheduler
   - name: crawler
     public: true
+    ssh: true
   - name: linux-agent
     docker: true
     image: agent

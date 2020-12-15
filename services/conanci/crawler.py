@@ -73,49 +73,52 @@ class Crawler(Worker):
             repos = session.query(database.Repo).all()
             channels = session.query(database.Channel).all()
             for repo in repos:
-                repo_dir = os.path.join(data_dir, str(repo.id))
-                controller = RepoController(repo_dir)
-                if not controller.is_clone_of(repo.url):
-                    logger.info("Clone URL '%s' to '%s'", repo.url, repo_dir)
-                    await loop.run_in_executor(None, controller.create_new_clone, repo.url)
-                else:
-                    logger.info("Fetch existing repo '%s' for URL '%s'",
-                                repo_dir, repo.url)
-                    await loop.run_in_executor(None, controller.fetch)
+                try:
+                    repo_dir = os.path.join(data_dir, str(repo.id))
+                    controller = RepoController(repo_dir)
+                    if not controller.is_clone_of(repo.url):
+                        logger.info("Clone URL '%s' to '%s'", repo.url, repo_dir)
+                        await loop.run_in_executor(None, controller.create_new_clone, repo.url)
+                    else:
+                        logger.info("Fetch existing repo '%s' for URL '%s'",
+                                    repo_dir, repo.url)
+                        await loop.run_in_executor(None, controller.fetch)
 
-                branches = controller.get_remote_branches()
-                for channel in channels:
-                    if channel.branch in branches:
-                        logger.info("Checkout branch '%s'", channel.branch)
-                        controller.checkout(channel.branch)
-                        sha = controller.get_sha()
+                    branches = controller.get_remote_branches()
+                    for channel in channels:
+                        if channel.branch in branches:
+                            logger.info("Checkout branch '%s'", channel.branch)
+                            controller.checkout(channel.branch)
+                            sha = controller.get_sha()
 
-                        commits = session.query(database.Commit).filter_by(repo=repo,
-                            sha=sha, channel=channel)
+                            commits = session.query(database.Commit).filter_by(repo=repo,
+                                sha=sha, channel=channel)
 
-                        # continue if this commit has already been stored
-                        if list(commits):
-                            logger.info("Commit '%s' exists", sha[:7])
-                            continue
+                            # continue if this commit has already been stored
+                            if list(commits):
+                                logger.info("Commit '%s' exists", sha[:7])
+                                continue
 
-                        logger.info("Add commit '%s'", sha[:7])
-                        commit = database.Commit()
-                        commit.sha = sha
-                        commit.repo = repo
-                        commit.channel = channel
-                        commit.status = database.CommitStatus.new
-                        session.add(commit)
-                        new_commits = True
+                            logger.info("Add commit '%s'", sha[:7])
+                            commit = database.Commit()
+                            commit.sha = sha
+                            commit.repo = repo
+                            commit.channel = channel
+                            commit.status = database.CommitStatus.new
+                            session.add(commit)
+                            new_commits = True
 
-                        old_commits = session.query(database.Commit).filter(
-                            database.Commit.repo == repo,
-                            database.Commit.channel == channel,
-                            database.Commit.sha != sha,
-                            database.Commit.status != database.CommitStatus.old
-                        )
-                        for c in old_commits:
-                            logger.info("Set status of '%s' to 'old'", c.sha[:7])
-                            c.status = database.CommitStatus.old
+                            old_commits = session.query(database.Commit).filter(
+                                database.Commit.repo == repo,
+                                database.Commit.channel == channel,
+                                database.Commit.sha != sha,
+                                database.Commit.status != database.CommitStatus.old
+                            )
+                            for c in old_commits:
+                                logger.info("Set status of '%s' to 'old'", c.sha[:7])
+                                c.status = database.CommitStatus.old
+                except git.exc.GitError as e:
+                    logger.error("Failed to process repo '%s' with message '%s'", repo.url, e)
 
         if new_commits:
             logger.info("Finish crawling with *new* commits")

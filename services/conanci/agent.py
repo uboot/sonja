@@ -12,6 +12,7 @@ conan_user = os.environ.get("CONAN_SERVER_USER", "demo")
 conan_password = os.environ.get("CONAN_SERVER_PASSWORD", "demo")
 conanci_user = os.environ.get("CONANCI_USER", "conanci")
 conanci_os = os.environ.get("CONANCI_AGENT_OS", "Linux")
+ssh_dir = os.environ.get("SSH_DIR", "/config-map")
 ssh_key = os.environ.get("SSH_KEY", "")
 
 
@@ -70,7 +71,7 @@ class Agent(Worker):
                 "channel": build.commit.channel.name,
                 "path": os.path.join(build.commit.repo.path, "conanfile.py")
                         if build.commit.repo.path != "" else "conanfile.py",
-                "ssh_dir": "/config-map",
+                "ssh_dir": ssh_dir,
                 "ssh_key": ssh_key
             }
             try:
