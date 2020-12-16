@@ -8,7 +8,16 @@ def create_repo():
     return repo
 
 
-def create_commit():
+def create_new_commit():
+    commit = database.Commit()
+    commit.repo = create_repo()
+    commit.channel = create_channel()
+    commit.sha = "2777a37dc82e296d55c23f738b79f139e627920c" # first commit
+    commit.status = database.CommitStatus.new
+    return commit
+
+
+def create_building_commit():
     commit = database.Commit()
     commit.repo = create_repo()
     commit.channel = create_channel()
@@ -30,10 +39,7 @@ def create_channel():
     return channel
 
 
-def create_build():
-    repo = create_repo()
-    channel = create_channel()
-
+def create_linux_profile():
     linux = database.Profile()
     linux.name = "GCC 9"
     linux.container = "uboot/gcc9:latest"
@@ -41,7 +47,10 @@ def create_build():
         database.Setting("os", "Linux"),
         database.Setting("build_type", "Release")
     ]
+    return linux
 
+
+def create_windows_profile():
     windows = database.Profile()
     windows.name = "MSVC 15"
     windows.container = "msvc15:local"
@@ -50,14 +59,11 @@ def create_build():
         database.Setting("build_type", "Release")
     ]
 
-    commit = database.Commit()
-    commit.repo = repo
-    commit.sha = "2777a37dc82e296d55c23f738b79f139e627920c"
-    commit.channel = channel
-    commit.status = database.CommitStatus.new
+
+def create_build():
     build = database.Build()
-    build.commit = commit
-    build.profile = linux
+    build.commit = create_building_commit()
+    build.profile = create_linux_profile()
     build.status = database.BuildStatus.new
     return build
 

@@ -85,7 +85,7 @@ class CrawlerTest(unittest.TestCase):
 
     def test_start_repo_and_old_commits(self):
         with database.session_scope() as session:
-            session.add(util.create_commit())
+            session.add(util.create_new_commit())
         self.crawler.start()
         time.sleep(5)
         called = self.crawler.query(lambda: self.scheduler.process_commits.called)
@@ -124,3 +124,24 @@ class SchedulerTest(unittest.TestCase):
 
     def test_start(self):
         self.scheduler.start()
+
+    def test_start_commit_and_profile(self):
+        with database.session_scope() as session:
+            session.add(util.create_new_commit())
+            session.add(util.create_linux_profile())
+        self.scheduler.start()
+        time.sleep(1)
+        self.scheduler.cancel()
+        self.scheduler.join()
+        self.assertTrue(self.linux_agent.process_builds.called)
+        self.assertTrue(self.windows_agent.process_builds.called)
+
+    def test_start_new_builds(self):
+        with database.session_scope() as session:
+            session.add(util.create_build())
+        self.scheduler.start()
+        time.sleep(1)
+        self.scheduler.cancel()
+        self.scheduler.join()
+        self.assertTrue(self.linux_agent.process_builds.called)
+        self.assertTrue(self.windows_agent.process_builds.called)

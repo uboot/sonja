@@ -1,3 +1,4 @@
+import asyncio
 from conanci import database
 from conanci.config import connect_to_database, logger
 from conanci.worker import Worker
@@ -15,6 +16,7 @@ class Scheduler(Worker):
         new_commits = True
         while new_commits:
             new_commits = await self.__process_commits()
+        self.reschedule(60)
         
     async def __process_commits(self):
         logger.info("Start processing commits")
@@ -38,18 +40,27 @@ class Scheduler(Worker):
 
         if new_commits:
             logger.info("Finish processing commits with *new* builds")
-            logger.info('Trigger linux agent: process builds')
-            try:
-                self.__linux_agent.process_builds()
-            except MaxRetryError:
-                logger.error("Failed to trigger Linux agent")
-
-            logger.info('Trigger windows agent: process builds')
-            try:
-                self.__windows_agent.process_builds()
-            except MaxRetryError:
-                logger.error("Failed to trigger Windows agent")
         else:
             logger.info("Finish processing commits with *no* builds")
 
+        with database.session_scope() as session:
+            num_new_builds = session.query(database.Build).filter_by(status=database.BuildStatus.new).count()
+        logger.info("Currently %d new builds exist", num_new_builds)
+
+        if num_new_builds == 0:
+            return new_commits
+
+        logger.info('Trigger linux agent: process builds')
+        try:
+            self.__linux_agent.process_builds()
+        except MaxRetryError:
+            logger.error("Failed to trigger Linux agent")
+
+        logger.info('Trigger windows agent: process builds')
+        try:
+            self.__windows_agent.process_builds()
+        except MaxRetryError:
+            logger.error("Failed to trigger Windows agent")
+
         return new_commits
+
