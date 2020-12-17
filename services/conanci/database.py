@@ -90,6 +90,8 @@ class BuildStatus(enum.Enum):
     active = 2
     error = 3
     success = 4
+    stopping = 5
+    stopped = 6
 
 
 dependencies = Table('dependencies', Base.metadata,

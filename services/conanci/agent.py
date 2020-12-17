@@ -27,7 +27,7 @@ class Agent(Worker):
     def __init__(self):
         super().__init__()
         connect_to_database()
-        self.__build = None
+        self.__build_id = None
 
     async def work(self):
         new_builds = True
@@ -35,11 +35,9 @@ class Agent(Worker):
             new_builds = await self.__process_builds()
 
     async def __process_builds(self):
-        logger.info("Start processing builds")
-        loop = asyncio.get_running_loop()
         # database.populate_database()
         # return
-
+        logger.info("Start processing builds")
         with database.session_scope() as session:
             build = session\
                 .query(database.Build)\
@@ -56,9 +54,8 @@ class Agent(Worker):
                 return False
         
             logger.info("Set status of build '%d' to 'active'", build.id)
-            self.__build = build.id
+            self.__build_id = build.id
             build.status = database.BuildStatus.active
-            session.commit()
 
             container = build.profile.container
             parameters = {
@@ -74,34 +71,64 @@ class Agent(Worker):
                 "ssh_dir": ssh_dir,
                 "ssh_key": ssh_key
             }
-            try:
-                with Builder(conanci_os, container) as builder:
-                    await loop.run_in_executor(None, builder.pull)
-                    await loop.run_in_executor(None, builder.setup, parameters)
-                    await loop.run_in_executor(None, builder.run)
 
-                    logger.info("Set status of build '%d' to 'success'", build.id)
-                    build.status = database.BuildStatus.success
-                    session.commit()
-                    self.__build = None
-            except Exception as e:
-                logger.error(e)
-                logger.info("Set status of build '%d' to 'error'", build.id)
-                build.status = database.BuildStatus.error
-                session.commit()
-                self.__build = None
+        try:
+            with Builder(conanci_os, container) as builder:
+                builder_task = asyncio.create_task(self.__run_build(builder, parameters))
+                # while running the build check if the build is set to stopping
+                while True:
+                    done, _ = await asyncio.wait({builder_task}, timeout=10)
+                    if done:
+                        break
 
-            logger.info("Finish processing build '%d'", build.id)
+                    with database.session_scope() as session:
+                        build = session.query(database.Build) \
+                            .filter_by(id=self.__build_id, status=database.BuildStatus.stopping) \
+                            .first()
+                        if build:
+                            logger.info("Cancel build '%d'", self.__build_id)
+                            builder.cancel()
+                            logger.info("Set status of build '%d' to 'stopped'", self.__build_id)
+                            build.status = database.BuildStatus.stopped
+                            self.__build_id = None
+                            return
+
+                logger.info("Set status of build '%d' to 'success'", self.__build_id)
+                self.__set_build_status(database.BuildStatus.success)
+                self.__build_id = None
+        except Exception as e:
+            logger.error(e)
+            logger.info("Set status of build '%d' to 'error'", self.__build_id)
+            self.__set_build_status(database.BuildStatus.error)
+            self.__build_id = None
+
+        logger.info("Finish processing build '%d'", self.__build_id)
             
         return True
 
     def cleanup(self):
-        if not self.__build:
+        if not self.__build_id:
+            return
+
+        logger.info("Set status of build '%d' to 'new'", self.__build_id)
+        self.__set_build_status(database.BuildStatus.new)
+
+    def __set_build_status(self, status):
+        if not self.__build_id:
             return
 
         with database.session_scope() as session:
-            build = session.query(database.Build)\
-                .filter_by(id=self.__build)\
+            build = session.query(database.Build) \
+                .filter_by(id=self.__build_id) \
                 .first()
-            logger.info("Set status of build '%d' to 'new'", build.id)
-            build.status = database.BuildStatus.new
+            if build:
+                build.status = status
+                self.__build_id = None
+            else:
+                logger.error("Failed to find build '%d' in database", self.__build_id)
+
+    async def __run_build(self, builder, parameters):
+        loop = asyncio.get_running_loop()
+        await loop.run_in_executor(None, builder.pull)
+        await loop.run_in_executor(None, builder.setup, parameters)
+        await loop.run_in_executor(None, builder.run)

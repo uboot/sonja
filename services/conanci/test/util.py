@@ -1,69 +1,60 @@
 from conanci import database
 
 
-def create_repo():
+def create_repo(parameters=dict()):
     repo = database.Repo()
-    repo.url = "https://github.com/uboot/conan-ci.git"
-    repo.path = "packages/hello"
+    if parameters.get("repo.invalid", False):
+        repo.url = "https://github.com/uboot/nonsense.git"
+    else:
+        repo.url = "https://github.com/uboot/conan-ci.git"
+    if parameters.get("repo.deadlock", False):
+        repo.path = "packages/deadlock"
+    else:
+        repo.path = "packages/hello"
     return repo
 
 
-def create_new_commit():
+def create_commit(parameters=dict()):
     commit = database.Commit()
-    commit.repo = create_repo()
-    commit.channel = create_channel()
-    commit.sha = "2777a37dc82e296d55c23f738b79f139e627920c" # first commit
-    commit.status = database.CommitStatus.new
+    commit.repo = create_repo(parameters)
+    commit.channel = create_channel(parameters)
+    commit.sha = "08979da6c039dd919292f7408785e2ad711b2fd5"
+    commit.status = parameters.get("commit.status", database.CommitStatus.new)
     return commit
 
 
-def create_building_commit():
-    commit = database.Commit()
-    commit.repo = create_repo()
-    commit.channel = create_channel()
-    commit.sha = "2777a37dc82e296d55c23f738b79f139e627920c" # first commit
-    commit.status = database.CommitStatus.building
-    return commit
-
-
-def create_invalid_repo():
-    repo = database.Repo()
-    repo.url = "https://github.com/uboot/nonsense.git"
-    return repo
-
-
-def create_channel():
+def create_channel(parameters=dict()):
     channel = database.Channel()
     channel.branch = "master"
     channel.name = "stable"
     return channel
 
 
-def create_linux_profile():
-    linux = database.Profile()
-    linux.name = "GCC 9"
-    linux.container = "uboot/gcc9:latest"
-    linux.settings = [
-        database.Setting("os", "Linux"),
-        database.Setting("build_type", "Release")
-    ]
-    return linux
+def create_profile(parameters=dict()):
+    profile = database.Profile()
+    if parameters.get("profile.os", "Linux") == "Linux":
+        profile.name = "GCC 9"
+        profile.container = "uboot/gcc9:latest"
+        profile.settings = [
+            database.Setting("os", "Linux"),
+            database.Setting("build_type", "Release")
+        ]
+    else:
+        profile.name = "MSVC 15"
+        profile.container = "msvc15:local"
+        profile.settings = [
+            database.Setting("os", "Windows"),
+            database.Setting("build_type", "Release")
+        ]
+    return profile
 
 
-def create_windows_profile():
-    windows = database.Profile()
-    windows.name = "MSVC 15"
-    windows.container = "msvc15:local"
-    windows.settings = [
-        database.Setting("os", "Windows"),
-        database.Setting("build_type", "Release")
-    ]
-
-
-def create_build():
+def create_build(parameters=dict()):
     build = database.Build()
-    build.commit = create_building_commit()
-    build.profile = create_linux_profile()
+    parameters["commit.status"] = database.CommitStatus.building
+    build.commit = create_commit(parameters)
+    build.profile = create_profile(parameters)
     build.status = database.BuildStatus.new
     return build
+
 

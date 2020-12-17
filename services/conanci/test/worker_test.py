@@ -18,6 +18,16 @@ class AgentTest(unittest.TestCase):
         self.agent.cancel()
         self.agent.join()
 
+    def __wait_for_build_status(self, status, timeout):
+        start = time.time()
+        while True:
+            with database.session_scope() as session:
+                build = session.query(database.Build).first()
+                if build.status == status:
+                    return True
+            if time.time() - start > timeout:
+                return False
+
     def test_start(self):
         self.agent.start()
 
@@ -30,20 +40,27 @@ class AgentTest(unittest.TestCase):
         with database.session_scope() as session:
             session.add(util.create_build())
         self.agent.start()
-        time.sleep(3)
+        self.assertTrue(self.__wait_for_build_status(database.BuildStatus.active, 15))
+
+    def test_stop_build(self):
+        with database.session_scope() as session:
+            build = util.create_build({"repo.deadlock": True})
+            session.add(build)
+        self.agent.start()
+        self.__wait_for_build_status(database.BuildStatus.active, 15)
         with database.session_scope() as session:
             build = session.query(database.Build).first()
-            self.assertEqual(build.status, database.BuildStatus.active)
+            build.status = database.BuildStatus.stopping
+        self.assertTrue(self.__wait_for_build_status(database.BuildStatus.stopped, 15))
 
     def test_cancel_build(self):
         with database.session_scope() as session:
             session.add(util.create_build())
         self.agent.start()
+        self.__wait_for_build_status(database.BuildStatus.active, 15)
         self.agent.cancel()
         self.agent.join()
-        with database.session_scope() as session:
-            build = session.query(database.Build).first()
-            self.assertEqual(build.status, database.BuildStatus.new)
+        self.assertTrue(self.__wait_for_build_status(database.BuildStatus.new, 15))
 
 
 class CrawlerTest(unittest.TestCase):
@@ -81,11 +98,11 @@ class CrawlerTest(unittest.TestCase):
         self.assertTrue(called)
         with database.session_scope() as session:
             commit = session.query(database.Commit).first()
-            self.assertEqual(commit.status, database.CommitStatus.new)
+            self.assertEqual(database.CommitStatus.new, commit.status)
 
     def test_start_repo_and_old_commits(self):
         with database.session_scope() as session:
-            session.add(util.create_new_commit())
+            session.add(util.create_commit({"commit.status": database.CommitStatus.new}))
         self.crawler.start()
         time.sleep(5)
         called = self.crawler.query(lambda: self.scheduler.process_commits.called)
@@ -102,7 +119,7 @@ class CrawlerTest(unittest.TestCase):
 
     def test_start_invalid_repo(self):
         with database.session_scope() as session:
-            session.add(util.create_invalid_repo())
+            session.add(util.create_repo({"repo.invalid": True}))
             session.add(util.create_channel())
         self.crawler.start()
         time.sleep(3)
@@ -127,8 +144,8 @@ class SchedulerTest(unittest.TestCase):
 
     def test_start_commit_and_profile(self):
         with database.session_scope() as session:
-            session.add(util.create_new_commit())
-            session.add(util.create_linux_profile())
+            session.add(util.create_commit({"commit.status": database.CommitStatus.new}))
+            session.add(util.create_profile({"os": "Linux"}))
         self.scheduler.start()
         time.sleep(1)
         self.scheduler.cancel()
