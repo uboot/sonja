@@ -3,6 +3,7 @@ import os
 import re
 import string
 import tarfile
+import threading
 
 from conanci.config import logger
 from io import BytesIO
@@ -49,6 +50,9 @@ class Builder(object):
         self.__image = image
         self.__build_os = build_os
         self.__container = None
+        self.__logs = None
+        self.__cancel_lock = threading.Lock()
+        self.__cancelled = False
 
     def __enter__(self):
         return self
@@ -80,6 +84,7 @@ class Builder(object):
 
         self.__container = self.__client.containers.create(image=self.__image,
                                                            command=command)
+        logger.info("Created docker container '%s'", self.__container.short_id)
 
         if self.__build_os == "Linux":
             build_data_dir = "/"
@@ -91,29 +96,47 @@ class Builder(object):
                             .format(self.__container.short_id))
 
     def run(self):
-        logger.info("Start build in container '{0}'"\
-                    .format(self.__container.short_id))
-        self.__container.start()
-        logs = self.__container.logs(stream=True, follow=True)
-        for line in logs:
+        with self.__cancel_lock:
+            if self.__cancelled:
+                logger.info("Build was cancelled")
+                return
+            logger.info("Start build in container '{0}'" \
+                        .format(self.__container.short_id))
+            self.__container.start()
+            self.__logs = self.__container.logs(stream=True, follow=True)
+        for line in self.__logs:
             logger.info(line.decode("utf-8").strip("\n\r"))
+        with self.__cancel_lock:
+            self.__logs = None
+            if self.__cancelled:
+                logger.info("Build was cancelled")
+                return
+
         result = self.__container.wait()
         if result.get("StatusCode"):
             raise Exception("Build in container '{0}' failed with status '{1}'".format(
                             self.__container.short_id, result.get("StatusCode")))
+
+    def cancel(self):
+        with self.__cancel_lock:
+            logger.info("Cancel build")
+            self.__cancelled = True
+            if self.__logs:
+                logger.info("Close logs")
+                self.__logs.close()
 
     def __exit__(self, type, value, traceback):
         if not self.__container:
             return
 
         try:
-            logger.info("Stop temporary docker containers")
+            logger.info("Stop docker container '%s'", self.__container.short_id)
             self.__container.stop()
         except docker.errors.APIError:
             pass
 
         try:
-            logger.info("Remove temporary docker containers")
+            logger.info("Remove docker container '%s'", self.__container.short_id)
             self.__container.remove()
         except docker.errors.APIError:
             pass

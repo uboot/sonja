@@ -16,7 +16,7 @@ class Scheduler(Worker):
         new_commits = True
         while new_commits:
             new_commits = await self.__process_commits()
-        self.reschedule(60)
+        self.reschedule_internally(60)
         
     async def __process_commits(self):
         logger.info("Start processing commits")
