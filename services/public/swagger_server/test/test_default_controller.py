@@ -5,6 +5,7 @@ from __future__ import absolute_import
 from flask import json
 from six import BytesIO
 
+from swagger_server.models.build import Build  # noqa: E501
 from swagger_server.models.channel import Channel  # noqa: E501
 from swagger_server.models.profile import Profile  # noqa: E501
 from swagger_server.models.repo import Repo  # noqa: E501
@@ -89,6 +90,17 @@ class TestDefaultController(BaseTestCase):
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
+    def test_get_builds(self):
+        """Test case for get_builds
+
+        get builds
+        """
+        response = self.client.open(
+            '/build/{buildStatus}'.format(build_status='build_status_example'),
+            method='GET')
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
     def test_get_channels(self):
         """Test case for get_channels
 
@@ -119,6 +131,42 @@ class TestDefaultController(BaseTestCase):
         response = self.client.open(
             '/repo',
             method='GET')
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
+    def test_ping(self):
+        """Test case for ping
+
+        ping the service
+        """
+        response = self.client.open(
+            '/ping',
+            method='GET')
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
+    def test_populate_database(self):
+        """Test case for populate_database
+
+        Populate the database with sample data
+        """
+        response = self.client.open(
+            '/populate-database',
+            method='GET')
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
+    def test_update_build(self):
+        """Test case for update_build
+
+        update a build
+        """
+        body = Build()
+        response = self.client.open(
+            '/put/{buildId}'.format(build_id=56),
+            method='PUT',
+            data=json.dumps(body),
+            content_type='application/json')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 

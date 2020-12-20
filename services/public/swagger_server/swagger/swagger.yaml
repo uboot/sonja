@@ -204,6 +204,64 @@ paths:
         "200":
           description: success
       x-openapi-router-controller: swagger_server.controllers.default_controller
+  /build/{buildStatus}:
+    get:
+      summary: get builds
+      operationId: get_builds
+      parameters:
+      - name: buildStatus
+        in: path
+        description: build status
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: list of builds
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Build'
+                x-content-type: application/json
+        "400":
+          description: bad input parameter
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /put/{buildId}:
+    put:
+      summary: update a build
+      operationId: update_build
+      parameters:
+      - name: buildId
+        in: path
+        description: id of the build to update
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        description: updated build data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Build'
+      responses:
+        "200":
+          description: updated build
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Build'
+        "400":
+          description: invalid input, object invalid
+        "404":
+          description: build not found
+      x-openapi-router-controller: swagger_server.controllers.default_controller
 components:
   schemas:
     Repo:
@@ -301,4 +359,51 @@ components:
           example: 2777a37dc82e296d55c23f738b79f139e627920c
         repo:
           $ref: '#/components/schemas/Repo'
+      example:
+        repo:
+          path: packages/hello
+          id: 1
+          url: https://github.com/uboot/conan-ci.git
+        id: 1
+        sha: 2777a37dc82e296d55c23f738b79f139e627920c
+    Build:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 1
+        status:
+          type: string
+          example: new
+          enum:
+          - active
+          - error
+          - new
+          - stopped
+          - stopping
+          - success
+        commit:
+          $ref: '#/components/schemas/Commit'
+        profile:
+          $ref: '#/components/schemas/Profile'
+      example:
+        profile:
+          container: conanio/gcc9
+          settings:
+          - value: Release
+            key: build_type
+          - value: Release
+            key: build_type
+          name: GCC 9
+          id: 1
+        commit:
+          repo:
+            path: packages/hello
+            id: 1
+            url: https://github.com/uboot/conan-ci.git
+          id: 1
+          sha: 2777a37dc82e296d55c23f738b79f139e627920c
+        id: 1
+        status: new
 

@@ -4,11 +4,22 @@ import six
 from conanci import database
 
 from flask import abort
+from swagger_server.models.build import Build  # noqa: E501
 from swagger_server.models.channel import Channel  # noqa: E501
+from swagger_server.models.commit import Commit  # noqa: E501
 from swagger_server.models.profile import Profile  # noqa: E501
 from swagger_server.models.setting import Setting  # noqa: E501
 from swagger_server.models.repo import Repo  # noqa: E501
-from swagger_server import util
+
+
+build_status_table = {
+    "new": database.BuildStatus.new,
+    "active": database.BuildStatus.active,
+    "error": database.BuildStatus.error,
+    "stopping": database.BuildStatus.stopping,
+    "stopped": database.BuildStatus.stopped,
+    "success": database.BuildStatus.success
+}
 
 
 def ping():  # noqa: E501
@@ -179,6 +190,63 @@ def get_repos():  # noqa: E501
     """
     with database.session_scope() as session:
         return [Repo(r.id, r.url, r.path) for r in session.query(database.Repo).all()]
+
+
+def get_builds(build_status):  # noqa: E501
+    """get builds
+
+     # noqa: E501
+
+    :param build_status: build status
+    :type build_status: str
+
+    :rtype: List[Build]
+    """
+    with database.session_scope() as session:
+        try:
+            status = build_status_table[build_status]
+        except KeyError:
+            abort(400)
+        return [Build(b.id, b.status.name,
+                      Commit(b.commit.id, b.commit.sha,
+                             Repo(b.commit.repo.id, b.commit.repo.url, b.commit.repo.path)),
+                      Profile(b.profile.id, b.profile.name, b.profile.container,
+                              [Setting(s.key, s.value) for s in b.profile.settings])
+                      )
+                for b in session.query(database.Build).filter_by(status=status).all()]
+
+
+def update_build(build_id, body=None):  # noqa: E501
+    """update a build
+
+     # noqa: E501
+
+    :param build_id: id of the build to update
+    :type build_id: int
+    :param body: updated build data
+    :type body: dict | bytes
+
+    :rtype: None
+    """
+    if connexion.request.is_json:
+        body = Build.from_dict(connexion.request.get_json())  # noqa: E501
+    with database.session_scope() as session:
+        build = session.query(database.Build).filter_by(id=build_id).first()
+        if not build:
+            abort(404)
+        try:
+            build.status = build_status_table[body.status]
+        except KeyError:
+            abort(400)
+
+        commit = build.commit
+        repo = commit.repo
+        profile = build.profile
+        return Build(build.id, build.status.name,
+                     Commit(commit.id, commit.sha,
+                            Repo(repo.id, repo.url, repo.path)),
+                     Profile(profile.id, profile.name, profile.container,
+                             [Setting(s.key, s.value) for s in profile.settings]))
 
 
 def populate_database():  # noqa: E501

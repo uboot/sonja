@@ -13,7 +13,7 @@ def main():
     app.app.json_encoder = encoder.JSONEncoder
     setup_logging()
     connect_to_database()
-    populate_database()
+    #populate_database()
     app.run(port=8080)
 
 if __name__ == '__main__':

@@ -191,13 +191,13 @@ def populate_database():
         # commit.sha = "2777a37dc82e296d55c23f738b79f139e627920c"
         # commit.channel = channel
         # commit.status = CommitStatus.new
-        #
+
         # linux_build = Build()
         # linux_build.commit = commit
         # linux_build.profile = linux
         # linux_build.status = BuildStatus.new
         # session.add(linux_build)
-        #
+
         # windows_build = Build()
         # windows_build.commit = commit
         # windows_build.profile = windows
