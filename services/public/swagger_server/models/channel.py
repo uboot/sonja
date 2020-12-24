@@ -14,11 +14,13 @@ class Channel(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: int=None, name: str=None, branch: str=None):  # noqa: E501
+    def __init__(self, id: int=None, ecosystem: int=None, name: str=None, branch: str=None):  # noqa: E501
         """Channel - a model defined in Swagger
 
         :param id: The id of this Channel.  # noqa: E501
         :type id: int
+        :param ecosystem: The ecosystem of this Channel.  # noqa: E501
+        :type ecosystem: int
         :param name: The name of this Channel.  # noqa: E501
         :type name: str
         :param branch: The branch of this Channel.  # noqa: E501
@@ -26,16 +28,19 @@ class Channel(Model):
         """
         self.swagger_types = {
             'id': int,
+            'ecosystem': int,
             'name': str,
             'branch': str
         }
 
         self.attribute_map = {
             'id': 'id',
+            'ecosystem': 'ecosystem',
             'name': 'name',
             'branch': 'branch'
         }
         self._id = id
+        self._ecosystem = ecosystem
         self._name = name
         self._branch = branch
 
@@ -70,6 +75,29 @@ class Channel(Model):
         """
 
         self._id = id
+
+    @property
+    def ecosystem(self) -> int:
+        """Gets the ecosystem of this Channel.
+
+
+        :return: The ecosystem of this Channel.
+        :rtype: int
+        """
+        return self._ecosystem
+
+    @ecosystem.setter
+    def ecosystem(self, ecosystem: int):
+        """Sets the ecosystem of this Channel.
+
+
+        :param ecosystem: The ecosystem of this Channel.
+        :type ecosystem: int
+        """
+        if ecosystem is None:
+            raise ValueError("Invalid value for `ecosystem`, must not be `None`")  # noqa: E501
+
+        self._ecosystem = ecosystem
 
     @property
     def name(self) -> str:

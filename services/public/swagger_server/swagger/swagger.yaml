@@ -16,6 +16,97 @@ paths:
         "200":
           description: success
       x-openapi-router-controller: swagger_server.controllers.default_controller
+  /ecosystem:
+    get:
+      summary: get all ecosystems
+      operationId: get_ecosystems
+      responses:
+        "200":
+          description: list of ecosystems
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ecosystem'
+                x-content-type: application/json
+        "400":
+          description: bad input parameter
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+    post:
+      summary: add a new ecosystem
+      operationId: add_ecosystem
+      requestBody:
+        description: ecosystem to add
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Ecosystem'
+      responses:
+        "201":
+          description: ecosystem created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ecosystem'
+        "400":
+          description: invalid input, object invalid
+        "409":
+          description: an existing item already exists
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /ecosystem/{ecosystemId}:
+    delete:
+      summary: delete an ecosystem
+      operationId: delete_ecosystem
+      parameters:
+      - name: ecosystemId
+        in: path
+        description: ecosystem id to delete
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "204":
+          description: ecosystem deleted
+        "400":
+          description: invalid ID supplied
+        "404":
+          description: ecosystem not found
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+    patch:
+      summary: update an ecosystem
+      operationId: update_ecosystem
+      parameters:
+      - name: ecosystemId
+        in: path
+        description: id of the ecosystem to update
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: updated ecosystem data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Ecosystem'
+      responses:
+        "200":
+          description: updated ecosystem
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ecosystem'
+        "400":
+          description: invalid input, object invalid
+        "404":
+          description: ecosystem not found
+      x-openapi-router-controller: swagger_server.controllers.default_controller
   /repo:
     get:
       summary: get all current repos
@@ -67,7 +158,7 @@ paths:
         explode: false
         schema:
           type: integer
-          format: int32
+          format: int64
       responses:
         "204":
           description: repo deleted
@@ -127,7 +218,7 @@ paths:
         explode: false
         schema:
           type: integer
-          format: int32
+          format: int64
       responses:
         "204":
           description: profile deleted
@@ -187,7 +278,7 @@ paths:
         explode: false
         schema:
           type: integer
-          format: int32
+          format: int64
       responses:
         "204":
           description: channel deleted
@@ -200,6 +291,14 @@ paths:
     get:
       summary: Populate the database with sample data
       operationId: populate_database
+      responses:
+        "200":
+          description: success
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /clear-database:
+    get:
+      summary: remove all entries from the database
+      operationId: clear_database
       responses:
         "200":
           description: success
@@ -230,8 +329,8 @@ paths:
         "400":
           description: bad input parameter
       x-openapi-router-controller: swagger_server.controllers.default_controller
-  /put/{buildId}:
-    put:
+  /build/{buildId}:
+    patch:
       summary: update a build
       operationId: update_build
       parameters:
@@ -243,7 +342,7 @@ paths:
         explode: false
         schema:
           type: integer
-          format: int32
+          format: int64
       requestBody:
         description: updated build data
         content:
@@ -264,14 +363,51 @@ paths:
       x-openapi-router-controller: swagger_server.controllers.default_controller
 components:
   schemas:
+    Ecosystem:
+      required:
+      - name
+      - user
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        name:
+          type: string
+          example: My Company
+        user:
+          type: string
+          example: mycompany
+        settings:
+          type: string
+          example: ""
+        public_ssh_key:
+          type: string
+          example: ""
+        known_hosts:
+          type: string
+          example: Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN2hSR21kbm05dFVEYk85SURTd0JLNlRiUWErUFhZUENQeTZyYlRyVHR3N1BIa2NjS3JwcDB5VmhwNUhkRUljS3I2cExsVkRCZk9MWDlRVXN5Q09WMHd6ZmpJSk5sR0VZc2RsTEppekhoYm4ybVVqdlNBSFFxWkVUWVA4MWVGekxRTm5QSHQ0RVZWVWg3VmZERVNVODRLZXptRDVRbFdwWExtdlUzMS95TWYrU2U4eGhIVHZLU0NaSUZJbVd3b0c2bWJVb1dmOW56cElvYVNqQit3ZXFxVVVtcGFhYXNYVmFsNzJKK1VYMkIrMlJQVzNSY1QwZU96UWdxbEpMM1JLclRKdmRzakUzSkVBdkdxM2xHSFNaWHkyOEczc2t1YTJTbVZpL3c0eUNFNmdiT0RxblRXbGc3K3dDNjA0eWRHWEE4VkppUzVhcDQzSlhpVUZGQWFRPT0K
+      example:
+        settings: ""
+        name: My Company
+        id: 1
+        known_hosts: Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN2hSR21kbm05dFVEYk85SURTd0JLNlRiUWErUFhZUENQeTZyYlRyVHR3N1BIa2NjS3JwcDB5VmhwNUhkRUljS3I2cExsVkRCZk9MWDlRVXN5Q09WMHd6ZmpJSk5sR0VZc2RsTEppekhoYm4ybVVqdlNBSFFxWkVUWVA4MWVGekxRTm5QSHQ0RVZWVWg3VmZERVNVODRLZXptRDVRbFdwWExtdlUzMS95TWYrU2U4eGhIVHZLU0NaSUZJbVd3b0c2bWJVb1dmOW56cElvYVNqQit3ZXFxVVVtcGFhYXNYVmFsNzJKK1VYMkIrMlJQVzNSY1QwZU96UWdxbEpMM1JLclRKdmRzakUzSkVBdkdxM2xHSFNaWHkyOEczc2t1YTJTbVZpL3c0eUNFNmdiT0RxblRXbGc3K3dDNjA0eWRHWEE4VkppUzVhcDQzSlhpVUZGQWFRPT0K
+        user: mycompany
+        public_ssh_key: ""
     Repo:
       required:
+      - ecosystem
       - url
       type: object
       properties:
         id:
           type: integer
-          format: int32
+          format: int64
+          example: 1
+        ecosystem:
+          type: integer
+          format: int64
           example: 1
         url:
           type: string
@@ -281,17 +417,23 @@ components:
           example: packages/hello
       example:
         path: packages/hello
+        ecosystem: 1
         id: 1
         url: https://github.com/uboot/conan-ci.git
     Profile:
       required:
       - container
+      - ecosystem
       - name
       type: object
       properties:
         id:
           type: integer
-          format: int32
+          format: int64
+          example: 1
+        ecosystem:
+          type: integer
+          format: int64
           example: 1
         name:
           type: string
@@ -310,6 +452,7 @@ components:
           key: build_type
         - value: Release
           key: build_type
+        ecosystem: 1
         name: GCC 9
         id: 1
     Setting:
@@ -330,12 +473,17 @@ components:
     Channel:
       required:
       - branch
+      - ecosystem
       - name
       type: object
       properties:
         id:
           type: integer
-          format: int32
+          format: int64
+          example: 1
+        ecosystem:
+          type: integer
+          format: int64
           example: 1
         name:
           type: string
@@ -344,6 +492,7 @@ components:
           type: string
           example: master
       example:
+        ecosystem: 1
         name: stable
         id: 1
         branch: master
@@ -352,7 +501,7 @@ components:
       properties:
         id:
           type: integer
-          format: int32
+          format: int64
           example: 1
         sha:
           type: string
@@ -362,6 +511,7 @@ components:
       example:
         repo:
           path: packages/hello
+          ecosystem: 1
           id: 1
           url: https://github.com/uboot/conan-ci.git
         id: 1
@@ -371,7 +521,7 @@ components:
       properties:
         id:
           type: integer
-          format: int32
+          format: int64
           example: 1
         status:
           type: string
@@ -395,11 +545,13 @@ components:
             key: build_type
           - value: Release
             key: build_type
+          ecosystem: 1
           name: GCC 9
           id: 1
         commit:
           repo:
             path: packages/hello
+            ecosystem: 1
             id: 1
             url: https://github.com/uboot/conan-ci.git
           id: 1

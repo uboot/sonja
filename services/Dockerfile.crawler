@@ -6,6 +6,7 @@ RUN apk add --no-cache \
 		git \
 		py3-pip \
 		py3-wheel \
+		py3-cryptography \
 		py3-mysqlclient
 
 RUN mkdir -p /usr/src/app

@@ -15,11 +15,13 @@ class Profile(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: int=None, name: str=None, container: str=None, settings: List[Setting]=None):  # noqa: E501
+    def __init__(self, id: int=None, ecosystem: int=None, name: str=None, container: str=None, settings: List[Setting]=None):  # noqa: E501
         """Profile - a model defined in Swagger
 
         :param id: The id of this Profile.  # noqa: E501
         :type id: int
+        :param ecosystem: The ecosystem of this Profile.  # noqa: E501
+        :type ecosystem: int
         :param name: The name of this Profile.  # noqa: E501
         :type name: str
         :param container: The container of this Profile.  # noqa: E501
@@ -29,6 +31,7 @@ class Profile(Model):
         """
         self.swagger_types = {
             'id': int,
+            'ecosystem': int,
             'name': str,
             'container': str,
             'settings': List[Setting]
@@ -36,11 +39,13 @@ class Profile(Model):
 
         self.attribute_map = {
             'id': 'id',
+            'ecosystem': 'ecosystem',
             'name': 'name',
             'container': 'container',
             'settings': 'settings'
         }
         self._id = id
+        self._ecosystem = ecosystem
         self._name = name
         self._container = container
         self._settings = settings
@@ -76,6 +81,29 @@ class Profile(Model):
         """
 
         self._id = id
+
+    @property
+    def ecosystem(self) -> int:
+        """Gets the ecosystem of this Profile.
+
+
+        :return: The ecosystem of this Profile.
+        :rtype: int
+        """
+        return self._ecosystem
+
+    @ecosystem.setter
+    def ecosystem(self, ecosystem: int):
+        """Sets the ecosystem of this Profile.
+
+
+        :param ecosystem: The ecosystem of this Profile.
+        :type ecosystem: int
+        """
+        if ecosystem is None:
+            raise ValueError("Invalid value for `ecosystem`, must not be `None`")  # noqa: E501
+
+        self._ecosystem = ecosystem
 
     @property
     def name(self) -> str:

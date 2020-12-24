@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Enum, ForeignKey, Integer, String, Table
+from sqlalchemy import create_engine, Column, Enum, ForeignKey, Integer, String, Table, Text
 from sqlalchemy.orm import backref, relationship, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -6,6 +6,8 @@ from contextlib import contextmanager
 import enum
 import logging
 import os
+
+from conanci.ssh import decode, encode, generate_rsa_key
 
 
 logging.basicConfig(level=logging.INFO)
@@ -25,10 +27,24 @@ engine = create_engine(connection_string, echo=False)
 Session = sessionmaker(engine)
 
 
+class Ecosystem(Base):
+    __tablename__ = 'ecosystem'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(255), nullable=False)
+    user = Column(String(255))
+    public_ssh_key = Column(Text())
+    ssh_key = Column(Text())
+    known_hosts = Column(Text())
+    settings = Column(Text())
+
+
 class Repo(Base):
     __tablename__ = 'repo'
 
     id = Column(Integer, primary_key=True)
+    ecosystem_id = Column(Integer, ForeignKey('ecosystem.id'))
+    ecosystem = relationship("Ecosystem", backref="repos")
     url = Column(String(255), nullable=False)
     path = Column(String(255))
 
@@ -37,6 +53,8 @@ class Channel(Base):
     __tablename__ = 'channel'
 
     id = Column(Integer, primary_key=True)
+    ecosystem_id = Column(Integer, ForeignKey('ecosystem.id'))
+    ecosystem = relationship("Ecosystem", backref="channels")
     name = Column(String(255), nullable=False)
     branch = Column(String(255), nullable=False)
 
@@ -45,6 +63,8 @@ class Profile(Base):
     __tablename__ = 'profile'
 
     id = Column(Integer, primary_key=True)
+    ecosystem_id = Column(Integer, ForeignKey('ecosystem.id'))
+    ecosystem = relationship("Ecosystem", backref="profiles")
     name = Column(String(255), nullable=False)
     container = Column(String(255), nullable=False)
     settings = relationship('Setting', backref='profile', lazy=True,
@@ -158,12 +178,28 @@ def session_scope():
 def populate_database():
     logger.info("Populate database")
     with session_scope() as session:
+        ecosystem = Ecosystem()
+        ecosystem.name = "Conan CI"
+        ecosystem.user = "conanci"
+        private, public = generate_rsa_key()
+        ecosystem.ssh_key = encode(private)
+        ecosystem.public_ssh_key = encode(public)
+        ecosystem.known_hosts = ("Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN"
+                                 "2hSR21kbm05dFVEYk85SURTd0JLNlRiUWErUFhZUENQeTZyYlRyVHR3N1BIa2NjS3JwcDB5VmhwNUhkRUljS3"
+                                 "I2cExsVkRCZk9MWDlRVXN5Q09WMHd6ZmpJSk5sR0VZc2RsTEppekhoYm4ybVVqdlNBSFFxWkVUWVA4MWVGekx"
+                                 "RTm5QSHQ0RVZWVWg3VmZERVNVODRLZXptRDVRbFdwWExtdlUzMS95TWYrU2U4eGhIVHZLU0NaSUZJbVd3b0c2"
+                                 "bWJVb1dmOW56cElvYVNqQit3ZXFxVVVtcGFhYXNYVmFsNzJKK1VYMkIrMlJQVzNSY1QwZU96UWdxbEpMM1JLc"
+                                 "lRKdmRzakUzSkVBdkdxM2xHSFNaWHkyOEczc2t1YTJTbVZpL3c0eUNFNmdiT0RxblRXbGc3K3dDNjA0eWRHWE"
+                                 "E4VkppUzVhcDQzSlhpVUZGQWFRPT0K")
+
         repo = Repo()
+        repo.ecosystem = ecosystem
         repo.url = "git@github.com:uboot/conan-ci.git"
         repo.path = "packages/hello"
         session.add(repo)
 
         linux = Profile()
+        linux.ecosystem = ecosystem
         linux.name = "GCC 9"
         linux.container = "uboot/gcc9:latest"
         linux.settings = [
@@ -173,6 +209,7 @@ def populate_database():
         session.add(linux)
 
         windows = Profile()
+        windows.ecosystem = ecosystem
         windows.name = "MSVC 15"
         windows.container = "msvc15:local"
         windows.settings = [
@@ -182,6 +219,7 @@ def populate_database():
         session.add(windows)
 
         channel = Channel()
+        channel.ecosystem = ecosystem
         channel.branch = "master"
         channel.name = "stable"
         session.add(channel)
@@ -215,3 +253,4 @@ def clear_database():
         session.query(Setting).delete()
         session.query(Profile).delete()
         session.query(Repo).delete()
+        session.query(Ecosystem).delete()

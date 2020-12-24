@@ -14,11 +14,13 @@ class Repo(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: int=None, url: str=None, path: str=None):  # noqa: E501
+    def __init__(self, id: int=None, ecosystem: int=None, url: str=None, path: str=None):  # noqa: E501
         """Repo - a model defined in Swagger
 
         :param id: The id of this Repo.  # noqa: E501
         :type id: int
+        :param ecosystem: The ecosystem of this Repo.  # noqa: E501
+        :type ecosystem: int
         :param url: The url of this Repo.  # noqa: E501
         :type url: str
         :param path: The path of this Repo.  # noqa: E501
@@ -26,16 +28,19 @@ class Repo(Model):
         """
         self.swagger_types = {
             'id': int,
+            'ecosystem': int,
             'url': str,
             'path': str
         }
 
         self.attribute_map = {
             'id': 'id',
+            'ecosystem': 'ecosystem',
             'url': 'url',
             'path': 'path'
         }
         self._id = id
+        self._ecosystem = ecosystem
         self._url = url
         self._path = path
 
@@ -70,6 +75,29 @@ class Repo(Model):
         """
 
         self._id = id
+
+    @property
+    def ecosystem(self) -> int:
+        """Gets the ecosystem of this Repo.
+
+
+        :return: The ecosystem of this Repo.
+        :rtype: int
+        """
+        return self._ecosystem
+
+    @ecosystem.setter
+    def ecosystem(self, ecosystem: int):
+        """Sets the ecosystem of this Repo.
+
+
+        :param ecosystem: The ecosystem of this Repo.
+        :type ecosystem: int
+        """
+        if ecosystem is None:
+            raise ValueError("Invalid value for `ecosystem`, must not be `None`")  # noqa: E501
+
+        self._ecosystem = ecosystem
 
     @property
     def url(self) -> str:
