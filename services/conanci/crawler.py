@@ -1,19 +1,21 @@
 from conanci import database
 from conanci.config import connect_to_database, logger
+from conanci.ssh import decode
 from conanci.worker import Worker
-from sqlalchemy.orm import sessionmaker
 import asyncio
 import git
 import os.path
 import re
 import shutil
+import stat
 
 data_dir = os.environ.get("VCS_DATA_DIR", "/data")
 
 
 class RepoController(object):
-    def __init__(self, repo_dir):
-        self.repo_dir = repo_dir
+    def __init__(self, work_dir):
+        self.work_dir = work_dir
+        self.repo_dir = os.path.join(work_dir, "repo")
 
     def is_clone_of(self, url):
         try:
@@ -29,9 +31,23 @@ class RepoController(object):
                 return True
         return False
 
-    def create_new_clone(self, url):
-        shutil.rmtree(self.repo_dir, ignore_errors=True)
-        git.Repo.clone_from(url=url, to_path=self.repo_dir)
+    def create_new_repo(self, url):
+        shutil.rmtree(self.work_dir, ignore_errors=True)
+        repo = git.Repo.init(self.repo_dir)
+        repo.create_remote('origin', url=url)
+
+    def setup_ssh(self, ssh_key, known_hosts):
+        ssh_key_path = os.path.abspath(os.path.join(self.work_dir, "id_rsa"))
+        with open(ssh_key_path, "w") as f:
+            f.write(decode(ssh_key))
+        os.chmod(ssh_key_path, stat.S_IRUSR | stat.S_IWUSR)
+        known_hosts_path = os.path.abspath(os.path.join(self.work_dir, "known_hosts"))
+        with open(known_hosts_path, "w") as f:
+            f.write(decode(known_hosts))
+        repo = git.Repo(self.repo_dir)
+        config = repo.config_writer()
+        config.set_value("core", "sshCommand", "ssh -i {0} -o UserKnownHostsFile={1}".format(ssh_key_path,
+                                                                                             known_hosts_path))
 
     def fetch(self):
         repo = git.Repo(self.repo_dir)
@@ -74,15 +90,16 @@ class Crawler(Worker):
             channels = session.query(database.Channel).all()
             for repo in repos:
                 try:
-                    repo_dir = os.path.join(data_dir, str(repo.id))
-                    controller = RepoController(repo_dir)
+                    work_dir = os.path.join(data_dir, str(repo.id))
+                    controller = RepoController(work_dir)
                     if not controller.is_clone_of(repo.url):
-                        logger.info("Clone URL '%s' to '%s'", repo.url, repo_dir)
-                        await loop.run_in_executor(None, controller.create_new_clone, repo.url)
-                    else:
-                        logger.info("Fetch existing repo '%s' for URL '%s'",
-                                    repo_dir, repo.url)
-                        await loop.run_in_executor(None, controller.fetch)
+                        logger.info("Create repo for URL '%s' in '%s'", repo.url, work_dir)
+                        await loop.run_in_executor(None, controller.create_new_repo, repo.url)
+                    logger.info("Setup SSH for in '%s'", work_dir)
+                    await loop.run_in_executor(None, controller.setup_ssh, repo.ecosystem.ssh_key,
+                                               repo.ecosystem.known_hosts)
+                    logger.info("Fetch repo '%s' for URL '%s'", work_dir, repo.url)
+                    await loop.run_in_executor(None, controller.fetch)
 
                     branches = controller.get_remote_branches()
                     for channel in channels:

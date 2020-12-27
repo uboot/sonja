@@ -42,6 +42,8 @@ spec:
           value: {{ $.Values.mysql.mysqlRootPassword }}
         - name: CONANCI_AGENT_OS
           value: Linux
+        - name: CONANCI_CRAWLER_URL
+          value: {{ template "conan-ci.fullname" $ }}-crawler
         - name: CONANCI_SCHEDULER_URL
           value: {{ template "conan-ci.fullname" $ }}-scheduler
         - name: CONANCI_LINUXAGENT_URL
@@ -136,6 +138,8 @@ spec:
           value: {{ $.Values.mysql.mysqlRootPassword }}
         - name: CONANCI_AGENT_OS
           value: Windows
+        - name: CONANCI_CRAWLER_URL
+          value: {{ template "conan-ci.fullname" $ }}-crawler
         - name: CONANCI_SCHEDULER_URL
           value: {{ template "conan-ci.fullname" $ }}-scheduler
         - name: CONANCI_LINUXAGENT_URL

@@ -16,6 +16,7 @@ from __future__ import absolute_import
 
 # import apis into sdk package
 from conanci.swagger_client.agent_api import AgentApi
+from conanci.swagger_client.crawler_api import CrawlerApi
 from conanci.swagger_client.scheduler_api import SchedulerApi
 # import ApiClient
 from conanci.swagger_client.api_client import ApiClient

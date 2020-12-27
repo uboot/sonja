@@ -178,19 +178,9 @@ def session_scope():
 def populate_database():
     logger.info("Populate database")
     with session_scope() as session:
-        ecosystem = Ecosystem()
-        ecosystem.name = "Conan CI"
-        ecosystem.user = "conanci"
-        private, public = generate_rsa_key()
-        ecosystem.ssh_key = encode(private)
-        ecosystem.public_ssh_key = encode(public)
-        ecosystem.known_hosts = ("Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN"
-                                 "2hSR21kbm05dFVEYk85SURTd0JLNlRiUWErUFhZUENQeTZyYlRyVHR3N1BIa2NjS3JwcDB5VmhwNUhkRUljS3"
-                                 "I2cExsVkRCZk9MWDlRVXN5Q09WMHd6ZmpJSk5sR0VZc2RsTEppekhoYm4ybVVqdlNBSFFxWkVUWVA4MWVGekx"
-                                 "RTm5QSHQ0RVZWVWg3VmZERVNVODRLZXptRDVRbFdwWExtdlUzMS95TWYrU2U4eGhIVHZLU0NaSUZJbVd3b0c2"
-                                 "bWJVb1dmOW56cElvYVNqQit3ZXFxVVVtcGFhYXNYVmFsNzJKK1VYMkIrMlJQVzNSY1QwZU96UWdxbEpMM1JLc"
-                                 "lRKdmRzakUzSkVBdkdxM2xHSFNaWHkyOEczc2t1YTJTbVZpL3c0eUNFNmdiT0RxblRXbGc3K3dDNjA0eWRHWE"
-                                 "E4VkppUzVhcDQzSlhpVUZGQWFRPT0K")
+        ecosystem = session.query(Ecosystem).filter_by(id=1).first()
+        if not ecosystem:
+            raise Exception("Found no ecosystem with ID=1")
 
         repo = Repo()
         repo.ecosystem = ecosystem
@@ -246,6 +236,12 @@ def populate_database():
 
 
 def clear_database():
+    clear_ecosystems()
+    with session_scope() as session:
+        session.query(Ecosystem).delete()
+
+
+def clear_ecosystems():
     with session_scope() as session:
         session.query(Build).delete()
         session.query(Commit).delete()
@@ -253,4 +249,3 @@ def clear_database():
         session.query(Setting).delete()
         session.query(Profile).delete()
         session.query(Repo).delete()
-        session.query(Ecosystem).delete()

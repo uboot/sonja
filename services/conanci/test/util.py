@@ -1,8 +1,28 @@
 from conanci import database
 
+import os
+
+
+def create_ecosystem(parameters=dict()):
+    ecosystem = database.Ecosystem()
+    ecosystem.name = "Conan CI"
+    ecosystem.user = "conanci"
+    ecosystem.known_hosts = ("Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN"
+                             "2hSR21kbm05dFVEYk85SURTd0JLNlRiUWErUFhZUENQeTZyYlRyVHR3N1BIa2NjS3JwcDB5VmhwNUhkRUljS3"
+                             "I2cExsVkRCZk9MWDlRVXN5Q09WMHd6ZmpJSk5sR0VZc2RsTEppekhoYm4ybVVqdlNBSFFxWkVUWVA4MWVGekx"
+                             "RTm5QSHQ0RVZWVWg3VmZERVNVODRLZXptRDVRbFdwWExtdlUzMS95TWYrU2U4eGhIVHZLU0NaSUZJbVd3b0c2"
+                             "bWJVb1dmOW56cElvYVNqQit3ZXFxVVVtcGFhYXNYVmFsNzJKK1VYMkIrMlJQVzNSY1QwZU96UWdxbEpMM1JLc"
+                             "lRKdmRzakUzSkVBdkdxM2xHSFNaWHkyOEczc2t1YTJTbVZpL3c0eUNFNmdiT0RxblRXbGc3K3dDNjA0eWRHWE"
+                             "E4VkppUzVhcDQzSlhpVUZGQWFRPT0K")
+    ecosystem.ssh_key = os.environ.get("SSH_KEY", "")
+    ecosystem.public_ssh_key = os.environ.get("PUBLIC_SSH_KEY", "")
+    parameters["ecosystem"] = ecosystem
+    return ecosystem
+
 
 def create_repo(parameters=dict()):
     repo = database.Repo()
+    repo.ecosystem = parameters.get("ecosysstem", create_ecosystem(parameters))
     if parameters.get("repo.invalid", False):
         repo.url = "https://github.com/uboot/nonsense.git"
     else:
@@ -25,6 +45,7 @@ def create_commit(parameters=dict()):
 
 def create_channel(parameters=dict()):
     channel = database.Channel()
+    channel.ecosystem = parameters.get("ecosysstem", create_ecosystem(parameters))
     channel.branch = "master"
     channel.name = "stable"
     return channel
@@ -32,6 +53,7 @@ def create_channel(parameters=dict()):
 
 def create_profile(parameters=dict()):
     profile = database.Profile()
+    profile.ecosystem = parameters.get("ecosysstem", create_ecosystem(parameters))
     if parameters.get("profile.os", "Linux") == "Linux":
         profile.name = "GCC 9"
         profile.container = "uboot/gcc9:latest"

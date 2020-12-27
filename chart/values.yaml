@@ -15,6 +15,8 @@ mysql:
   imageTag: 8.0.21
   mysqlRootPassword: secret
   mysqlDatabase: conan-ci
+  persistence:
+    existingClaim: mysql
 
 phpmyadmin:
   db:
@@ -25,8 +27,6 @@ services:
     public: true
   - name: scheduler
   - name: crawler
-    public: true
-    ssh: true
   - name: linux-agent
     docker: true
     image: agent

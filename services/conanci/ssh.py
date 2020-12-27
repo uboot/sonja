@@ -13,8 +13,8 @@ def generate_rsa_key():
     )
     private = key.private_bytes(
         encoding=serialization.Encoding.PEM,
-        format = serialization.PrivateFormat.TraditionalOpenSSL,
-        encryption_algorithm = serialization.NoEncryption()
+        format=serialization.PrivateFormat.TraditionalOpenSSL,
+        encryption_algorithm=serialization.NoEncryption()
     ).decode("utf-8")
     public = key.public_key().public_bytes(
         encoding=serialization.Encoding.OpenSSH,

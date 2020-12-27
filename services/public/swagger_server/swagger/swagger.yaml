@@ -287,6 +287,14 @@ paths:
         "404":
           description: channel not found
       x-openapi-router-controller: swagger_server.controllers.default_controller
+  /process-repos:
+    get:
+      summary: scan repos for new commits
+      operationId: process_repos
+      responses:
+        "200":
+          description: success
+      x-openapi-router-controller: swagger_server.controllers.default_controller
   /populate-database:
     get:
       summary: Populate the database with sample data
@@ -299,6 +307,14 @@ paths:
     get:
       summary: remove all entries from the database
       operationId: clear_database
+      responses:
+        "200":
+          description: success
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /clear-ecosystems:
+    get:
+      summary: remove all entries but the ecosystems from the database
+      operationId: clear_ecosystems
       responses:
         "200":
           description: success
