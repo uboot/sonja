@@ -68,8 +68,8 @@ class Agent(Worker):
                 "channel": build.commit.channel.name,
                 "path": os.path.join(build.commit.repo.path, "conanfile.py")
                         if build.commit.repo.path != "" else "conanfile.py",
-                "ssh_dir": ssh_dir,
-                "ssh_key": ssh_key
+                "ssh_key": build.profile.ecosystem.ssh_key,
+                "known_hosts": build.profile.ecosystem.known_hosts
             }
 
         try:

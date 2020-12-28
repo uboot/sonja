@@ -7,6 +7,14 @@ import unittest
 from contextlib import contextmanager
 
 
+known_hosts = ("Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN"
+               "2hSR21kbm05dFVEYk85SURTd0JLNlRiUWErUFhZUENQeTZyYlRyVHR3N1BIa2NjS3JwcDB5VmhwNUhkRUljS3"
+               "I2cExsVkRCZk9MWDlRVXN5Q09WMHd6ZmpJSk5sR0VZc2RsTEppekhoYm4ybVVqdlNBSFFxWkVUWVA4MWVGekx"
+               "RTm5QSHQ0RVZWVWg3VmZERVNVODRLZXptRDVRbFdwWExtdlUzMS95TWYrU2U4eGhIVHZLU0NaSUZJbVd3b0c2"
+               "bWJVb1dmOW56cElvYVNqQit3ZXFxVVVtcGFhYXNYVmFsNzJKK1VYMkIrMlJQVzNSY1QwZU96UWdxbEpMM1JLc"
+               "lRKdmRzakUzSkVBdkdxM2xHSFNaWHkyOEczc2t1YTJTbVZpL3c0eUNFNmdiT0RxblRXbGc3K3dDNjA0eWRHWE"
+               "E4VkppUzVhcDQzSlhpVUZGQWFRPT0K")
+
 @contextmanager
 def environment(key, value):
     os.environ[key] = value
@@ -41,13 +49,12 @@ def get_linux_build_parameters():
         "conanci_user": "conanci",
         "channel": "latest",
         "path": "packages/hello/conanfile.py",
-        "ssh_dir": os.path.dirname(ssh_key_path),
-        "ssh_key": os.path.basename(ssh_key_path)
+        "ssh_key": os.environ.get("SSH_KEY", ""),
+        "known_hosts": known_hosts
     }
 
 
 def get_windows_build_parameters():
-    ssh_key_path = os.environ.get("SSH_KEY_PATH", "")
     return {
         "conan_url": os.environ.get("CONAN_SERVER_URL", "127.0.0.1"),
         "conan_user": "demo",
@@ -57,8 +64,8 @@ def get_windows_build_parameters():
         "conanci_user": "conanci",
         "channel": "latest",
         "path": "packages/hello/conanfile.py",
-        "ssh_dir": os.path.dirname(ssh_key_path),
-        "ssh_key": os.path.basename(ssh_key_path)
+        "ssh_key": os.environ.get("SSH_KEY", ""),
+        "known_hosts": known_hosts
     }
 
 

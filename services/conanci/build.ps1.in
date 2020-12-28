@@ -7,7 +7,7 @@ function ThrowOnNonZero {
 
 echo '### Setup SSH ###'
 mkdir -p "$$env:userprofile\.ssh"; ThrowOnNonZero
-Copy-Item "C:\$ssh_key" -Destination "$$env:userprofile\.ssh"; ThrowOnNonZero
+Copy-Item "C:\id_rsa" -Destination "$$env:userprofile\.ssh"; ThrowOnNonZero
 Copy-Item C:\known_hosts -Destination "$$env:userprofile\.ssh"; ThrowOnNonZero
 
 echo '### Setup Conan ###'

@@ -6,6 +6,7 @@ import tarfile
 import threading
 
 from conanci.config import logger
+from conanci.ssh import decode
 from io import BytesIO
 
 
@@ -14,6 +15,11 @@ docker_image_pattern = ("([a-z0-9\\.-]+(:[0-9]+)?/)?"
 
 # docker run --name conan -d --rm -p 9300:9300 -v /path-to-server-config:/root/.conan_server conanio/conan_server:1.28.1
 
+def add_content_to_tar(tar, file_name, text_data):
+    tarinfo = tarfile.TarInfo(file_name)
+    content = BytesIO(bytes(text_data, "utf-8"))
+    tarinfo.size = len(content.getbuffer())
+    tar.addfile(tarinfo, content)
 
 def create_build_tar(build_os, parameters):
     if build_os == "Linux":
@@ -31,14 +37,9 @@ def create_build_tar(build_os, parameters):
     # place into archive
     f = BytesIO()
     tar = tarfile.open(mode="w", fileobj=f, dereference=True)
-    tarinfo = tarfile.TarInfo(script_name)
-    content = BytesIO(bytes(script, "utf-8"))
-    tarinfo.size = len(content.getbuffer())
-    tar.addfile(tarinfo, content)
-    ssh_key_path = os.path.join(parameters["ssh_dir"], parameters["ssh_key"])
-    tar.add(name=ssh_key_path, arcname=parameters["ssh_key"])
-    known_hosts_path = os.path.join(parameters["ssh_dir"], "known_hosts")
-    tar.add(name=known_hosts_path, arcname="known_hosts")
+    add_content_to_tar(tar, script_name, script)
+    add_content_to_tar(tar, "id_rsa", decode(parameters["ssh_key"]))
+    add_content_to_tar(tar, "known_hosts", decode(parameters["known_hosts"]))
     tar.close()
     f.seek(0)
     return f

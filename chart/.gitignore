@@ -1,4 +1,2 @@
 charts/*.tgz
 Chart.lock
-id_*
-known_hosts

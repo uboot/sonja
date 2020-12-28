@@ -3,8 +3,8 @@ set -e
 
 echo '### Setup SSH ###'
 mkdir -p ~/.ssh
-cp "/$ssh_key" ~/.ssh
-chmod 600 ~/.ssh/"$ssh_key"
+cp /id_rsa ~/.ssh
+chmod 600 ~/.ssh/id_rsa
 cp /known_hosts ~/.ssh
 
 echo '### Setup Conan ###'

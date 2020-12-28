@@ -35,5 +35,3 @@ services:
 windows:
   - name: one
     image: agent
-
-sshKey: id_ed25519
