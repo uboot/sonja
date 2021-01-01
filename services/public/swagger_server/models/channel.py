@@ -6,6 +6,8 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
+from swagger_server.models.channel_attributes import ChannelAttributes  # noqa: F401,E501
+from swagger_server.models.profile_relationships import ProfileRelationships  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -14,35 +16,35 @@ class Channel(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: int=None, ecosystem: int=None, name: str=None, branch: str=None):  # noqa: E501
+    def __init__(self, id: int=None, type: str=None, attributes: ChannelAttributes=None, relationships: ProfileRelationships=None):  # noqa: E501
         """Channel - a model defined in Swagger
 
         :param id: The id of this Channel.  # noqa: E501
         :type id: int
-        :param ecosystem: The ecosystem of this Channel.  # noqa: E501
-        :type ecosystem: int
-        :param name: The name of this Channel.  # noqa: E501
-        :type name: str
-        :param branch: The branch of this Channel.  # noqa: E501
-        :type branch: str
+        :param type: The type of this Channel.  # noqa: E501
+        :type type: str
+        :param attributes: The attributes of this Channel.  # noqa: E501
+        :type attributes: ChannelAttributes
+        :param relationships: The relationships of this Channel.  # noqa: E501
+        :type relationships: ProfileRelationships
         """
         self.swagger_types = {
             'id': int,
-            'ecosystem': int,
-            'name': str,
-            'branch': str
+            'type': str,
+            'attributes': ChannelAttributes,
+            'relationships': ProfileRelationships
         }
 
         self.attribute_map = {
             'id': 'id',
-            'ecosystem': 'ecosystem',
-            'name': 'name',
-            'branch': 'branch'
+            'type': 'type',
+            'attributes': 'attributes',
+            'relationships': 'relationships'
         }
         self._id = id
-        self._ecosystem = ecosystem
-        self._name = name
-        self._branch = branch
+        self._type = type
+        self._attributes = attributes
+        self._relationships = relationships
 
     @classmethod
     def from_dict(cls, dikt) -> 'Channel':
@@ -77,70 +79,66 @@ class Channel(Model):
         self._id = id
 
     @property
-    def ecosystem(self) -> int:
-        """Gets the ecosystem of this Channel.
+    def type(self) -> str:
+        """Gets the type of this Channel.
 
 
-        :return: The ecosystem of this Channel.
-        :rtype: int
-        """
-        return self._ecosystem
-
-    @ecosystem.setter
-    def ecosystem(self, ecosystem: int):
-        """Sets the ecosystem of this Channel.
-
-
-        :param ecosystem: The ecosystem of this Channel.
-        :type ecosystem: int
-        """
-        if ecosystem is None:
-            raise ValueError("Invalid value for `ecosystem`, must not be `None`")  # noqa: E501
-
-        self._ecosystem = ecosystem
-
-    @property
-    def name(self) -> str:
-        """Gets the name of this Channel.
-
-
-        :return: The name of this Channel.
+        :return: The type of this Channel.
         :rtype: str
         """
-        return self._name
+        return self._type
 
-    @name.setter
-    def name(self, name: str):
-        """Sets the name of this Channel.
+    @type.setter
+    def type(self, type: str):
+        """Sets the type of this Channel.
 
 
-        :param name: The name of this Channel.
-        :type name: str
+        :param type: The type of this Channel.
+        :type type: str
         """
-        if name is None:
-            raise ValueError("Invalid value for `name`, must not be `None`")  # noqa: E501
+        if type is None:
+            raise ValueError("Invalid value for `type`, must not be `None`")  # noqa: E501
 
-        self._name = name
+        self._type = type
 
     @property
-    def branch(self) -> str:
-        """Gets the branch of this Channel.
+    def attributes(self) -> ChannelAttributes:
+        """Gets the attributes of this Channel.
 
 
-        :return: The branch of this Channel.
-        :rtype: str
+        :return: The attributes of this Channel.
+        :rtype: ChannelAttributes
         """
-        return self._branch
+        return self._attributes
 
-    @branch.setter
-    def branch(self, branch: str):
-        """Sets the branch of this Channel.
+    @attributes.setter
+    def attributes(self, attributes: ChannelAttributes):
+        """Sets the attributes of this Channel.
 
 
-        :param branch: The branch of this Channel.
-        :type branch: str
+        :param attributes: The attributes of this Channel.
+        :type attributes: ChannelAttributes
         """
-        if branch is None:
-            raise ValueError("Invalid value for `branch`, must not be `None`")  # noqa: E501
 
-        self._branch = branch
+        self._attributes = attributes
+
+    @property
+    def relationships(self) -> ProfileRelationships:
+        """Gets the relationships of this Channel.
+
+
+        :return: The relationships of this Channel.
+        :rtype: ProfileRelationships
+        """
+        return self._relationships
+
+    @relationships.setter
+    def relationships(self, relationships: ProfileRelationships):
+        """Sets the relationships of this Channel.
+
+
+        :param relationships: The relationships of this Channel.
+        :type relationships: ProfileRelationships
+        """
+
+        self._relationships = relationships

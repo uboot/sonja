@@ -6,7 +6,8 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
-from swagger_server.models.setting import Setting  # noqa: F401,E501
+from swagger_server.models.profile_attributes import ProfileAttributes  # noqa: F401,E501
+from swagger_server.models.profile_relationships import ProfileRelationships  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -15,40 +16,35 @@ class Profile(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: int=None, ecosystem: int=None, name: str=None, container: str=None, settings: List[Setting]=None):  # noqa: E501
+    def __init__(self, id: int=None, type: str=None, attributes: ProfileAttributes=None, relationships: ProfileRelationships=None):  # noqa: E501
         """Profile - a model defined in Swagger
 
         :param id: The id of this Profile.  # noqa: E501
         :type id: int
-        :param ecosystem: The ecosystem of this Profile.  # noqa: E501
-        :type ecosystem: int
-        :param name: The name of this Profile.  # noqa: E501
-        :type name: str
-        :param container: The container of this Profile.  # noqa: E501
-        :type container: str
-        :param settings: The settings of this Profile.  # noqa: E501
-        :type settings: List[Setting]
+        :param type: The type of this Profile.  # noqa: E501
+        :type type: str
+        :param attributes: The attributes of this Profile.  # noqa: E501
+        :type attributes: ProfileAttributes
+        :param relationships: The relationships of this Profile.  # noqa: E501
+        :type relationships: ProfileRelationships
         """
         self.swagger_types = {
             'id': int,
-            'ecosystem': int,
-            'name': str,
-            'container': str,
-            'settings': List[Setting]
+            'type': str,
+            'attributes': ProfileAttributes,
+            'relationships': ProfileRelationships
         }
 
         self.attribute_map = {
             'id': 'id',
-            'ecosystem': 'ecosystem',
-            'name': 'name',
-            'container': 'container',
-            'settings': 'settings'
+            'type': 'type',
+            'attributes': 'attributes',
+            'relationships': 'relationships'
         }
         self._id = id
-        self._ecosystem = ecosystem
-        self._name = name
-        self._container = container
-        self._settings = settings
+        self._type = type
+        self._attributes = attributes
+        self._relationships = relationships
 
     @classmethod
     def from_dict(cls, dikt) -> 'Profile':
@@ -83,91 +79,66 @@ class Profile(Model):
         self._id = id
 
     @property
-    def ecosystem(self) -> int:
-        """Gets the ecosystem of this Profile.
+    def type(self) -> str:
+        """Gets the type of this Profile.
 
 
-        :return: The ecosystem of this Profile.
-        :rtype: int
-        """
-        return self._ecosystem
-
-    @ecosystem.setter
-    def ecosystem(self, ecosystem: int):
-        """Sets the ecosystem of this Profile.
-
-
-        :param ecosystem: The ecosystem of this Profile.
-        :type ecosystem: int
-        """
-        if ecosystem is None:
-            raise ValueError("Invalid value for `ecosystem`, must not be `None`")  # noqa: E501
-
-        self._ecosystem = ecosystem
-
-    @property
-    def name(self) -> str:
-        """Gets the name of this Profile.
-
-
-        :return: The name of this Profile.
+        :return: The type of this Profile.
         :rtype: str
         """
-        return self._name
+        return self._type
 
-    @name.setter
-    def name(self, name: str):
-        """Sets the name of this Profile.
+    @type.setter
+    def type(self, type: str):
+        """Sets the type of this Profile.
 
 
-        :param name: The name of this Profile.
-        :type name: str
+        :param type: The type of this Profile.
+        :type type: str
         """
-        if name is None:
-            raise ValueError("Invalid value for `name`, must not be `None`")  # noqa: E501
+        if type is None:
+            raise ValueError("Invalid value for `type`, must not be `None`")  # noqa: E501
 
-        self._name = name
+        self._type = type
 
     @property
-    def container(self) -> str:
-        """Gets the container of this Profile.
+    def attributes(self) -> ProfileAttributes:
+        """Gets the attributes of this Profile.
 
 
-        :return: The container of this Profile.
-        :rtype: str
+        :return: The attributes of this Profile.
+        :rtype: ProfileAttributes
         """
-        return self._container
+        return self._attributes
 
-    @container.setter
-    def container(self, container: str):
-        """Sets the container of this Profile.
+    @attributes.setter
+    def attributes(self, attributes: ProfileAttributes):
+        """Sets the attributes of this Profile.
 
 
-        :param container: The container of this Profile.
-        :type container: str
+        :param attributes: The attributes of this Profile.
+        :type attributes: ProfileAttributes
         """
-        if container is None:
-            raise ValueError("Invalid value for `container`, must not be `None`")  # noqa: E501
 
-        self._container = container
+        self._attributes = attributes
 
     @property
-    def settings(self) -> List[Setting]:
-        """Gets the settings of this Profile.
+    def relationships(self) -> ProfileRelationships:
+        """Gets the relationships of this Profile.
 
 
-        :return: The settings of this Profile.
-        :rtype: List[Setting]
+        :return: The relationships of this Profile.
+        :rtype: ProfileRelationships
         """
-        return self._settings
+        return self._relationships
 
-    @settings.setter
-    def settings(self, settings: List[Setting]):
-        """Sets the settings of this Profile.
+    @relationships.setter
+    def relationships(self, relationships: ProfileRelationships):
+        """Sets the relationships of this Profile.
 
 
-        :param settings: The settings of this Profile.
-        :type settings: List[Setting]
+        :param relationships: The relationships of this Profile.
+        :type relationships: ProfileRelationships
         """
 
-        self._settings = settings
+        self._relationships = relationships

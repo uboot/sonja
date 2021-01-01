@@ -6,6 +6,8 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
+from swagger_server.models.ecosystem_attributes import EcosystemAttributes  # noqa: F401,E501
+from swagger_server.models.ecosystem_relationships import EcosystemRelationships  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -14,45 +16,35 @@ class Ecosystem(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: int=None, name: str=None, user: str=None, settings: str=None, public_ssh_key: str=None, known_hosts: str=None):  # noqa: E501
+    def __init__(self, id: int=None, type: str=None, attributes: EcosystemAttributes=None, relationships: EcosystemRelationships=None):  # noqa: E501
         """Ecosystem - a model defined in Swagger
 
         :param id: The id of this Ecosystem.  # noqa: E501
         :type id: int
-        :param name: The name of this Ecosystem.  # noqa: E501
-        :type name: str
-        :param user: The user of this Ecosystem.  # noqa: E501
-        :type user: str
-        :param settings: The settings of this Ecosystem.  # noqa: E501
-        :type settings: str
-        :param public_ssh_key: The public_ssh_key of this Ecosystem.  # noqa: E501
-        :type public_ssh_key: str
-        :param known_hosts: The known_hosts of this Ecosystem.  # noqa: E501
-        :type known_hosts: str
+        :param type: The type of this Ecosystem.  # noqa: E501
+        :type type: str
+        :param attributes: The attributes of this Ecosystem.  # noqa: E501
+        :type attributes: EcosystemAttributes
+        :param relationships: The relationships of this Ecosystem.  # noqa: E501
+        :type relationships: EcosystemRelationships
         """
         self.swagger_types = {
             'id': int,
-            'name': str,
-            'user': str,
-            'settings': str,
-            'public_ssh_key': str,
-            'known_hosts': str
+            'type': str,
+            'attributes': EcosystemAttributes,
+            'relationships': EcosystemRelationships
         }
 
         self.attribute_map = {
             'id': 'id',
-            'name': 'name',
-            'user': 'user',
-            'settings': 'settings',
-            'public_ssh_key': 'public_ssh_key',
-            'known_hosts': 'known_hosts'
+            'type': 'type',
+            'attributes': 'attributes',
+            'relationships': 'relationships'
         }
         self._id = id
-        self._name = name
-        self._user = user
-        self._settings = settings
-        self._public_ssh_key = public_ssh_key
-        self._known_hosts = known_hosts
+        self._type = type
+        self._attributes = attributes
+        self._relationships = relationships
 
     @classmethod
     def from_dict(cls, dikt) -> 'Ecosystem':
@@ -87,110 +79,66 @@ class Ecosystem(Model):
         self._id = id
 
     @property
-    def name(self) -> str:
-        """Gets the name of this Ecosystem.
+    def type(self) -> str:
+        """Gets the type of this Ecosystem.
 
 
-        :return: The name of this Ecosystem.
+        :return: The type of this Ecosystem.
         :rtype: str
         """
-        return self._name
+        return self._type
 
-    @name.setter
-    def name(self, name: str):
-        """Sets the name of this Ecosystem.
+    @type.setter
+    def type(self, type: str):
+        """Sets the type of this Ecosystem.
 
 
-        :param name: The name of this Ecosystem.
-        :type name: str
+        :param type: The type of this Ecosystem.
+        :type type: str
         """
-        if name is None:
-            raise ValueError("Invalid value for `name`, must not be `None`")  # noqa: E501
+        if type is None:
+            raise ValueError("Invalid value for `type`, must not be `None`")  # noqa: E501
 
-        self._name = name
+        self._type = type
 
     @property
-    def user(self) -> str:
-        """Gets the user of this Ecosystem.
+    def attributes(self) -> EcosystemAttributes:
+        """Gets the attributes of this Ecosystem.
 
 
-        :return: The user of this Ecosystem.
-        :rtype: str
+        :return: The attributes of this Ecosystem.
+        :rtype: EcosystemAttributes
         """
-        return self._user
+        return self._attributes
 
-    @user.setter
-    def user(self, user: str):
-        """Sets the user of this Ecosystem.
+    @attributes.setter
+    def attributes(self, attributes: EcosystemAttributes):
+        """Sets the attributes of this Ecosystem.
 
 
-        :param user: The user of this Ecosystem.
-        :type user: str
+        :param attributes: The attributes of this Ecosystem.
+        :type attributes: EcosystemAttributes
         """
-        if user is None:
-            raise ValueError("Invalid value for `user`, must not be `None`")  # noqa: E501
 
-        self._user = user
+        self._attributes = attributes
 
     @property
-    def settings(self) -> str:
-        """Gets the settings of this Ecosystem.
+    def relationships(self) -> EcosystemRelationships:
+        """Gets the relationships of this Ecosystem.
 
 
-        :return: The settings of this Ecosystem.
-        :rtype: str
+        :return: The relationships of this Ecosystem.
+        :rtype: EcosystemRelationships
         """
-        return self._settings
+        return self._relationships
 
-    @settings.setter
-    def settings(self, settings: str):
-        """Sets the settings of this Ecosystem.
-
-
-        :param settings: The settings of this Ecosystem.
-        :type settings: str
-        """
-
-        self._settings = settings
-
-    @property
-    def public_ssh_key(self) -> str:
-        """Gets the public_ssh_key of this Ecosystem.
+    @relationships.setter
+    def relationships(self, relationships: EcosystemRelationships):
+        """Sets the relationships of this Ecosystem.
 
 
-        :return: The public_ssh_key of this Ecosystem.
-        :rtype: str
-        """
-        return self._public_ssh_key
-
-    @public_ssh_key.setter
-    def public_ssh_key(self, public_ssh_key: str):
-        """Sets the public_ssh_key of this Ecosystem.
-
-
-        :param public_ssh_key: The public_ssh_key of this Ecosystem.
-        :type public_ssh_key: str
+        :param relationships: The relationships of this Ecosystem.
+        :type relationships: EcosystemRelationships
         """
 
-        self._public_ssh_key = public_ssh_key
-
-    @property
-    def known_hosts(self) -> str:
-        """Gets the known_hosts of this Ecosystem.
-
-
-        :return: The known_hosts of this Ecosystem.
-        :rtype: str
-        """
-        return self._known_hosts
-
-    @known_hosts.setter
-    def known_hosts(self, known_hosts: str):
-        """Sets the known_hosts of this Ecosystem.
-
-
-        :param known_hosts: The known_hosts of this Ecosystem.
-        :type known_hosts: str
-        """
-
-        self._known_hosts = known_hosts
+        self._relationships = relationships

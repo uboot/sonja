@@ -6,8 +6,8 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
-from swagger_server.models.commit import Commit  # noqa: F401,E501
-from swagger_server.models.profile import Profile  # noqa: F401,E501
+from swagger_server.models.build_attributes import BuildAttributes  # noqa: F401,E501
+from swagger_server.models.build_relationships import BuildRelationships  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -16,35 +16,35 @@ class Build(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: int=None, status: str=None, commit: Commit=None, profile: Profile=None):  # noqa: E501
+    def __init__(self, id: int=None, type: str=None, attributes: BuildAttributes=None, relationships: BuildRelationships=None):  # noqa: E501
         """Build - a model defined in Swagger
 
         :param id: The id of this Build.  # noqa: E501
         :type id: int
-        :param status: The status of this Build.  # noqa: E501
-        :type status: str
-        :param commit: The commit of this Build.  # noqa: E501
-        :type commit: Commit
-        :param profile: The profile of this Build.  # noqa: E501
-        :type profile: Profile
+        :param type: The type of this Build.  # noqa: E501
+        :type type: str
+        :param attributes: The attributes of this Build.  # noqa: E501
+        :type attributes: BuildAttributes
+        :param relationships: The relationships of this Build.  # noqa: E501
+        :type relationships: BuildRelationships
         """
         self.swagger_types = {
             'id': int,
-            'status': str,
-            'commit': Commit,
-            'profile': Profile
+            'type': str,
+            'attributes': BuildAttributes,
+            'relationships': BuildRelationships
         }
 
         self.attribute_map = {
             'id': 'id',
-            'status': 'status',
-            'commit': 'commit',
-            'profile': 'profile'
+            'type': 'type',
+            'attributes': 'attributes',
+            'relationships': 'relationships'
         }
         self._id = id
-        self._status = status
-        self._commit = commit
-        self._profile = profile
+        self._type = type
+        self._attributes = attributes
+        self._relationships = relationships
 
     @classmethod
     def from_dict(cls, dikt) -> 'Build':
@@ -79,70 +79,64 @@ class Build(Model):
         self._id = id
 
     @property
-    def status(self) -> str:
-        """Gets the status of this Build.
+    def type(self) -> str:
+        """Gets the type of this Build.
 
 
-        :return: The status of this Build.
+        :return: The type of this Build.
         :rtype: str
         """
-        return self._status
+        return self._type
 
-    @status.setter
-    def status(self, status: str):
-        """Sets the status of this Build.
+    @type.setter
+    def type(self, type: str):
+        """Sets the type of this Build.
 
 
-        :param status: The status of this Build.
-        :type status: str
+        :param type: The type of this Build.
+        :type type: str
         """
-        allowed_values = ["active", "error", "new", "stopped", "stopping", "success"]  # noqa: E501
-        if status not in allowed_values:
-            raise ValueError(
-                "Invalid value for `status` ({0}), must be one of {1}"
-                .format(status, allowed_values)
-            )
 
-        self._status = status
+        self._type = type
 
     @property
-    def commit(self) -> Commit:
-        """Gets the commit of this Build.
+    def attributes(self) -> BuildAttributes:
+        """Gets the attributes of this Build.
 
 
-        :return: The commit of this Build.
-        :rtype: Commit
+        :return: The attributes of this Build.
+        :rtype: BuildAttributes
         """
-        return self._commit
+        return self._attributes
 
-    @commit.setter
-    def commit(self, commit: Commit):
-        """Sets the commit of this Build.
+    @attributes.setter
+    def attributes(self, attributes: BuildAttributes):
+        """Sets the attributes of this Build.
 
 
-        :param commit: The commit of this Build.
-        :type commit: Commit
+        :param attributes: The attributes of this Build.
+        :type attributes: BuildAttributes
         """
 
-        self._commit = commit
+        self._attributes = attributes
 
     @property
-    def profile(self) -> Profile:
-        """Gets the profile of this Build.
+    def relationships(self) -> BuildRelationships:
+        """Gets the relationships of this Build.
 
 
-        :return: The profile of this Build.
-        :rtype: Profile
+        :return: The relationships of this Build.
+        :rtype: BuildRelationships
         """
-        return self._profile
+        return self._relationships
 
-    @profile.setter
-    def profile(self, profile: Profile):
-        """Sets the profile of this Build.
+    @relationships.setter
+    def relationships(self, relationships: BuildRelationships):
+        """Sets the relationships of this Build.
 
 
-        :param profile: The profile of this Build.
-        :type profile: Profile
+        :param relationships: The relationships of this Build.
+        :type relationships: BuildRelationships
         """
 
-        self._profile = profile
+        self._relationships = relationships

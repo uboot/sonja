@@ -6,6 +6,8 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
+from swagger_server.models.repo_attributes import RepoAttributes  # noqa: F401,E501
+from swagger_server.models.repo_relationships import RepoRelationships  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -14,35 +16,35 @@ class Repo(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: int=None, ecosystem: int=None, url: str=None, path: str=None):  # noqa: E501
+    def __init__(self, id: int=None, type: str=None, attributes: RepoAttributes=None, relationships: RepoRelationships=None):  # noqa: E501
         """Repo - a model defined in Swagger
 
         :param id: The id of this Repo.  # noqa: E501
         :type id: int
-        :param ecosystem: The ecosystem of this Repo.  # noqa: E501
-        :type ecosystem: int
-        :param url: The url of this Repo.  # noqa: E501
-        :type url: str
-        :param path: The path of this Repo.  # noqa: E501
-        :type path: str
+        :param type: The type of this Repo.  # noqa: E501
+        :type type: str
+        :param attributes: The attributes of this Repo.  # noqa: E501
+        :type attributes: RepoAttributes
+        :param relationships: The relationships of this Repo.  # noqa: E501
+        :type relationships: RepoRelationships
         """
         self.swagger_types = {
             'id': int,
-            'ecosystem': int,
-            'url': str,
-            'path': str
+            'type': str,
+            'attributes': RepoAttributes,
+            'relationships': RepoRelationships
         }
 
         self.attribute_map = {
             'id': 'id',
-            'ecosystem': 'ecosystem',
-            'url': 'url',
-            'path': 'path'
+            'type': 'type',
+            'attributes': 'attributes',
+            'relationships': 'relationships'
         }
         self._id = id
-        self._ecosystem = ecosystem
-        self._url = url
-        self._path = path
+        self._type = type
+        self._attributes = attributes
+        self._relationships = relationships
 
     @classmethod
     def from_dict(cls, dikt) -> 'Repo':
@@ -77,68 +79,66 @@ class Repo(Model):
         self._id = id
 
     @property
-    def ecosystem(self) -> int:
-        """Gets the ecosystem of this Repo.
+    def type(self) -> str:
+        """Gets the type of this Repo.
 
 
-        :return: The ecosystem of this Repo.
-        :rtype: int
-        """
-        return self._ecosystem
-
-    @ecosystem.setter
-    def ecosystem(self, ecosystem: int):
-        """Sets the ecosystem of this Repo.
-
-
-        :param ecosystem: The ecosystem of this Repo.
-        :type ecosystem: int
-        """
-        if ecosystem is None:
-            raise ValueError("Invalid value for `ecosystem`, must not be `None`")  # noqa: E501
-
-        self._ecosystem = ecosystem
-
-    @property
-    def url(self) -> str:
-        """Gets the url of this Repo.
-
-
-        :return: The url of this Repo.
+        :return: The type of this Repo.
         :rtype: str
         """
-        return self._url
+        return self._type
 
-    @url.setter
-    def url(self, url: str):
-        """Sets the url of this Repo.
+    @type.setter
+    def type(self, type: str):
+        """Sets the type of this Repo.
 
 
-        :param url: The url of this Repo.
-        :type url: str
+        :param type: The type of this Repo.
+        :type type: str
         """
-        if url is None:
-            raise ValueError("Invalid value for `url`, must not be `None`")  # noqa: E501
+        if type is None:
+            raise ValueError("Invalid value for `type`, must not be `None`")  # noqa: E501
 
-        self._url = url
+        self._type = type
 
     @property
-    def path(self) -> str:
-        """Gets the path of this Repo.
+    def attributes(self) -> RepoAttributes:
+        """Gets the attributes of this Repo.
 
 
-        :return: The path of this Repo.
-        :rtype: str
+        :return: The attributes of this Repo.
+        :rtype: RepoAttributes
         """
-        return self._path
+        return self._attributes
 
-    @path.setter
-    def path(self, path: str):
-        """Sets the path of this Repo.
+    @attributes.setter
+    def attributes(self, attributes: RepoAttributes):
+        """Sets the attributes of this Repo.
 
 
-        :param path: The path of this Repo.
-        :type path: str
+        :param attributes: The attributes of this Repo.
+        :type attributes: RepoAttributes
         """
 
-        self._path = path
+        self._attributes = attributes
+
+    @property
+    def relationships(self) -> RepoRelationships:
+        """Gets the relationships of this Repo.
+
+
+        :return: The relationships of this Repo.
+        :rtype: RepoRelationships
+        """
+        return self._relationships
+
+    @relationships.setter
+    def relationships(self, relationships: RepoRelationships):
+        """Sets the relationships of this Repo.
+
+
+        :param relationships: The relationships of this Repo.
+        :type relationships: RepoRelationships
+        """
+
+        self._relationships = relationships

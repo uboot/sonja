@@ -6,7 +6,8 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
-from swagger_server.models.repo import Repo  # noqa: F401,E501
+from swagger_server.models.commit_attributes import CommitAttributes  # noqa: F401,E501
+from swagger_server.models.commit_relationships import CommitRelationships  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -15,30 +16,35 @@ class Commit(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: int=None, sha: str=None, repo: Repo=None):  # noqa: E501
+    def __init__(self, id: int=None, type: str=None, attributes: CommitAttributes=None, relationships: CommitRelationships=None):  # noqa: E501
         """Commit - a model defined in Swagger
 
         :param id: The id of this Commit.  # noqa: E501
         :type id: int
-        :param sha: The sha of this Commit.  # noqa: E501
-        :type sha: str
-        :param repo: The repo of this Commit.  # noqa: E501
-        :type repo: Repo
+        :param type: The type of this Commit.  # noqa: E501
+        :type type: str
+        :param attributes: The attributes of this Commit.  # noqa: E501
+        :type attributes: CommitAttributes
+        :param relationships: The relationships of this Commit.  # noqa: E501
+        :type relationships: CommitRelationships
         """
         self.swagger_types = {
             'id': int,
-            'sha': str,
-            'repo': Repo
+            'type': str,
+            'attributes': CommitAttributes,
+            'relationships': CommitRelationships
         }
 
         self.attribute_map = {
             'id': 'id',
-            'sha': 'sha',
-            'repo': 'repo'
+            'type': 'type',
+            'attributes': 'attributes',
+            'relationships': 'relationships'
         }
         self._id = id
-        self._sha = sha
-        self._repo = repo
+        self._type = type
+        self._attributes = attributes
+        self._relationships = relationships
 
     @classmethod
     def from_dict(cls, dikt) -> 'Commit':
@@ -73,43 +79,66 @@ class Commit(Model):
         self._id = id
 
     @property
-    def sha(self) -> str:
-        """Gets the sha of this Commit.
+    def type(self) -> str:
+        """Gets the type of this Commit.
 
 
-        :return: The sha of this Commit.
+        :return: The type of this Commit.
         :rtype: str
         """
-        return self._sha
+        return self._type
 
-    @sha.setter
-    def sha(self, sha: str):
-        """Sets the sha of this Commit.
+    @type.setter
+    def type(self, type: str):
+        """Sets the type of this Commit.
 
 
-        :param sha: The sha of this Commit.
-        :type sha: str
+        :param type: The type of this Commit.
+        :type type: str
         """
+        if type is None:
+            raise ValueError("Invalid value for `type`, must not be `None`")  # noqa: E501
 
-        self._sha = sha
+        self._type = type
 
     @property
-    def repo(self) -> Repo:
-        """Gets the repo of this Commit.
+    def attributes(self) -> CommitAttributes:
+        """Gets the attributes of this Commit.
 
 
-        :return: The repo of this Commit.
-        :rtype: Repo
+        :return: The attributes of this Commit.
+        :rtype: CommitAttributes
         """
-        return self._repo
+        return self._attributes
 
-    @repo.setter
-    def repo(self, repo: Repo):
-        """Sets the repo of this Commit.
+    @attributes.setter
+    def attributes(self, attributes: CommitAttributes):
+        """Sets the attributes of this Commit.
 
 
-        :param repo: The repo of this Commit.
-        :type repo: Repo
+        :param attributes: The attributes of this Commit.
+        :type attributes: CommitAttributes
         """
 
-        self._repo = repo
+        self._attributes = attributes
+
+    @property
+    def relationships(self) -> CommitRelationships:
+        """Gets the relationships of this Commit.
+
+
+        :return: The relationships of this Commit.
+        :rtype: CommitRelationships
+        """
+        return self._relationships
+
+    @relationships.setter
+    def relationships(self, relationships: CommitRelationships):
+        """Sets the relationships of this Commit.
+
+
+        :param relationships: The relationships of this Commit.
+        :type relationships: CommitRelationships
+        """
+
+        self._relationships = relationships
