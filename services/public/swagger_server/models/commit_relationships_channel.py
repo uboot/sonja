@@ -6,7 +6,7 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
-from swagger_server.models.commit_relationships_channel_data import CommitRelationshipsChannelData  # noqa: F401,E501
+from swagger_server.models.ecosystem_relationships_channels_data import EcosystemRelationshipsChannelsData  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -15,14 +15,14 @@ class CommitRelationshipsChannel(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, data: CommitRelationshipsChannelData=None):  # noqa: E501
+    def __init__(self, data: EcosystemRelationshipsChannelsData=None):  # noqa: E501
         """CommitRelationshipsChannel - a model defined in Swagger
 
         :param data: The data of this CommitRelationshipsChannel.  # noqa: E501
-        :type data: CommitRelationshipsChannelData
+        :type data: EcosystemRelationshipsChannelsData
         """
         self.swagger_types = {
-            'data': CommitRelationshipsChannelData
+            'data': EcosystemRelationshipsChannelsData
         }
 
         self.attribute_map = {
@@ -42,22 +42,22 @@ class CommitRelationshipsChannel(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def data(self) -> CommitRelationshipsChannelData:
+    def data(self) -> EcosystemRelationshipsChannelsData:
         """Gets the data of this CommitRelationshipsChannel.
 
 
         :return: The data of this CommitRelationshipsChannel.
-        :rtype: CommitRelationshipsChannelData
+        :rtype: EcosystemRelationshipsChannelsData
         """
         return self._data
 
     @data.setter
-    def data(self, data: CommitRelationshipsChannelData):
+    def data(self, data: EcosystemRelationshipsChannelsData):
         """Sets the data of this CommitRelationshipsChannel.
 
 
         :param data: The data of this CommitRelationshipsChannel.
-        :type data: CommitRelationshipsChannelData
+        :type data: EcosystemRelationshipsChannelsData
         """
 
         self._data = data

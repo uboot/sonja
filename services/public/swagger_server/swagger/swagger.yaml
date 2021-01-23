@@ -70,7 +70,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200'
+                $ref: '#/components/schemas/EcosystemList'
         "400":
           description: bad input parameter
       x-openapi-router-controller: swagger_server.controllers.ecosystem_controller
@@ -84,20 +84,47 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Ecosystem'
+              $ref: '#/components/schemas/EcosystemData'
       responses:
         "201":
           description: ecosystem created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Ecosystem'
+                $ref: '#/components/schemas/EcosystemData'
         "400":
           description: invalid input, object invalid
         "409":
           description: an existing item already exists
       x-openapi-router-controller: swagger_server.controllers.ecosystem_controller
   /ecosystem/{ecosystemId}:
+    get:
+      tags:
+      - Ecosystem
+      summary: get an ecosystem
+      operationId: get_ecosystem
+      parameters:
+      - name: ecosystemId
+        in: path
+        description: ecosystem ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: ecosystem
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EcosystemData'
+        "400":
+          description: invalid ID supplied
+        "404":
+          description: ecosystem not found
+      x-openapi-router-controller: swagger_server.controllers.ecosystem_controller
     delete:
       tags:
       - Ecosystem
@@ -137,18 +164,18 @@ paths:
           type: integer
           format: int64
       requestBody:
-        description: updated ecosystem data
+        description: ecosystem updates
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Ecosystem'
+              $ref: '#/components/schemas/EcosystemData'
       responses:
         "200":
           description: updated ecosystem
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Ecosystem'
+                $ref: '#/components/schemas/EcosystemData'
         "400":
           description: invalid input, object invalid
         "404":
@@ -176,7 +203,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_1'
+                $ref: '#/components/schemas/RepoList'
         "400":
           description: bad input parameter
       x-openapi-router-controller: swagger_server.controllers.repo_controller
@@ -191,14 +218,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Repo'
+              $ref: '#/components/schemas/RepoData'
       responses:
         "201":
           description: repo created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Repo'
+                $ref: '#/components/schemas/RepoData'
         "400":
           description: invalid input, object invalid
         "409":
@@ -226,7 +253,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_2'
+                $ref: '#/components/schemas/RepoData'
         "400":
           description: invalid ID supplied
         "404":
@@ -255,32 +282,39 @@ paths:
         "404":
           description: repo not found
       x-openapi-router-controller: swagger_server.controllers.repo_controller
-  /ecosystem/{ecosystemId}/profile:
-    get:
+    patch:
       tags:
-      - Profile
-      summary: get all active profiles
-      operationId: get_profiles
+      - Repo
+      summary: update a repo
+      operationId: update_repo
       parameters:
-      - name: ecosystemId
+      - name: repoId
         in: path
-        description: ecosystem
+        description: id of the repo to update
         required: true
         style: simple
         explode: false
         schema:
           type: integer
           format: int64
+      requestBody:
+        description: repo updates
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RepoData'
       responses:
         "200":
-          description: list of profiles
+          description: updated repo
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_3'
+                $ref: '#/components/schemas/RepoData'
         "400":
-          description: bad input parameter
-      x-openapi-router-controller: swagger_server.controllers.profile_controller
+          description: invalid input, object invalid
+        "404":
+          description: repo not found
+      x-openapi-router-controller: swagger_server.controllers.repo_controller
   /profile:
     post:
       tags:
@@ -292,14 +326,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Profile'
+              $ref: '#/components/schemas/ProfileData'
       responses:
         "201":
           description: profile created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Profile'
+                $ref: '#/components/schemas/ProfileData'
         "400":
           description: invalid input, object invalid
         "409":
@@ -327,7 +361,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_4'
+                $ref: '#/components/schemas/ProfileData'
         "400":
           description: invalid ID supplied
         "404":
@@ -356,6 +390,39 @@ paths:
         "404":
           description: profile not found
       x-openapi-router-controller: swagger_server.controllers.profile_controller
+    patch:
+      tags:
+      - Profile
+      summary: update a profile
+      operationId: update_profile
+      parameters:
+      - name: profileId
+        in: path
+        description: id of the profile to update
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: profile updates
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileData'
+      responses:
+        "200":
+          description: updated profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileData'
+        "400":
+          description: invalid input, object invalid
+        "404":
+          description: profile not found
+      x-openapi-router-controller: swagger_server.controllers.profile_controller
   /repo/{repoId}/commit:
     get:
       tags:
@@ -378,7 +445,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_5'
+                $ref: '#/components/schemas/CommitList'
         "400":
           description: bad input parameter
       x-openapi-router-controller: swagger_server.controllers.commit_controller
@@ -391,7 +458,7 @@ paths:
       parameters:
       - name: commitId
         in: path
-        description: commite ID
+        description: commit ID
         required: true
         style: simple
         explode: false
@@ -404,38 +471,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_6'
+                $ref: '#/components/schemas/CommitData'
         "400":
           description: invalid ID supplied
         "404":
-          description: chommit not found
+          description: commit not found
       x-openapi-router-controller: swagger_server.controllers.commit_controller
-  /ecosystem/{ecosystemId}/channel:
-    get:
-      tags:
-      - Channel
-      summary: get the channels of an ecosystem
-      operationId: get_channels
-      parameters:
-      - name: ecosystemId
-        in: path
-        description: ecosystem
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: integer
-          format: int64
-      responses:
-        "200":
-          description: list of channels
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/inline_response_200_7'
-        "400":
-          description: bad input parameter
-      x-openapi-router-controller: swagger_server.controllers.channel_controller
   /channel:
     post:
       tags:
@@ -447,14 +488,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Channel'
+              $ref: '#/components/schemas/ChannelData'
       responses:
         "201":
           description: channel created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Channel'
+                $ref: '#/components/schemas/ChannelData'
         "400":
           description: invalid input, object invalid
         "409":
@@ -482,7 +523,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_8'
+                $ref: '#/components/schemas/ChannelData'
         "400":
           description: invalid ID supplied
         "404":
@@ -511,6 +552,39 @@ paths:
         "404":
           description: channel not found
       x-openapi-router-controller: swagger_server.controllers.channel_controller
+    patch:
+      tags:
+      - Channel
+      summary: update a channel
+      operationId: update_channel
+      parameters:
+      - name: channelId
+        in: path
+        description: id of the channel to update
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: Channel updates
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelData'
+      responses:
+        "200":
+          description: updated channel
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelData'
+        "400":
+          description: invalid input, object invalid
+        "404":
+          description: channel not found
+      x-openapi-router-controller: swagger_server.controllers.channel_controller
   /ecosystem/{ecosystemId}/build:
     get:
       tags:
@@ -527,32 +601,44 @@ paths:
         schema:
           type: integer
           format: int64
-      - name: filter_status
-        in: query
-        description: build status
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
-          enum:
-          - active
-          - error
-          - new
-          - stopped
-          - stopping
-          - success
       responses:
         "200":
           description: list of builds
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_9'
+                $ref: '#/components/schemas/BuildList'
         "400":
           description: bad input parameter
       x-openapi-router-controller: swagger_server.controllers.build_controller
   /build/{buildId}:
+    get:
+      tags:
+      - Build
+      summary: get a build
+      operationId: get_build
+      parameters:
+      - name: buildId
+        in: path
+        description: build ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: build
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BuildData'
+        "400":
+          description: invalid ID supplied
+        "404":
+          description: build not found
+      x-openapi-router-controller: swagger_server.controllers.build_controller
     patch:
       tags:
       - Build
@@ -573,14 +659,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Build'
+              $ref: '#/components/schemas/BuildData'
       responses:
         "200":
           description: updated build
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Build'
+                $ref: '#/components/schemas/BuildData'
         "400":
           description: invalid input, object invalid
         "404":
@@ -599,7 +685,7 @@ components:
           example: 1
         type:
           type: string
-          example: ecosytem
+          example: ecosytems
         attributes:
           $ref: '#/components/schemas/Ecosystem_attributes'
         relationships:
@@ -607,17 +693,23 @@ components:
       example:
         relationships:
           channels:
-            links:
-              related: ecosystem/1/channel
+            data:
+            - id: 1
+              type: channels
+            - id: 1
+              type: channels
           repos:
             links:
-              related: ecosystem/1/repo
+              related: repos
           builds:
             links:
-              related: ecosystem/1/build
+              related: builds
           profiles:
-            links:
-              related: ecosystem/1/profile
+            data:
+            - id: 1
+              type: profiles
+            - id: 1
+              type: profiles
         attributes:
           settings: ""
           name: My Company
@@ -625,7 +717,108 @@ components:
           user: mycompany
           public_ssh_key: ""
         id: 1
-        type: ecosytem
+        type: ecosytems
+    EcosystemData:
+      required:
+      - data
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Ecosystem'
+      example:
+        data:
+          relationships:
+            channels:
+              data:
+              - id: 1
+                type: channels
+              - id: 1
+                type: channels
+            repos:
+              links:
+                related: repos
+            builds:
+              links:
+                related: builds
+            profiles:
+              data:
+              - id: 1
+                type: profiles
+              - id: 1
+                type: profiles
+          attributes:
+            settings: ""
+            name: My Company
+            known_hosts: Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN2hSR21kbm05dFVEYk85SURTd0JLNlRiUWErUFhZUENQeTZyYlRyVHR3N1BIa2NjS3JwcDB5VmhwNUhkRUljS3I2cExsVkRCZk9MWDlRVXN5Q09WMHd6ZmpJSk5sR0VZc2RsTEppekhoYm4ybVVqdlNBSFFxWkVUWVA4MWVGekxRTm5QSHQ0RVZWVWg3VmZERVNVODRLZXptRDVRbFdwWExtdlUzMS95TWYrU2U4eGhIVHZLU0NaSUZJbVd3b0c2bWJVb1dmOW56cElvYVNqQit3ZXFxVVVtcGFhYXNYVmFsNzJKK1VYMkIrMlJQVzNSY1QwZU96UWdxbEpMM1JLclRKdmRzakUzSkVBdkdxM2xHSFNaWHkyOEczc2t1YTJTbVZpL3c0eUNFNmdiT0RxblRXbGc3K3dDNjA0eWRHWEE4VkppUzVhcDQzSlhpVUZGQWFRPT0K
+            user: mycompany
+            public_ssh_key: ""
+          id: 1
+          type: ecosytems
+    EcosystemList:
+      required:
+      - data
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ecosystem'
+      example:
+        data:
+        - relationships:
+            channels:
+              data:
+              - id: 1
+                type: channels
+              - id: 1
+                type: channels
+            repos:
+              links:
+                related: repos
+            builds:
+              links:
+                related: builds
+            profiles:
+              data:
+              - id: 1
+                type: profiles
+              - id: 1
+                type: profiles
+          attributes:
+            settings: ""
+            name: My Company
+            known_hosts: Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN2hSR21kbm05dFVEYk85SURTd0JLNlRiUWErUFhZUENQeTZyYlRyVHR3N1BIa2NjS3JwcDB5VmhwNUhkRUljS3I2cExsVkRCZk9MWDlRVXN5Q09WMHd6ZmpJSk5sR0VZc2RsTEppekhoYm4ybVVqdlNBSFFxWkVUWVA4MWVGekxRTm5QSHQ0RVZWVWg3VmZERVNVODRLZXptRDVRbFdwWExtdlUzMS95TWYrU2U4eGhIVHZLU0NaSUZJbVd3b0c2bWJVb1dmOW56cElvYVNqQit3ZXFxVVVtcGFhYXNYVmFsNzJKK1VYMkIrMlJQVzNSY1QwZU96UWdxbEpMM1JLclRKdmRzakUzSkVBdkdxM2xHSFNaWHkyOEczc2t1YTJTbVZpL3c0eUNFNmdiT0RxblRXbGc3K3dDNjA0eWRHWEE4VkppUzVhcDQzSlhpVUZGQWFRPT0K
+            user: mycompany
+            public_ssh_key: ""
+          id: 1
+          type: ecosytems
+        - relationships:
+            channels:
+              data:
+              - id: 1
+                type: channels
+              - id: 1
+                type: channels
+            repos:
+              links:
+                related: repos
+            builds:
+              links:
+                related: builds
+            profiles:
+              data:
+              - id: 1
+                type: profiles
+              - id: 1
+                type: profiles
+          attributes:
+            settings: ""
+            name: My Company
+            known_hosts: Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN2hSR21kbm05dFVEYk85SURTd0JLNlRiUWErUFhZUENQeTZyYlRyVHR3N1BIa2NjS3JwcDB5VmhwNUhkRUljS3I2cExsVkRCZk9MWDlRVXN5Q09WMHd6ZmpJSk5sR0VZc2RsTEppekhoYm4ybVVqdlNBSFFxWkVUWVA4MWVGekxRTm5QSHQ0RVZWVWg3VmZERVNVODRLZXptRDVRbFdwWExtdlUzMS95TWYrU2U4eGhIVHZLU0NaSUZJbVd3b0c2bWJVb1dmOW56cElvYVNqQit3ZXFxVVVtcGFhYXNYVmFsNzJKK1VYMkIrMlJQVzNSY1QwZU96UWdxbEpMM1JLclRKdmRzakUzSkVBdkdxM2xHSFNaWHkyOEczc2t1YTJTbVZpL3c0eUNFNmdiT0RxblRXbGc3K3dDNjA0eWRHWEE4VkppUzVhcDQzSlhpVUZGQWFRPT0K
+            user: mycompany
+            public_ssh_key: ""
+          id: 1
+          type: ecosytems
     Repo:
       required:
       - type
@@ -637,7 +830,7 @@ components:
           example: 1
         type:
           type: string
-          example: repo
+          example: repos
         attributes:
           $ref: '#/components/schemas/Repo_attributes'
         relationships:
@@ -647,184 +840,42 @@ components:
           ecosystem:
             data:
               id: 1
-              type: ecosystem
+              type: ecosystems
           commits:
             links:
-              related: repo/1/commit
+              related: commit
         attributes:
           path: packages/hello
+          name: Conan CI
           url: https://github.com/uboot/conan-ci.git
         id: 1
-        type: repo
-    Profile:
+        type: repos
+    RepoData:
       required:
-      - type
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          example: 1
-        type:
-          type: string
-          example: profile
-        attributes:
-          $ref: '#/components/schemas/Profile_attributes'
-        relationships:
-          $ref: '#/components/schemas/Profile_relationships'
-      example:
-        relationships:
-          ecosystem:
-            data:
-              id: 1
-              type: ecosystem
-        attributes:
-          container: conanio/gcc9
-          settings:
-          - value: Release
-            key: build_type
-          - value: Release
-            key: build_type
-          name: GCC 9
-        id: 1
-        type: profile
-    Channel:
-      required:
-      - type
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          example: 1
-        type:
-          type: string
-          example: channel
-        attributes:
-          $ref: '#/components/schemas/Channel_attributes'
-        relationships:
-          $ref: '#/components/schemas/Profile_relationships'
-      example:
-        relationships:
-          ecosystem:
-            data:
-              id: 1
-              type: ecosystem
-        attributes:
-          name: stable
-          branch: master
-        id: 1
-        type: channel
-    Commit:
-      required:
-      - type
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          example: 1
-        type:
-          type: string
-          example: commit
-        attributes:
-          $ref: '#/components/schemas/Commit_attributes'
-        relationships:
-          $ref: '#/components/schemas/Commit_relationships'
-      example:
-        relationships:
-          repo:
-            data:
-              id: 1
-              type: repo
-          channel:
-            data:
-              id: 1
-              type: channel
-        attributes:
-          sha: 2777a37dc82e296d55c23f738b79f139e627920c
-        id: 1
-        type: commit
-    Build:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          example: 1
-        type:
-          type: string
-          example: build
-        attributes:
-          $ref: '#/components/schemas/Build_attributes'
-        relationships:
-          $ref: '#/components/schemas/Build_relationships'
-      example:
-        relationships:
-          profile:
-            data:
-              id: 1
-              type: profile
-          commit:
-            data:
-              id: 1
-              type: commit
-        attributes:
-          status: new
-        id: 1
-        type: build
-    inline_response_200:
+      - data
       type: object
       properties:
         data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Ecosystem'
+          $ref: '#/components/schemas/Repo'
       example:
         data:
-        - relationships:
-            channels:
+          relationships:
+            ecosystem:
+              data:
+                id: 1
+                type: ecosystems
+            commits:
               links:
-                related: ecosystem/1/channel
-            repos:
-              links:
-                related: ecosystem/1/repo
-            builds:
-              links:
-                related: ecosystem/1/build
-            profiles:
-              links:
-                related: ecosystem/1/profile
+                related: commit
           attributes:
-            settings: ""
-            name: My Company
-            known_hosts: Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN2hSR21kbm05dFVEYk85SURTd0JLNlRiUWErUFhZUENQeTZyYlRyVHR3N1BIa2NjS3JwcDB5VmhwNUhkRUljS3I2cExsVkRCZk9MWDlRVXN5Q09WMHd6ZmpJSk5sR0VZc2RsTEppekhoYm4ybVVqdlNBSFFxWkVUWVA4MWVGekxRTm5QSHQ0RVZWVWg3VmZERVNVODRLZXptRDVRbFdwWExtdlUzMS95TWYrU2U4eGhIVHZLU0NaSUZJbVd3b0c2bWJVb1dmOW56cElvYVNqQit3ZXFxVVVtcGFhYXNYVmFsNzJKK1VYMkIrMlJQVzNSY1QwZU96UWdxbEpMM1JLclRKdmRzakUzSkVBdkdxM2xHSFNaWHkyOEczc2t1YTJTbVZpL3c0eUNFNmdiT0RxblRXbGc3K3dDNjA0eWRHWEE4VkppUzVhcDQzSlhpVUZGQWFRPT0K
-            user: mycompany
-            public_ssh_key: ""
+            path: packages/hello
+            name: Conan CI
+            url: https://github.com/uboot/conan-ci.git
           id: 1
-          type: ecosytem
-        - relationships:
-            channels:
-              links:
-                related: ecosystem/1/channel
-            repos:
-              links:
-                related: ecosystem/1/repo
-            builds:
-              links:
-                related: ecosystem/1/build
-            profiles:
-              links:
-                related: ecosystem/1/profile
-          attributes:
-            settings: ""
-            name: My Company
-            known_hosts: Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN2hSR21kbm05dFVEYk85SURTd0JLNlRiUWErUFhZUENQeTZyYlRyVHR3N1BIa2NjS3JwcDB5VmhwNUhkRUljS3I2cExsVkRCZk9MWDlRVXN5Q09WMHd6ZmpJSk5sR0VZc2RsTEppekhoYm4ybVVqdlNBSFFxWkVUWVA4MWVGekxRTm5QSHQ0RVZWVWg3VmZERVNVODRLZXptRDVRbFdwWExtdlUzMS95TWYrU2U4eGhIVHZLU0NaSUZJbVd3b0c2bWJVb1dmOW56cElvYVNqQit3ZXFxVVVtcGFhYXNYVmFsNzJKK1VYMkIrMlJQVzNSY1QwZU96UWdxbEpMM1JLclRKdmRzakUzSkVBdkdxM2xHSFNaWHkyOEczc2t1YTJTbVZpL3c0eUNFNmdiT0RxblRXbGc3K3dDNjA0eWRHWEE4VkppUzVhcDQzSlhpVUZGQWFRPT0K
-            user: mycompany
-            public_ssh_key: ""
-          id: 1
-          type: ecosytem
-    inline_response_200_1:
+          type: repos
+    RepoList:
+      required:
+      - data
       type: object
       properties:
         data:
@@ -837,88 +888,65 @@ components:
             ecosystem:
               data:
                 id: 1
-                type: ecosystem
+                type: ecosystems
             commits:
               links:
-                related: repo/1/commit
+                related: commit
           attributes:
             path: packages/hello
+            name: Conan CI
             url: https://github.com/uboot/conan-ci.git
           id: 1
-          type: repo
+          type: repos
         - relationships:
             ecosystem:
               data:
                 id: 1
-                type: ecosystem
+                type: ecosystems
             commits:
               links:
-                related: repo/1/commit
+                related: commit
           attributes:
             path: packages/hello
+            name: Conan CI
             url: https://github.com/uboot/conan-ci.git
           id: 1
-          type: repo
-    inline_response_200_2:
+          type: repos
+    Profile:
+      required:
+      - type
       type: object
       properties:
-        data:
-          $ref: '#/components/schemas/Repo'
+        id:
+          type: integer
+          format: int64
+          example: 1
+        type:
+          type: string
+          example: profiles
+        attributes:
+          $ref: '#/components/schemas/Profile_attributes'
+        relationships:
+          $ref: '#/components/schemas/Profile_relationships'
       example:
-        data:
-          relationships:
-            ecosystem:
-              data:
-                id: 1
-                type: ecosystem
-            commits:
-              links:
-                related: repo/1/commit
-          attributes:
-            path: packages/hello
-            url: https://github.com/uboot/conan-ci.git
-          id: 1
-          type: repo
-    inline_response_200_3:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Profile'
-      example:
-        data:
-        - relationships:
-            ecosystem:
-              data:
-                id: 1
-                type: ecosystem
-          attributes:
-            container: conanio/gcc9
-            settings:
-            - value: Release
-              key: build_type
-            - value: Release
-              key: build_type
-            name: GCC 9
-          id: 1
-          type: profile
-        - relationships:
-            ecosystem:
-              data:
-                id: 1
-                type: ecosystem
-          attributes:
-            container: conanio/gcc9
-            settings:
-            - value: Release
-              key: build_type
-            - value: Release
-              key: build_type
-            name: GCC 9
-          id: 1
-          type: profile
-    inline_response_200_4:
+        relationships:
+          ecosystem:
+            data:
+              id: 1
+              type: ecosystems
+        attributes:
+          container: conanio/gcc9
+          settings:
+          - value: Release
+            key: build_type
+          - value: Release
+            key: build_type
+          name: GCC 9
+        id: 1
+        type: profiles
+    ProfileData:
+      required:
+      - data
       type: object
       properties:
         data:
@@ -929,7 +957,7 @@ components:
             ecosystem:
               data:
                 id: 1
-                type: ecosystem
+                type: ecosystems
           attributes:
             container: conanio/gcc9
             settings:
@@ -939,8 +967,120 @@ components:
               key: build_type
             name: GCC 9
           id: 1
-          type: profile
-    inline_response_200_5:
+          type: profiles
+    Channel:
+      required:
+      - type
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        type:
+          type: string
+          example: channels
+        attributes:
+          $ref: '#/components/schemas/Channel_attributes'
+        relationships:
+          $ref: '#/components/schemas/Profile_relationships'
+      example:
+        relationships:
+          ecosystem:
+            data:
+              id: 1
+              type: ecosystems
+        attributes:
+          name: stable
+          branch: master
+        id: 1
+        type: channels
+    ChannelData:
+      required:
+      - data
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Channel'
+      example:
+        data:
+          relationships:
+            ecosystem:
+              data:
+                id: 1
+                type: ecosystems
+          attributes:
+            name: stable
+            branch: master
+          id: 1
+          type: channels
+    Commit:
+      required:
+      - type
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        type:
+          type: string
+          example: commits
+        attributes:
+          $ref: '#/components/schemas/Commit_attributes'
+        relationships:
+          $ref: '#/components/schemas/Commit_relationships'
+      example:
+        relationships:
+          repo:
+            data:
+              id: 1
+              type: repos
+          channel:
+            data:
+              id: 1
+              type: channels
+          builds:
+            data:
+            - id: 1
+              type: builds
+            - id: 1
+              type: builds
+        attributes:
+          sha: 2777a37dc82e296d55c23f738b79f139e627920c
+        id: 1
+        type: commits
+    CommitData:
+      required:
+      - data
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Commit'
+      example:
+        data:
+          relationships:
+            repo:
+              data:
+                id: 1
+                type: repos
+            channel:
+              data:
+                id: 1
+                type: channels
+            builds:
+              data:
+              - id: 1
+                type: builds
+              - id: 1
+                type: builds
+          attributes:
+            sha: 2777a37dc82e296d55c23f738b79f139e627920c
+          id: 1
+          type: commits
+    CommitList:
+      required:
+      - data
       type: object
       properties:
         data:
@@ -953,95 +1093,101 @@ components:
             repo:
               data:
                 id: 1
-                type: repo
+                type: repos
             channel:
               data:
                 id: 1
-                type: channel
+                type: channels
+            builds:
+              data:
+              - id: 1
+                type: builds
+              - id: 1
+                type: builds
           attributes:
             sha: 2777a37dc82e296d55c23f738b79f139e627920c
           id: 1
-          type: commit
+          type: commits
         - relationships:
             repo:
               data:
                 id: 1
-                type: repo
+                type: repos
             channel:
               data:
                 id: 1
-                type: channel
+                type: channels
+            builds:
+              data:
+              - id: 1
+                type: builds
+              - id: 1
+                type: builds
           attributes:
             sha: 2777a37dc82e296d55c23f738b79f139e627920c
           id: 1
-          type: commit
-    inline_response_200_6:
+          type: commits
+    Build:
       type: object
       properties:
-        data:
-          $ref: '#/components/schemas/Commit'
+        id:
+          type: integer
+          format: int64
+          example: 1
+        type:
+          type: string
+          example: builds
+        attributes:
+          $ref: '#/components/schemas/Build_attributes'
+        relationships:
+          $ref: '#/components/schemas/Build_relationships'
       example:
-        data:
-          relationships:
-            repo:
-              data:
-                id: 1
-                type: repo
-            channel:
-              data:
-                id: 1
-                type: channel
-          attributes:
-            sha: 2777a37dc82e296d55c23f738b79f139e627920c
-          id: 1
-          type: commit
-    inline_response_200_7:
+        relationships:
+          ecosystem:
+            data:
+              id: 1
+              type: ecosystems
+          profile:
+            data:
+              id: 1
+              type: profiles
+          commit:
+            data:
+              id: 1
+              type: commits
+        attributes:
+          status: new
+        id: 1
+        type: builds
+    BuildData:
+      required:
+      - data
       type: object
       properties:
         data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Channel'
-      example:
-        data:
-        - relationships:
-            ecosystem:
-              data:
-                id: 1
-                type: ecosystem
-          attributes:
-            name: stable
-            branch: master
-          id: 1
-          type: channel
-        - relationships:
-            ecosystem:
-              data:
-                id: 1
-                type: ecosystem
-          attributes:
-            name: stable
-            branch: master
-          id: 1
-          type: channel
-    inline_response_200_8:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/Channel'
+          $ref: '#/components/schemas/Build'
       example:
         data:
           relationships:
             ecosystem:
               data:
                 id: 1
-                type: ecosystem
+                type: ecosystems
+            profile:
+              data:
+                id: 1
+                type: profiles
+            commit:
+              data:
+                id: 1
+                type: commits
           attributes:
-            name: stable
-            branch: master
+            status: new
           id: 1
-          type: channel
-    inline_response_200_9:
+          type: builds
+    BuildList:
+      required:
+      - data
       type: object
       properties:
         data:
@@ -1051,31 +1197,39 @@ components:
       example:
         data:
         - relationships:
+            ecosystem:
+              data:
+                id: 1
+                type: ecosystems
             profile:
               data:
                 id: 1
-                type: profile
+                type: profiles
             commit:
               data:
                 id: 1
-                type: commit
+                type: commits
           attributes:
             status: new
           id: 1
-          type: build
+          type: builds
         - relationships:
+            ecosystem:
+              data:
+                id: 1
+                type: ecosystems
             profile:
               data:
                 id: 1
-                type: profile
+                type: profiles
             commit:
               data:
                 id: 1
-                type: commit
+                type: commits
           attributes:
             status: new
           id: 1
-          type: build
+          type: builds
     Ecosystem_attributes:
       type: object
       properties:
@@ -1106,9 +1260,9 @@ components:
         related:
           type: string
           format: uri
-          example: ecosystem/1/build
+          example: builds
       example:
-        related: ecosystem/1/build
+        related: builds
     Ecosystem_relationships_builds:
       type: object
       properties:
@@ -1116,50 +1270,67 @@ components:
           $ref: '#/components/schemas/Ecosystem_relationships_builds_links'
       example:
         links:
-          related: ecosystem/1/build
-    Ecosystem_relationships_channels_links:
+          related: builds
+    Ecosystem_relationships_channels_data:
       type: object
       properties:
-        related:
+        type:
           type: string
-          format: uri
-          example: ecosystem/1/channel
+          example: channels
+        id:
+          type: integer
+          format: int64
+          example: 1
       example:
-        related: ecosystem/1/channel
+        id: 1
+        type: channels
     Ecosystem_relationships_channels:
       type: object
       properties:
-        links:
-          $ref: '#/components/schemas/Ecosystem_relationships_channels_links'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ecosystem_relationships_channels_data'
       example:
-        links:
-          related: ecosystem/1/channel
-    Ecosystem_relationships_profiles_links:
+        data:
+        - id: 1
+          type: channels
+        - id: 1
+          type: channels
+    Ecosystem_relationships_profiles_data:
       type: object
       properties:
-        related:
+        type:
           type: string
-          format: uri
-          example: ecosystem/1/profile
+          example: profiles
+        id:
+          type: integer
+          format: int64
+          example: 1
       example:
-        related: ecosystem/1/profile
+        id: 1
+        type: profiles
     Ecosystem_relationships_profiles:
-      type: object
       properties:
-        links:
-          $ref: '#/components/schemas/Ecosystem_relationships_profiles_links'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ecosystem_relationships_profiles_data'
       example:
-        links:
-          related: ecosystem/1/profile
+        data:
+        - id: 1
+          type: profiles
+        - id: 1
+          type: profiles
     Ecosystem_relationships_repos_links:
       type: object
       properties:
         related:
           type: string
           format: uri
-          example: ecosystem/1/repo
+          example: repos
       example:
-        related: ecosystem/1/repo
+        related: repos
     Ecosystem_relationships_repos:
       type: object
       properties:
@@ -1167,7 +1338,7 @@ components:
           $ref: '#/components/schemas/Ecosystem_relationships_repos_links'
       example:
         links:
-          related: ecosystem/1/repo
+          related: repos
     Ecosystem_relationships:
       type: object
       properties:
@@ -1181,20 +1352,29 @@ components:
           $ref: '#/components/schemas/Ecosystem_relationships_repos'
       example:
         channels:
-          links:
-            related: ecosystem/1/channel
+          data:
+          - id: 1
+            type: channels
+          - id: 1
+            type: channels
         repos:
           links:
-            related: ecosystem/1/repo
+            related: repos
         builds:
           links:
-            related: ecosystem/1/build
+            related: builds
         profiles:
-          links:
-            related: ecosystem/1/profile
+          data:
+          - id: 1
+            type: profiles
+          - id: 1
+            type: profiles
     Repo_attributes:
       type: object
       properties:
+        name:
+          type: string
+          example: Conan CI
         url:
           type: string
           example: https://github.com/uboot/conan-ci.git
@@ -1203,20 +1383,21 @@ components:
           example: packages/hello
       example:
         path: packages/hello
+        name: Conan CI
         url: https://github.com/uboot/conan-ci.git
     Repo_relationships_ecosystem_data:
       type: object
       properties:
         type:
           type: string
-          example: ecosystem
+          example: ecosystems
         id:
           type: integer
           format: int64
           example: 1
       example:
         id: 1
-        type: ecosystem
+        type: ecosystems
     Repo_relationships_ecosystem:
       type: object
       properties:
@@ -1225,16 +1406,16 @@ components:
       example:
         data:
           id: 1
-          type: ecosystem
+          type: ecosystems
     Repo_relationships_commits_links:
       type: object
       properties:
         related:
           type: string
           format: uri
-          example: repo/1/commit
+          example: commit
       example:
-        related: repo/1/commit
+        related: commit
     Repo_relationships_commits:
       type: object
       properties:
@@ -1242,7 +1423,7 @@ components:
           $ref: '#/components/schemas/Repo_relationships_commits_links'
       example:
         links:
-          related: repo/1/commit
+          related: commit
     Repo_relationships:
       type: object
       properties:
@@ -1254,10 +1435,10 @@ components:
         ecosystem:
           data:
             id: 1
-            type: ecosystem
+            type: ecosystems
         commits:
           links:
-            related: repo/1/commit
+            related: commit
     Profile_attributes_settings:
       required:
       - key
@@ -1303,7 +1484,7 @@ components:
         ecosystem:
           data:
             id: 1
-            type: ecosystem
+            type: ecosystems
     Channel_attributes:
       type: object
       properties:
@@ -1329,14 +1510,14 @@ components:
       properties:
         type:
           type: string
-          example: repo
+          example: repos
         id:
           type: integer
           format: int64
           example: 1
       example:
         id: 1
-        type: repo
+        type: repos
     Commit_relationships_repo:
       type: object
       properties:
@@ -1345,29 +1526,42 @@ components:
       example:
         data:
           id: 1
-          type: repo
-    Commit_relationships_channel_data:
+          type: repos
+    Commit_relationships_channel:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Ecosystem_relationships_channels_data'
+      example:
+        data:
+          id: 1
+          type: channels
+    Commit_relationships_builds_data:
       type: object
       properties:
         type:
           type: string
-          example: channel
+          example: builds
         id:
           type: integer
           format: int64
           example: 1
       example:
         id: 1
-        type: channel
-    Commit_relationships_channel:
+        type: builds
+    Commit_relationships_builds:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/Commit_relationships_channel_data'
+          type: array
+          items:
+            $ref: '#/components/schemas/Commit_relationships_builds_data'
       example:
         data:
-          id: 1
-          type: channel
+        - id: 1
+          type: builds
+        - id: 1
+          type: builds
     Commit_relationships:
       type: object
       properties:
@@ -1375,15 +1569,23 @@ components:
           $ref: '#/components/schemas/Commit_relationships_repo'
         channel:
           $ref: '#/components/schemas/Commit_relationships_channel'
+        builds:
+          $ref: '#/components/schemas/Commit_relationships_builds'
       example:
         repo:
           data:
             id: 1
-            type: repo
+            type: repos
         channel:
           data:
             id: 1
-            type: channel
+            type: channels
+        builds:
+          data:
+          - id: 1
+            type: builds
+          - id: 1
+            type: builds
     Build_attributes:
       type: object
       properties:
@@ -1404,14 +1606,14 @@ components:
       properties:
         type:
           type: string
-          example: commit
+          example: commits
         id:
           type: integer
           format: int64
           example: 1
       example:
         id: 1
-        type: commit
+        type: commits
     Build_relationships_commit:
       type: object
       properties:
@@ -1420,43 +1622,36 @@ components:
       example:
         data:
           id: 1
-          type: commit
-    Build_relationships_profile_data:
-      type: object
-      properties:
-        type:
-          type: string
-          example: profile
-        id:
-          type: integer
-          format: int64
-          example: 1
-      example:
-        id: 1
-        type: profile
+          type: commits
     Build_relationships_profile:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/Build_relationships_profile_data'
+          $ref: '#/components/schemas/Ecosystem_relationships_profiles_data'
       example:
         data:
           id: 1
-          type: profile
+          type: profiles
     Build_relationships:
       type: object
       properties:
+        ecosystem:
+          $ref: '#/components/schemas/Repo_relationships_ecosystem'
         commit:
           $ref: '#/components/schemas/Build_relationships_commit'
         profile:
           $ref: '#/components/schemas/Build_relationships_profile'
       example:
+        ecosystem:
+          data:
+            id: 1
+            type: ecosystems
         profile:
           data:
             id: 1
-            type: profile
+            type: profiles
         commit:
           data:
             id: 1
-            type: commit
+            type: commits
 

@@ -3,7 +3,6 @@ import connexion
 import logging
 import logging.config
 import os
-import signal
 import sqlalchemy
 import time
 import yaml

@@ -7,8 +7,6 @@ import enum
 import logging
 import os
 
-from conanci.ssh import decode, encode, generate_rsa_key
-
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("conanci")
@@ -45,6 +43,7 @@ class Repo(Base):
     id = Column(Integer, primary_key=True)
     ecosystem_id = Column(Integer, ForeignKey('ecosystem.id'))
     ecosystem = relationship("Ecosystem", backref="repos")
+    name = Column(String(255))
     url = Column(String(255), nullable=False)
     path = Column(String(255))
 
@@ -183,6 +182,7 @@ def populate_database():
             raise Exception("Found no ecosystem with ID=1")
 
         repo = Repo()
+        repo.name = "Hello"
         repo.ecosystem = ecosystem
         repo.url = "git@github.com:uboot/conan-ci.git"
         repo.path = "packages/hello"
@@ -214,23 +214,23 @@ def populate_database():
         channel.name = "stable"
         session.add(channel)
 
-        # commit = Commit()
-        # commit.repo = repo
-        # commit.sha = "2777a37dc82e296d55c23f738b79f139e627920c"
-        # commit.channel = channel
-        # commit.status = CommitStatus.new
+        commit = Commit()
+        commit.repo = repo
+        commit.sha = "2777a37dc82e296d55c23f738b79f139e627920c"
+        commit.channel = channel
+        commit.status = CommitStatus.new
 
-        # linux_build = Build()
-        # linux_build.commit = commit
-        # linux_build.profile = linux
-        # linux_build.status = BuildStatus.new
-        # session.add(linux_build)
+        linux_build = Build()
+        linux_build.commit = commit
+        linux_build.profile = linux
+        linux_build.status = BuildStatus.active
+        session.add(linux_build)
 
-        # windows_build = Build()
-        # windows_build.commit = commit
-        # windows_build.profile = windows
-        # windows_build.status = BuildStatus.new
-        # session.add(windows_build)
+        windows_build = Build()
+        windows_build.commit = commit
+        windows_build.profile = windows
+        windows_build.status = BuildStatus.active
+        session.add(windows_build)
 
         session.commit()
 

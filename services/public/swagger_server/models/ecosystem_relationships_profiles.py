@@ -6,7 +6,7 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
-from swagger_server.models.ecosystem_relationships_profiles_links import EcosystemRelationshipsProfilesLinks  # noqa: F401,E501
+from swagger_server.models.ecosystem_relationships_profiles_data import EcosystemRelationshipsProfilesData  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -15,20 +15,20 @@ class EcosystemRelationshipsProfiles(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, links: EcosystemRelationshipsProfilesLinks=None):  # noqa: E501
+    def __init__(self, data: List[EcosystemRelationshipsProfilesData]=None):  # noqa: E501
         """EcosystemRelationshipsProfiles - a model defined in Swagger
 
-        :param links: The links of this EcosystemRelationshipsProfiles.  # noqa: E501
-        :type links: EcosystemRelationshipsProfilesLinks
+        :param data: The data of this EcosystemRelationshipsProfiles.  # noqa: E501
+        :type data: List[EcosystemRelationshipsProfilesData]
         """
         self.swagger_types = {
-            'links': EcosystemRelationshipsProfilesLinks
+            'data': List[EcosystemRelationshipsProfilesData]
         }
 
         self.attribute_map = {
-            'links': 'links'
+            'data': 'data'
         }
-        self._links = links
+        self._data = data
 
     @classmethod
     def from_dict(cls, dikt) -> 'EcosystemRelationshipsProfiles':
@@ -42,22 +42,22 @@ class EcosystemRelationshipsProfiles(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def links(self) -> EcosystemRelationshipsProfilesLinks:
-        """Gets the links of this EcosystemRelationshipsProfiles.
+    def data(self) -> List[EcosystemRelationshipsProfilesData]:
+        """Gets the data of this EcosystemRelationshipsProfiles.
 
 
-        :return: The links of this EcosystemRelationshipsProfiles.
-        :rtype: EcosystemRelationshipsProfilesLinks
+        :return: The data of this EcosystemRelationshipsProfiles.
+        :rtype: List[EcosystemRelationshipsProfilesData]
         """
-        return self._links
+        return self._data
 
-    @links.setter
-    def links(self, links: EcosystemRelationshipsProfilesLinks):
-        """Sets the links of this EcosystemRelationshipsProfiles.
+    @data.setter
+    def data(self, data: List[EcosystemRelationshipsProfilesData]):
+        """Sets the data of this EcosystemRelationshipsProfiles.
 
 
-        :param links: The links of this EcosystemRelationshipsProfiles.
-        :type links: EcosystemRelationshipsProfilesLinks
+        :param data: The data of this EcosystemRelationshipsProfiles.
+        :type data: List[EcosystemRelationshipsProfilesData]
         """
 
-        self._links = links
+        self._data = data

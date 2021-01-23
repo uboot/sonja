@@ -1,66 +1,50 @@
 from conanci import database
 from flask import abort
-from swagger_server.models import CommitAttributes, CommitRelationships, CommitRelationshipsRepoData, \
-    CommitRelationshipsChannelData
-from swagger_server.models.commit import Commit
-from swagger_server.models.commit_relationships_channel import CommitRelationshipsChannel  # noqa: F401,E501
-from swagger_server.models.commit_relationships_repo import CommitRelationshipsRepo  # noqa: F401,E501
-from swagger_server.models.inline_response2005 import InlineResponse2005  # noqa: E501
-from swagger_server.models.inline_response2006 import InlineResponse2006  # noqa: E501
+from swagger_server import models
 
 
 def __create_commit(record: database.Commit):
-    return Commit(
+    return models.Commit(
         id=record.id,
-        type="commit",
-        attributes=CommitAttributes(
+        type="commits",
+        attributes=models.CommitAttributes(
             sha=record.sha
         ),
-        relationships=CommitRelationships(
-            repo=CommitRelationshipsRepo(
-                data=CommitRelationshipsRepoData(
+        relationships=models.CommitRelationships(
+            repo=models.CommitRelationshipsRepo(
+                data=models.CommitRelationshipsRepoData(
                     id=record.repo_id,
-                    type="repo"
+                    type="repos"
                 )
             ),
-            channel=CommitRelationshipsChannel(
-                data=CommitRelationshipsChannelData(
+            channel=models.CommitRelationshipsChannel(
+                data=models.EcosystemRelationshipsChannelsData(
                     id=record.channel_id,
-                    type="channel"
+                    type="channels"
                 )
+            ),
+            builds=models.CommitRelationshipsBuilds(
+                data=[
+                    models.CommitRelationshipsBuildsData(
+                        id=build.id,
+                        type="builds"
+                    ) for build in record.builds
+                ]
             )
         )
     )
 
-def get_commit(commit_id):  # noqa: E501
-    """get a commit
-
-     # noqa: E501
-
-    :param commit_id: commite ID
-    :type commit_id: int
-
-    :rtype: InlineResponse2006
-    """
+def get_commit(commit_id):
     with database.session_scope() as session:
         record = session.query(database.Commit).filter_by(id=commit_id).first()
         if not record:
             abort(404)
-        return InlineResponse2006(data=__create_commit(record))
+        return models.CommitData(data=__create_commit(record))
 
 
-def get_commits(repo_id):  # noqa: E501
-    """get the commits of a repo
-
-     # noqa: E501
-
-    :param repo_id: repo
-    :type repo_id: int
-
-    :rtype: InlineResponse2005
-    """
+def get_commits(repo_id):
     with database.session_scope() as session:
-        return InlineResponse2005(
+        return models.CommitList(
             data=[__create_commit(record) for record in
                   session.query(database.Commit).filter_by(repo_id=repo_id).all()]
         )

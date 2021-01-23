@@ -6,6 +6,7 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
+from swagger_server.models.commit_relationships_builds import CommitRelationshipsBuilds  # noqa: F401,E501
 from swagger_server.models.commit_relationships_channel import CommitRelationshipsChannel  # noqa: F401,E501
 from swagger_server.models.commit_relationships_repo import CommitRelationshipsRepo  # noqa: F401,E501
 from swagger_server import util
@@ -16,25 +17,30 @@ class CommitRelationships(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, repo: CommitRelationshipsRepo=None, channel: CommitRelationshipsChannel=None):  # noqa: E501
+    def __init__(self, repo: CommitRelationshipsRepo=None, channel: CommitRelationshipsChannel=None, builds: CommitRelationshipsBuilds=None):  # noqa: E501
         """CommitRelationships - a model defined in Swagger
 
         :param repo: The repo of this CommitRelationships.  # noqa: E501
         :type repo: CommitRelationshipsRepo
         :param channel: The channel of this CommitRelationships.  # noqa: E501
         :type channel: CommitRelationshipsChannel
+        :param builds: The builds of this CommitRelationships.  # noqa: E501
+        :type builds: CommitRelationshipsBuilds
         """
         self.swagger_types = {
             'repo': CommitRelationshipsRepo,
-            'channel': CommitRelationshipsChannel
+            'channel': CommitRelationshipsChannel,
+            'builds': CommitRelationshipsBuilds
         }
 
         self.attribute_map = {
             'repo': 'repo',
-            'channel': 'channel'
+            'channel': 'channel',
+            'builds': 'builds'
         }
         self._repo = repo
         self._channel = channel
+        self._builds = builds
 
     @classmethod
     def from_dict(cls, dikt) -> 'CommitRelationships':
@@ -88,3 +94,24 @@ class CommitRelationships(Model):
         """
 
         self._channel = channel
+
+    @property
+    def builds(self) -> CommitRelationshipsBuilds:
+        """Gets the builds of this CommitRelationships.
+
+
+        :return: The builds of this CommitRelationships.
+        :rtype: CommitRelationshipsBuilds
+        """
+        return self._builds
+
+    @builds.setter
+    def builds(self, builds: CommitRelationshipsBuilds):
+        """Sets the builds of this CommitRelationships.
+
+
+        :param builds: The builds of this CommitRelationships.
+        :type builds: CommitRelationshipsBuilds
+        """
+
+        self._builds = builds

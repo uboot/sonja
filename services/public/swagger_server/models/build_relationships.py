@@ -8,6 +8,7 @@ from typing import List, Dict  # noqa: F401
 from swagger_server.models.base_model_ import Model
 from swagger_server.models.build_relationships_commit import BuildRelationshipsCommit  # noqa: F401,E501
 from swagger_server.models.build_relationships_profile import BuildRelationshipsProfile  # noqa: F401,E501
+from swagger_server.models.repo_relationships_ecosystem import RepoRelationshipsEcosystem  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -16,23 +17,28 @@ class BuildRelationships(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, commit: BuildRelationshipsCommit=None, profile: BuildRelationshipsProfile=None):  # noqa: E501
+    def __init__(self, ecosystem: RepoRelationshipsEcosystem=None, commit: BuildRelationshipsCommit=None, profile: BuildRelationshipsProfile=None):  # noqa: E501
         """BuildRelationships - a model defined in Swagger
 
+        :param ecosystem: The ecosystem of this BuildRelationships.  # noqa: E501
+        :type ecosystem: RepoRelationshipsEcosystem
         :param commit: The commit of this BuildRelationships.  # noqa: E501
         :type commit: BuildRelationshipsCommit
         :param profile: The profile of this BuildRelationships.  # noqa: E501
         :type profile: BuildRelationshipsProfile
         """
         self.swagger_types = {
+            'ecosystem': RepoRelationshipsEcosystem,
             'commit': BuildRelationshipsCommit,
             'profile': BuildRelationshipsProfile
         }
 
         self.attribute_map = {
+            'ecosystem': 'ecosystem',
             'commit': 'commit',
             'profile': 'profile'
         }
+        self._ecosystem = ecosystem
         self._commit = commit
         self._profile = profile
 
@@ -46,6 +52,27 @@ class BuildRelationships(Model):
         :rtype: BuildRelationships
         """
         return util.deserialize_model(dikt, cls)
+
+    @property
+    def ecosystem(self) -> RepoRelationshipsEcosystem:
+        """Gets the ecosystem of this BuildRelationships.
+
+
+        :return: The ecosystem of this BuildRelationships.
+        :rtype: RepoRelationshipsEcosystem
+        """
+        return self._ecosystem
+
+    @ecosystem.setter
+    def ecosystem(self, ecosystem: RepoRelationshipsEcosystem):
+        """Sets the ecosystem of this BuildRelationships.
+
+
+        :param ecosystem: The ecosystem of this BuildRelationships.
+        :type ecosystem: RepoRelationshipsEcosystem
+        """
+
+        self._ecosystem = ecosystem
 
     @property
     def commit(self) -> BuildRelationshipsCommit:

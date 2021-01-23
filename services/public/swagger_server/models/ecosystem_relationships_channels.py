@@ -6,7 +6,7 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
-from swagger_server.models.ecosystem_relationships_channels_links import EcosystemRelationshipsChannelsLinks  # noqa: F401,E501
+from swagger_server.models.ecosystem_relationships_channels_data import EcosystemRelationshipsChannelsData  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -15,20 +15,20 @@ class EcosystemRelationshipsChannels(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, links: EcosystemRelationshipsChannelsLinks=None):  # noqa: E501
+    def __init__(self, data: List[EcosystemRelationshipsChannelsData]=None):  # noqa: E501
         """EcosystemRelationshipsChannels - a model defined in Swagger
 
-        :param links: The links of this EcosystemRelationshipsChannels.  # noqa: E501
-        :type links: EcosystemRelationshipsChannelsLinks
+        :param data: The data of this EcosystemRelationshipsChannels.  # noqa: E501
+        :type data: List[EcosystemRelationshipsChannelsData]
         """
         self.swagger_types = {
-            'links': EcosystemRelationshipsChannelsLinks
+            'data': List[EcosystemRelationshipsChannelsData]
         }
 
         self.attribute_map = {
-            'links': 'links'
+            'data': 'data'
         }
-        self._links = links
+        self._data = data
 
     @classmethod
     def from_dict(cls, dikt) -> 'EcosystemRelationshipsChannels':
@@ -42,22 +42,22 @@ class EcosystemRelationshipsChannels(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def links(self) -> EcosystemRelationshipsChannelsLinks:
-        """Gets the links of this EcosystemRelationshipsChannels.
+    def data(self) -> List[EcosystemRelationshipsChannelsData]:
+        """Gets the data of this EcosystemRelationshipsChannels.
 
 
-        :return: The links of this EcosystemRelationshipsChannels.
-        :rtype: EcosystemRelationshipsChannelsLinks
+        :return: The data of this EcosystemRelationshipsChannels.
+        :rtype: List[EcosystemRelationshipsChannelsData]
         """
-        return self._links
+        return self._data
 
-    @links.setter
-    def links(self, links: EcosystemRelationshipsChannelsLinks):
-        """Sets the links of this EcosystemRelationshipsChannels.
+    @data.setter
+    def data(self, data: List[EcosystemRelationshipsChannelsData]):
+        """Sets the data of this EcosystemRelationshipsChannels.
 
 
-        :param links: The links of this EcosystemRelationshipsChannels.
-        :type links: EcosystemRelationshipsChannelsLinks
+        :param data: The data of this EcosystemRelationshipsChannels.
+        :type data: List[EcosystemRelationshipsChannelsData]
         """
 
-        self._links = links
+        self._data = data

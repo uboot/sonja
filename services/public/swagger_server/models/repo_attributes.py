@@ -14,23 +14,28 @@ class RepoAttributes(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, url: str=None, path: str=None):  # noqa: E501
+    def __init__(self, name: str=None, url: str=None, path: str=None):  # noqa: E501
         """RepoAttributes - a model defined in Swagger
 
+        :param name: The name of this RepoAttributes.  # noqa: E501
+        :type name: str
         :param url: The url of this RepoAttributes.  # noqa: E501
         :type url: str
         :param path: The path of this RepoAttributes.  # noqa: E501
         :type path: str
         """
         self.swagger_types = {
+            'name': str,
             'url': str,
             'path': str
         }
 
         self.attribute_map = {
+            'name': 'name',
             'url': 'url',
             'path': 'path'
         }
+        self._name = name
         self._url = url
         self._path = path
 
@@ -44,6 +49,27 @@ class RepoAttributes(Model):
         :rtype: RepoAttributes
         """
         return util.deserialize_model(dikt, cls)
+
+    @property
+    def name(self) -> str:
+        """Gets the name of this RepoAttributes.
+
+
+        :return: The name of this RepoAttributes.
+        :rtype: str
+        """
+        return self._name
+
+    @name.setter
+    def name(self, name: str):
+        """Sets the name of this RepoAttributes.
+
+
+        :param name: The name of this RepoAttributes.
+        :type name: str
+        """
+
+        self._name = name
 
     @property
     def url(self) -> str:

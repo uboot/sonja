@@ -6,7 +6,7 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
-from swagger_server.models.build_relationships_profile_data import BuildRelationshipsProfileData  # noqa: F401,E501
+from swagger_server.models.ecosystem_relationships_profiles_data import EcosystemRelationshipsProfilesData  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -15,14 +15,14 @@ class BuildRelationshipsProfile(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, data: BuildRelationshipsProfileData=None):  # noqa: E501
+    def __init__(self, data: EcosystemRelationshipsProfilesData=None):  # noqa: E501
         """BuildRelationshipsProfile - a model defined in Swagger
 
         :param data: The data of this BuildRelationshipsProfile.  # noqa: E501
-        :type data: BuildRelationshipsProfileData
+        :type data: EcosystemRelationshipsProfilesData
         """
         self.swagger_types = {
-            'data': BuildRelationshipsProfileData
+            'data': EcosystemRelationshipsProfilesData
         }
 
         self.attribute_map = {
@@ -42,22 +42,22 @@ class BuildRelationshipsProfile(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def data(self) -> BuildRelationshipsProfileData:
+    def data(self) -> EcosystemRelationshipsProfilesData:
         """Gets the data of this BuildRelationshipsProfile.
 
 
         :return: The data of this BuildRelationshipsProfile.
-        :rtype: BuildRelationshipsProfileData
+        :rtype: EcosystemRelationshipsProfilesData
         """
         return self._data
 
     @data.setter
-    def data(self, data: BuildRelationshipsProfileData):
+    def data(self, data: EcosystemRelationshipsProfilesData):
         """Sets the data of this BuildRelationshipsProfile.
 
 
         :param data: The data of this BuildRelationshipsProfile.
-        :type data: BuildRelationshipsProfileData
+        :type data: EcosystemRelationshipsProfilesData
         """
 
         self._data = data
