@@ -2,16 +2,20 @@
 
 from __future__ import absolute_import
 
+from conanci import database
+from conanci.test import util
 from flask import json
-from six import BytesIO
-
-from swagger_server.models.build_data import BuildData  # noqa: E501
-from swagger_server.models.build_list import BuildList  # noqa: E501
+from swagger_server import models
 from swagger_server.test import BaseTestCase
 
 
 class TestBuildController(BaseTestCase):
     """BuildController integration test stubs"""
+
+    def setUp(self):
+        with database.session_scope() as session:
+            build = util.create_build()
+            session.add(build)
 
     def test_get_build(self):
         """Test case for get_build
@@ -40,9 +44,9 @@ class TestBuildController(BaseTestCase):
 
         update a build
         """
-        body = BuildData()
+        body = models.BuildData(data=models.Build(attributes=models.BuildAttributes(status="active")))
         response = self.client.open(
-            '/build/{build_id}'.format(build_id=789),
+            '/build/{build_id}'.format(build_id=1),
             method='PATCH',
             data=json.dumps(body),
             content_type='application/json')

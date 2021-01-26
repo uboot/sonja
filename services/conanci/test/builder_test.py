@@ -6,6 +6,19 @@ import threading
 import unittest
 from contextlib import contextmanager
 
+# Requires:
+#
+# 1. Conan server
+# docker run --name conan -d --rm -p 9300:9300 -v <path-to>/conan-server:/root/.conan_server conanio/conan_server:1.28.1
+#
+# conan-server/server.conf
+#
+# [write_permissions]
+# */*@*/*: demo
+#
+# [users]
+# demo: demo
+
 
 known_hosts = ("Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN"
                "2hSR21kbm05dFVEYk85SURTd0JLNlRiUWErUFhZUENQeTZyYlRyVHR3N1BIa2NjS3JwcDB5VmhwNUhkRUljS3"
@@ -39,7 +52,6 @@ def cancel_build(builder, seconds):
 
 
 def get_linux_build_parameters():
-    ssh_key_path = os.environ.get("SSH_KEY_PATH", "")
     return {
         "conan_url": os.environ.get("CONAN_SERVER_URL", "127.0.0.1"),
         "conan_user": "demo",

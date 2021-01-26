@@ -1,6 +1,9 @@
 from sqlalchemy import create_engine, Column, Enum, ForeignKey, Integer, String, Table, Text
-from sqlalchemy.orm import backref, relationship, sessionmaker
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import backref, relationship, sessionmaker
+
+import sqlalchemy
 
 from contextlib import contextmanager
 import enum
@@ -172,6 +175,16 @@ def session_scope():
         raise
     finally:
         session.close()
+
+
+def reset_database():
+        try:
+            Base.metadata.drop_all(engine)
+            Base.metadata.create_all(engine)
+            return
+        except OperationalError:
+            logger.warning("Failed to connect to database")
+            raise
 
 
 def populate_database():

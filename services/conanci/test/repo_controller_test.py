@@ -15,7 +15,7 @@ known_hosts = ("Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVB
 
 class RepoControllerTest(unittest.TestCase):
     def setUp(self):
-        self.work_dir = os.path.join(os.environ.get("VCS_DATA_DIR", "."), "test")
+        self.work_dir = os.environ.get("VCS_DATA_DIR", ".")
         shutil.rmtree(self.work_dir)
 
     def test_checkout_master(self):

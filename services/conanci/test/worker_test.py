@@ -8,11 +8,19 @@ import conanci.test.util as util
 import time
 import unittest
 
+# Requires:
+#
+# 1. MySQL database
+# docker run --rm -d --name mysql -p 3306:3306 -e MYSQL_DATABASE=conan-ci -e MYSQL_ROOT_PASSWORD=secret mysql:8.0.21
+#
+# 2. Conan server
+# cf. builder_test.py
+
 
 class AgentTest(unittest.TestCase):
     def setUp(self):
         self.agent = Agent()
-        database.clear_database()
+        database.reset_database()
 
     def tearDown(self):
         self.agent.cancel()
@@ -67,7 +75,7 @@ class CrawlerTest(unittest.TestCase):
     def setUp(self):
         self.scheduler = Mock()
         self.crawler = Crawler(self.scheduler)
-        database.clear_database()
+        database.reset_database()
 
     def tearDown(self):
         self.crawler.cancel()
@@ -133,7 +141,7 @@ class SchedulerTest(unittest.TestCase):
         self.linux_agent = Mock()
         self.windows_agent = Mock()
         self.scheduler = Scheduler(self.linux_agent, self.windows_agent)
-        database.clear_database()
+        database.reset_database()
 
     def tearDown(self):
         self.scheduler.cancel()

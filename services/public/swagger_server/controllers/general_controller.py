@@ -2,6 +2,7 @@ import os
 
 from conanci import database
 from conanci.swagger_client import ApiClient, Configuration, CrawlerApi
+from urllib3.exceptions import MaxRetryError
 
 
 crawler_url = os.environ.get('CONANCI_CRAWLER_URL', '127.0.0.1')
@@ -65,5 +66,8 @@ def process_repos():  # noqa: E501
 
     :rtype: None
     """
-    crawler.process_repos()
+    try:
+        crawler.process_repos()
+    except MaxRetryError as e:
+        pass
     return 'success'

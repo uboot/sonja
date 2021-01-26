@@ -2,14 +2,18 @@
 
 from __future__ import absolute_import
 
-from flask import json
-from six import BytesIO
-
+from conanci import database
+from conanci.test import util
 from swagger_server.test import BaseTestCase
 
 
 class TestGeneralController(BaseTestCase):
     """GeneralController integration test stubs"""
+
+    def setUp(self):
+        with database.session_scope() as session:
+            ecosystem = util.create_ecosystem()
+            session.add(ecosystem)
 
     def test_clear_database(self):
         """Test case for clear_database

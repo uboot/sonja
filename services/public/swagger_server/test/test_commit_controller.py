@@ -2,16 +2,18 @@
 
 from __future__ import absolute_import
 
-from flask import json
-from six import BytesIO
-
-from swagger_server.models.commit_data import CommitData  # noqa: E501
-from swagger_server.models.commit_list import CommitList  # noqa: E501
+from conanci import database
+from conanci.test import util
 from swagger_server.test import BaseTestCase
 
 
 class TestCommitController(BaseTestCase):
     """CommitController integration test stubs"""
+
+    def setUp(self):
+        with database.session_scope() as session:
+            commit = util.create_commit()
+            session.add(commit)
 
     def test_get_commit(self):
         """Test case for get_commit
@@ -19,7 +21,7 @@ class TestCommitController(BaseTestCase):
         get a commit
         """
         response = self.client.open(
-            '/commit/{commitId}'.format(commit_id=789),
+            '/commit/{commit_id}'.format(commit_id=1),
             method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
@@ -30,7 +32,7 @@ class TestCommitController(BaseTestCase):
         get the commits of a repo
         """
         response = self.client.open(
-            '/repo/{repoId}/commit'.format(repo_id=789),
+            '/repo/{repo_id}/commit'.format(repo_id=1),
             method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))

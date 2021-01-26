@@ -41,3 +41,4 @@ def connect_to_database():
     logger.error("Exit with 1")
     #os.kill(os.getpid(), signal.SIGKILL)
     exit(1)
+
