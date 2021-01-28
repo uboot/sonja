@@ -6,7 +6,7 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   version: 2.0.0
 servers:
-- url: /
+- url: /api/v1
 paths:
   /ping:
     get:

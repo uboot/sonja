@@ -7,7 +7,7 @@ spec:
   selector:
     app: {{ template "conan-ci.fullname" $ }}-{{ .name }}
   ports:
-    - port: 8080
+    - port: {{ .port | default "8080" }}
 ---
 {{- end }}
 kind: Service

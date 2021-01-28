@@ -24,14 +24,15 @@ phpmyadmin:
 
 services:
   - name: public
-    public: true
   - name: scheduler
   - name: crawler
+  - name: frontend
+    port: 80
   - name: linux-agent
     docker: true
     image: agent
     replicas: 1
 
-windows:
-  - name: one
-    image: agent
+# windows:
+#   - name: one
+#     image: agent
