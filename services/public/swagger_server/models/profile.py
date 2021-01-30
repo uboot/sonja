@@ -16,11 +16,11 @@ class Profile(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: int=None, type: str=None, attributes: ProfileAttributes=None, relationships: ProfileRelationships=None):  # noqa: E501
+    def __init__(self, id: str=None, type: str=None, attributes: ProfileAttributes=None, relationships: ProfileRelationships=None):  # noqa: E501
         """Profile - a model defined in Swagger
 
         :param id: The id of this Profile.  # noqa: E501
-        :type id: int
+        :type id: str
         :param type: The type of this Profile.  # noqa: E501
         :type type: str
         :param attributes: The attributes of this Profile.  # noqa: E501
@@ -29,7 +29,7 @@ class Profile(Model):
         :type relationships: ProfileRelationships
         """
         self.swagger_types = {
-            'id': int,
+            'id': str,
             'type': str,
             'attributes': ProfileAttributes,
             'relationships': ProfileRelationships
@@ -58,22 +58,22 @@ class Profile(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def id(self) -> int:
+    def id(self) -> str:
         """Gets the id of this Profile.
 
 
         :return: The id of this Profile.
-        :rtype: int
+        :rtype: str
         """
         return self._id
 
     @id.setter
-    def id(self, id: int):
+    def id(self, id: str):
         """Sets the id of this Profile.
 
 
         :param id: The id of this Profile.
-        :type id: int
+        :type id: str
         """
 
         self._id = id

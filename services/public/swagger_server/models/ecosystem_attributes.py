@@ -40,8 +40,8 @@ class EcosystemAttributes(Model):
             'name': 'name',
             'user': 'user',
             'settings': 'settings',
-            'public_ssh_key': 'public_ssh_key',
-            'known_hosts': 'known_hosts'
+            'public_ssh_key': 'public-ssh-key',
+            'known_hosts': 'known-hosts'
         }
         self._name = name
         self._user = user

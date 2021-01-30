@@ -20,7 +20,7 @@ def __create_ecosystem(record: database.Ecosystem):
         relationships=models.EcosystemRelationships(
             builds=models.EcosystemRelationshipsBuilds(
                 links=models.EcosystemRelationshipsBuildsLinks(
-                    related="builds"
+                    related="build"
                 )
             ),
             channels=models.EcosystemRelationshipsChannels(
@@ -41,7 +41,7 @@ def __create_ecosystem(record: database.Ecosystem):
             ),
             repos=models.EcosystemRelationshipsRepos(
                 links=models.EcosystemRelationshipsReposLinks(
-                    related="repos"
+                    related="repo"
                 )
             )
         )

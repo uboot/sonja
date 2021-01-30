@@ -6,6 +6,7 @@ RUN npm install -g ember-cli@3.23.0
 
 RUN git clone https://github.com/uboot/conan-ci-frontend.git \
   && cd conan-ci-frontend \
+  && git checkout 2744264bd99fd37c927ee1ed20ad3fb96215f635 \
   && npm install \
   && ember build --environment production
 
@@ -13,3 +14,5 @@ RUN git clone https://github.com/uboot/conan-ci-frontend.git \
 FROM nginx:1.19.6
 
 COPY --from=builder /app/conan-ci-frontend/dist /usr/share/nginx/html
+COPY frontend/ping.json /usr/share/nginx/html
+COPY frontend/nginx.conf /etc/nginx/nginx.conf

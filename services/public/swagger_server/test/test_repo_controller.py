@@ -24,7 +24,7 @@ class TestRepoController(BaseTestCase):
         """
         body = self.__create_repo("hello", "git@github.com:uboot/conan-ci.git", "packages/hello")
         response = self.client.open(
-            '/repo',
+            '/api/v1/repo',
             method='POST',
             data=json.dumps(body),
             content_type='application/json')
@@ -37,7 +37,7 @@ class TestRepoController(BaseTestCase):
         delete a repo
         """
         response = self.client.open(
-            '/repo/{repo_id}'.format(repo_id=1),
+            '/api/v1/repo/{repo_id}'.format(repo_id=1),
             method='DELETE')
         self.assert204(response,
                        'Response body is : ' + response.data.decode('utf-8'))
@@ -48,7 +48,7 @@ class TestRepoController(BaseTestCase):
         get a repo
         """
         response = self.client.open(
-            '/repo/{repo_id}'.format(repo_id=1),
+            '/api/v1/repo/{repo_id}'.format(repo_id=1),
             method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
@@ -59,7 +59,7 @@ class TestRepoController(BaseTestCase):
         get repos of an ecosystem
         """
         response = self.client.open(
-            '/ecosystem/{ecosystem_id}/repo'.format(ecosystem_id=1),
+            '/api/v1/ecosystem/{ecosystem_id}/repo'.format(ecosystem_id=1),
             method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
@@ -71,7 +71,7 @@ class TestRepoController(BaseTestCase):
         """
         body = self.__create_repo("hello", "git@github.com:uboot/conan-ci.git", "packages/hello")
         response = self.client.open(
-            '/repo/{repo_id}'.format(repo_id=1),
+            '/api/v1/repo/{repo_id}'.format(repo_id=1),
             method='PATCH',
             data=json.dumps(body),
             content_type='application/json')
@@ -91,7 +91,7 @@ class TestRepoController(BaseTestCase):
                     ecosystem=models.RepoRelationshipsEcosystem(
                         data=models.RepoRelationshipsEcosystemData(
                             type="ecosystems",
-                            id=1
+                            id="1"
                         )
                     )
                 )

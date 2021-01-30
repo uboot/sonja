@@ -14,17 +14,17 @@ class RepoRelationshipsEcosystemData(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, type: str=None, id: int=None):  # noqa: E501
+    def __init__(self, type: str=None, id: str=None):  # noqa: E501
         """RepoRelationshipsEcosystemData - a model defined in Swagger
 
         :param type: The type of this RepoRelationshipsEcosystemData.  # noqa: E501
         :type type: str
         :param id: The id of this RepoRelationshipsEcosystemData.  # noqa: E501
-        :type id: int
+        :type id: str
         """
         self.swagger_types = {
             'type': str,
-            'id': int
+            'id': str
         }
 
         self.attribute_map = {
@@ -67,22 +67,22 @@ class RepoRelationshipsEcosystemData(Model):
         self._type = type
 
     @property
-    def id(self) -> int:
+    def id(self) -> str:
         """Gets the id of this RepoRelationshipsEcosystemData.
 
 
         :return: The id of this RepoRelationshipsEcosystemData.
-        :rtype: int
+        :rtype: str
         """
         return self._id
 
     @id.setter
-    def id(self, id: int):
+    def id(self, id: str):
         """Sets the id of this RepoRelationshipsEcosystemData.
 
 
         :param id: The id of this RepoRelationshipsEcosystemData.
-        :type id: int
+        :type id: str
         """
 
         self._id = id

@@ -23,7 +23,7 @@ class TestBuildController(BaseTestCase):
         get a build
         """
         response = self.client.open(
-            '/build/{build_id}'.format(build_id=1),
+            '/api/v1/build/{build_id}'.format(build_id=1),
             method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
@@ -34,7 +34,7 @@ class TestBuildController(BaseTestCase):
         get builds of an ecosystem
         """
         response = self.client.open(
-            '/ecosystem/{ecosystem_id}/build'.format(ecosystem_id=789),
+            '/api/v1/ecosystem/{ecosystem_id}/build'.format(ecosystem_id=789),
             method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
@@ -44,9 +44,14 @@ class TestBuildController(BaseTestCase):
 
         update a build
         """
-        body = models.BuildData(data=models.Build(attributes=models.BuildAttributes(status="active")))
+        body = models.BuildData(
+            data=models.Build(
+                type="builds",
+                attributes=models.BuildAttributes(status="active")
+            )
+        )
         response = self.client.open(
-            '/build/{build_id}'.format(build_id=1),
+            '/api/v1/build/{build_id}'.format(build_id=1),
             method='PATCH',
             data=json.dumps(body),
             content_type='application/json')

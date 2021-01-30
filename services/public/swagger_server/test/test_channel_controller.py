@@ -24,7 +24,7 @@ class TestChannelController(BaseTestCase):
         """
         body = self.__create_channel("stable", "master")
         response = self.client.open(
-            '/channel',
+            '/api/v1/channel',
             method='POST',
             data=json.dumps(body),
             content_type='application/json')
@@ -37,7 +37,7 @@ class TestChannelController(BaseTestCase):
         delete a channel
         """
         response = self.client.open(
-            '/channel/{channel_id}'.format(channel_id=1),
+            '/api/v1/channel/{channel_id}'.format(channel_id=1),
             method='DELETE')
         self.assert204(response,
                        'Response body is : ' + response.data.decode('utf-8'))
@@ -48,7 +48,7 @@ class TestChannelController(BaseTestCase):
         get a channel
         """
         response = self.client.open(
-            '/channel/{channel_id}'.format(channel_id=1),
+            '/api/v1/channel/{channel_id}'.format(channel_id=1),
             method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
@@ -60,7 +60,7 @@ class TestChannelController(BaseTestCase):
         """
         body = self.__create_channel("stable", "master")
         response = self.client.open(
-            '/channel/{channel_id}'.format(channel_id=1),
+            '/api/v1/channel/{channel_id}'.format(channel_id=1),
             method='PATCH',
             data=json.dumps(body),
             content_type='application/json')
@@ -79,7 +79,7 @@ class TestChannelController(BaseTestCase):
                     ecosystem=models.RepoRelationshipsEcosystem(
                         data=models.RepoRelationshipsEcosystemData(
                             type="ecosystems",
-                            id=1
+                            id="1"
                         )
                     )
                 )

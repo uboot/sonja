@@ -14,17 +14,17 @@ class EcosystemRelationshipsProfilesData(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, type: str=None, id: int=None):  # noqa: E501
+    def __init__(self, type: str=None, id: str=None):  # noqa: E501
         """EcosystemRelationshipsProfilesData - a model defined in Swagger
 
         :param type: The type of this EcosystemRelationshipsProfilesData.  # noqa: E501
         :type type: str
         :param id: The id of this EcosystemRelationshipsProfilesData.  # noqa: E501
-        :type id: int
+        :type id: str
         """
         self.swagger_types = {
             'type': str,
-            'id': int
+            'id': str
         }
 
         self.attribute_map = {
@@ -67,22 +67,22 @@ class EcosystemRelationshipsProfilesData(Model):
         self._type = type
 
     @property
-    def id(self) -> int:
+    def id(self) -> str:
         """Gets the id of this EcosystemRelationshipsProfilesData.
 
 
         :return: The id of this EcosystemRelationshipsProfilesData.
-        :rtype: int
+        :rtype: str
         """
         return self._id
 
     @id.setter
-    def id(self, id: int):
+    def id(self, id: str):
         """Sets the id of this EcosystemRelationshipsProfilesData.
 
 
         :param id: The id of this EcosystemRelationshipsProfilesData.
-        :type id: int
+        :type id: str
         """
 
         self._id = id

@@ -47,7 +47,7 @@ class Repo(Base):
     ecosystem_id = Column(Integer, ForeignKey('ecosystem.id'))
     ecosystem = relationship("Ecosystem", backref="repos")
     name = Column(String(255))
-    url = Column(String(255), nullable=False)
+    url = Column(String(255))
     path = Column(String(255))
 
 
@@ -58,7 +58,7 @@ class Channel(Base):
     ecosystem_id = Column(Integer, ForeignKey('ecosystem.id'))
     ecosystem = relationship("Ecosystem", backref="channels")
     name = Column(String(255), nullable=False)
-    branch = Column(String(255), nullable=False)
+    branch = Column(String(255))
 
 
 class Profile(Base):
@@ -68,7 +68,7 @@ class Profile(Base):
     ecosystem_id = Column(Integer, ForeignKey('ecosystem.id'))
     ecosystem = relationship("Ecosystem", backref="profiles")
     name = Column(String(255), nullable=False)
-    container = Column(String(255), nullable=False)
+    container = Column(String(255))
     settings = relationship('Setting', backref='profile', lazy=True,
                                cascade="all, delete, delete-orphan")
 
@@ -227,23 +227,23 @@ def populate_database():
         channel.name = "stable"
         session.add(channel)
 
-        commit = Commit()
-        commit.repo = repo
-        commit.sha = "2777a37dc82e296d55c23f738b79f139e627920c"
-        commit.channel = channel
-        commit.status = CommitStatus.new
+        # commit = Commit()
+        # commit.repo = repo
+        # commit.sha = "2777a37dc82e296d55c23f738b79f139e627920c"
+        # commit.channel = channel
+        # commit.status = CommitStatus.new
 
-        linux_build = Build()
-        linux_build.commit = commit
-        linux_build.profile = linux
-        linux_build.status = BuildStatus.active
-        session.add(linux_build)
+        # linux_build = Build()
+        # linux_build.commit = commit
+        # linux_build.profile = linux
+        # linux_build.status = BuildStatus.active
+        # session.add(linux_build)
 
-        windows_build = Build()
-        windows_build.commit = commit
-        windows_build.profile = windows
-        windows_build.status = BuildStatus.active
-        session.add(windows_build)
+        # windows_build = Build()
+        # windows_build.commit = commit
+        # windows_build.profile = windows
+        # windows_build.status = BuildStatus.active
+        # session.add(windows_build)
 
         session.commit()
 

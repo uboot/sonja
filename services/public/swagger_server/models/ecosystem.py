@@ -16,11 +16,11 @@ class Ecosystem(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: int=None, type: str=None, attributes: EcosystemAttributes=None, relationships: EcosystemRelationships=None):  # noqa: E501
+    def __init__(self, id: str=None, type: str=None, attributes: EcosystemAttributes=None, relationships: EcosystemRelationships=None):  # noqa: E501
         """Ecosystem - a model defined in Swagger
 
         :param id: The id of this Ecosystem.  # noqa: E501
-        :type id: int
+        :type id: str
         :param type: The type of this Ecosystem.  # noqa: E501
         :type type: str
         :param attributes: The attributes of this Ecosystem.  # noqa: E501
@@ -29,7 +29,7 @@ class Ecosystem(Model):
         :type relationships: EcosystemRelationships
         """
         self.swagger_types = {
-            'id': int,
+            'id': str,
             'type': str,
             'attributes': EcosystemAttributes,
             'relationships': EcosystemRelationships
@@ -58,22 +58,22 @@ class Ecosystem(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def id(self) -> int:
+    def id(self) -> str:
         """Gets the id of this Ecosystem.
 
 
         :return: The id of this Ecosystem.
-        :rtype: int
+        :rtype: str
         """
         return self._id
 
     @id.setter
-    def id(self, id: int):
+    def id(self, id: str):
         """Sets the id of this Ecosystem.
 
 
         :param id: The id of this Ecosystem.
-        :type id: int
+        :type id: str
         """
 
         self._id = id

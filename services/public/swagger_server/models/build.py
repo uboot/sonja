@@ -16,11 +16,11 @@ class Build(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: int=None, type: str=None, attributes: BuildAttributes=None, relationships: BuildRelationships=None):  # noqa: E501
+    def __init__(self, id: str=None, type: str=None, attributes: BuildAttributes=None, relationships: BuildRelationships=None):  # noqa: E501
         """Build - a model defined in Swagger
 
         :param id: The id of this Build.  # noqa: E501
-        :type id: int
+        :type id: str
         :param type: The type of this Build.  # noqa: E501
         :type type: str
         :param attributes: The attributes of this Build.  # noqa: E501
@@ -29,7 +29,7 @@ class Build(Model):
         :type relationships: BuildRelationships
         """
         self.swagger_types = {
-            'id': int,
+            'id': str,
             'type': str,
             'attributes': BuildAttributes,
             'relationships': BuildRelationships
@@ -58,22 +58,22 @@ class Build(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def id(self) -> int:
+    def id(self) -> str:
         """Gets the id of this Build.
 
 
         :return: The id of this Build.
-        :rtype: int
+        :rtype: str
         """
         return self._id
 
     @id.setter
-    def id(self, id: int):
+    def id(self, id: str):
         """Sets the id of this Build.
 
 
         :param id: The id of this Build.
-        :type id: int
+        :type id: str
         """
 
         self._id = id
@@ -96,6 +96,8 @@ class Build(Model):
         :param type: The type of this Build.
         :type type: str
         """
+        if type is None:
+            raise ValueError("Invalid value for `type`, must not be `None`")  # noqa: E501
 
         self._type = type
 

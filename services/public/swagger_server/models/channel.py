@@ -16,11 +16,11 @@ class Channel(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: int=None, type: str=None, attributes: ChannelAttributes=None, relationships: ProfileRelationships=None):  # noqa: E501
+    def __init__(self, id: str=None, type: str=None, attributes: ChannelAttributes=None, relationships: ProfileRelationships=None):  # noqa: E501
         """Channel - a model defined in Swagger
 
         :param id: The id of this Channel.  # noqa: E501
-        :type id: int
+        :type id: str
         :param type: The type of this Channel.  # noqa: E501
         :type type: str
         :param attributes: The attributes of this Channel.  # noqa: E501
@@ -29,7 +29,7 @@ class Channel(Model):
         :type relationships: ProfileRelationships
         """
         self.swagger_types = {
-            'id': int,
+            'id': str,
             'type': str,
             'attributes': ChannelAttributes,
             'relationships': ProfileRelationships
@@ -58,22 +58,22 @@ class Channel(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def id(self) -> int:
+    def id(self) -> str:
         """Gets the id of this Channel.
 
 
         :return: The id of this Channel.
-        :rtype: int
+        :rtype: str
         """
         return self._id
 
     @id.setter
-    def id(self, id: int):
+    def id(self, id: str):
         """Sets the id of this Channel.
 
 
         :param id: The id of this Channel.
-        :type id: int
+        :type id: str
         """
 
         self._id = id

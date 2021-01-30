@@ -30,7 +30,7 @@ class TestEcosystemController(BaseTestCase):
             )
         ))
         response = self.client.open(
-            '/ecosystem',
+            '/api/v1/ecosystem',
             method='POST',
             data=json.dumps(body),
             content_type='application/json')
@@ -43,7 +43,7 @@ class TestEcosystemController(BaseTestCase):
         delete an ecosystem
         """
         response = self.client.open(
-            '/ecosystem/{ecosystem_id}'.format(ecosystem_id=1),
+            '/api/v1/ecosystem/{ecosystem_id}'.format(ecosystem_id=1),
             method='DELETE')
         self.assert204(response,
                        'Response body is : ' + response.data.decode('utf-8'))
@@ -54,7 +54,7 @@ class TestEcosystemController(BaseTestCase):
         get an ecosystem
         """
         response = self.client.open(
-            '/ecosystem/{ecosystem_id}'.format(ecosystem_id=1),
+            '/api/v1/ecosystem/{ecosystem_id}'.format(ecosystem_id=1),
             method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
@@ -65,7 +65,7 @@ class TestEcosystemController(BaseTestCase):
         get all ecosystems
         """
         response = self.client.open(
-            '/ecosystem',
+            '/api/v1/ecosystem',
             method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
@@ -83,7 +83,7 @@ class TestEcosystemController(BaseTestCase):
             )
         ))
         response = self.client.open(
-            '/ecosystem/{ecosystem_id}'.format(ecosystem_id=1),
+            '/api/v1/ecosystem/{ecosystem_id}'.format(ecosystem_id=1),
             method='PATCH',
             data=json.dumps(body),
             content_type='application/json')

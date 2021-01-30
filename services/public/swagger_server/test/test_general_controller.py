@@ -21,7 +21,7 @@ class TestGeneralController(BaseTestCase):
         remove all entries from the database
         """
         response = self.client.open(
-            '/clear-database',
+            '/api/v1/clear-database',
             method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
@@ -32,7 +32,7 @@ class TestGeneralController(BaseTestCase):
         remove all entries but the ecosystems from the database
         """
         response = self.client.open(
-            '/clear-ecosystems',
+            '/api/v1/clear-ecosystems',
             method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
@@ -43,7 +43,7 @@ class TestGeneralController(BaseTestCase):
         ping the service
         """
         response = self.client.open(
-            '/ping',
+            '/api/v1/ping',
             method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
@@ -54,7 +54,7 @@ class TestGeneralController(BaseTestCase):
         populate the database with sample data
         """
         response = self.client.open(
-            '/populate-database',
+            '/api/v1/populate-database',
             method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
@@ -65,7 +65,7 @@ class TestGeneralController(BaseTestCase):
         scan repos for new commits
         """
         response = self.client.open(
-            '/process-repos',
+            '/api/v1/process-repos',
             method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))

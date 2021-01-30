@@ -17,7 +17,7 @@ spec:
       - path: /
         backend:
           serviceName: {{ template "conan-ci.fullname" $ }}-frontend
-          servicePort: 80
+          servicePort: 8080
       - path: /api/v1
         backend:
           serviceName: {{ template "conan-ci.fullname" $ }}-public

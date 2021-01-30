@@ -25,7 +25,7 @@ spec:
         imagePullPolicy: Never
         livenessProbe:
           httpGet:
-            path: /ping
+            path: {{ .pingUrl | default "/ping" }}
             port: 8080
           initialDelaySeconds: 300
         env:

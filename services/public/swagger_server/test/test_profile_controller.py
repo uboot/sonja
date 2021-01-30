@@ -24,7 +24,7 @@ class TestProfileController(BaseTestCase):
         """
         body = self.__create_profile("Linux", "conanio/gcc9")
         response = self.client.open(
-            '/profile',
+            '/api/v1/profile',
             method='POST',
             data=json.dumps(body),
             content_type='application/json')
@@ -37,7 +37,7 @@ class TestProfileController(BaseTestCase):
         delete a profile
         """
         response = self.client.open(
-            '/profile/{profile_id}'.format(profile_id=1),
+            '/api/v1/profile/{profile_id}'.format(profile_id=1),
             method='DELETE')
         self.assert204(response,
                        'Response body is : ' + response.data.decode('utf-8'))
@@ -48,7 +48,7 @@ class TestProfileController(BaseTestCase):
         get a profile
         """
         response = self.client.open(
-            '/profile/{profile_id}'.format(profile_id=1),
+            '/api/v1/profile/{profile_id}'.format(profile_id=1),
             method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
@@ -60,7 +60,7 @@ class TestProfileController(BaseTestCase):
         """
         body = self.__create_profile("Linux", "conanio/gcc9")
         response = self.client.open(
-            '/profile/{profile_id}'.format(profile_id=1),
+            '/api/v1/profile/{profile_id}'.format(profile_id=1),
             method='PATCH',
             data=json.dumps(body),
             content_type='application/json')
@@ -80,7 +80,7 @@ class TestProfileController(BaseTestCase):
                     ecosystem=models.RepoRelationshipsEcosystem(
                         data=models.RepoRelationshipsEcosystemData(
                             type="ecosystems",
-                            id=1
+                            id="1"
                         )
                     )
                 )

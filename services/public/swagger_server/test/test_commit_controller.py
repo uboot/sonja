@@ -21,7 +21,7 @@ class TestCommitController(BaseTestCase):
         get a commit
         """
         response = self.client.open(
-            '/commit/{commit_id}'.format(commit_id=1),
+            '/api/v1/commit/{commit_id}'.format(commit_id=1),
             method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
@@ -32,7 +32,7 @@ class TestCommitController(BaseTestCase):
         get the commits of a repo
         """
         response = self.client.open(
-            '/repo/{repo_id}/commit'.format(repo_id=1),
+            '/api/v1/repo/{repo_id}/commit'.format(repo_id=1),
             method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
