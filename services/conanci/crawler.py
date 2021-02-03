@@ -77,6 +77,13 @@ class Crawler(Worker):
         self.__scheduler = scheduler
 
     async def work(self):
+        try:
+            await self.__process_repos()
+        except Exception as e:
+            logger.error("Processing repos failed: %s", e)
+        self.reschedule_internally(60)
+
+    async def __process_repos(self):
         logger.info("Start crawling")
         loop = asyncio.get_running_loop()
 

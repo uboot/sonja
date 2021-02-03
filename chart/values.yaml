@@ -10,16 +10,16 @@ conan-server:
   host_name: conan.conan-ci
   user: agent
   password: demo
-  persistence:
-    existingClaim: conan-server
+  # persistence:
+  #   existingClaim: conan-server
 
 
 mysql:
   imageTag: 8.0.21
   mysqlRootPassword: secret
   mysqlDatabase: conan-ci
-  persistence:
-    existingClaim: mysql
+  # persistence:
+  #   existingClaim: mysql
 
 phpmyadmin:
   db:

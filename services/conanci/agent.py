@@ -32,7 +32,10 @@ class Agent(Worker):
     async def work(self):
         new_builds = True
         while new_builds:
-            new_builds = await self.__process_builds()
+            try:
+                new_builds = await self.__process_builds()
+            except Exception as e:
+                logger.error("Processing builds failed: %s", e)
 
     async def __process_builds(self):
         # database.populate_database()

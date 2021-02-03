@@ -61,7 +61,7 @@ def get_builds(ecosystem_id):
         #     abort(400)
         records = session.query(database.Build).\
             join(database.Build.profile).\
-            filter(database.Profile.ecosystem_id == ecosystem_id, database.Build.status == database.BuildStatus.active)
+            filter(database.Profile.ecosystem_id == ecosystem_id)
         return models.BuildList(data=[__create_build(record) for record in records])
 
 

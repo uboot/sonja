@@ -15,7 +15,10 @@ class Scheduler(Worker):
     async def work(self):
         new_commits = True
         while new_commits:
-            new_commits = await self.__process_commits()
+            try:
+                new_commits = await self.__process_commits()
+            except Exception as e:
+                logger.error("Processing commits failed: %s", e)
         self.reschedule_internally(60)
         
     async def __process_commits(self):
