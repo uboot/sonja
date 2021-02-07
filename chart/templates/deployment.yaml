@@ -18,11 +18,10 @@ spec:
       containers:
       - name:  {{ .name }}
 {{- if .image }}
-        image: {{ .image }}:local
+        image: uboot/{{ .image }}:latest
 {{- else }}
-        image: {{ .name }}:local
+        image: uboot/{{ .name }}:latest
 {{- end }}
-        imagePullPolicy: Never
         livenessProbe:
           httpGet:
             path: {{ .pingUrl | default "/ping" }}
