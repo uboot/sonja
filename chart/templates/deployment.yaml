@@ -85,9 +85,9 @@ spec:
       containers:
       - name:  windows-agent
 {{- if .image }}
-        image: {{ .image }}:local
+        image: uboot/{{ .image }}:latest
 {{- else }}
-        image: {{ .name }}:local
+        image: uboot/{{ .name }}:latest
 {{- end }}
         imagePullPolicy: Never
         livenessProbe:
