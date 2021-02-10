@@ -94,7 +94,7 @@ class Agent(Worker):
                             logger.info("Set status of build '%d' to 'stopped'", self.__build_id)
                             build.status = database.BuildStatus.stopped
                             self.__build_id = None
-                            return
+                            return True
 
                 logger.info("Set status of build '%d' to 'success'", self.__build_id)
                 self.__set_build_status(database.BuildStatus.success)
@@ -104,8 +104,6 @@ class Agent(Worker):
             logger.info("Set status of build '%d' to 'error'", self.__build_id)
             self.__set_build_status(database.BuildStatus.error)
             self.__build_id = None
-
-        logger.info("Finish processing build '%d'", self.__build_id)
             
         return True
 
