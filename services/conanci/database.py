@@ -37,6 +37,9 @@ class Ecosystem(Base):
     public_ssh_key = Column(Text())
     ssh_key = Column(Text())
     known_hosts = Column(Text())
+    conan_remote = Column(String(255))
+    conan_user = Column(String(255))
+    conan_password = Column(String(255))
     settings = Column(Text())
 
 
@@ -69,6 +72,8 @@ class Profile(Base):
     ecosystem = relationship("Ecosystem", backref="profiles")
     name = Column(String(255), nullable=False)
     container = Column(String(255))
+    docker_user = Column(String(255))
+    docker_password = Column(String(255))
     settings = relationship('Setting', backref='profile', lazy=True,
                                cascade="all, delete, delete-orphan")
 
