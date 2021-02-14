@@ -20,7 +20,7 @@ spec:
   ports:
     - port: 8080
 ---
-{{- range .Values.windows }}
+{{- range .Values.windows.agents }}
 kind: Service
 apiVersion: v1
 metadata:

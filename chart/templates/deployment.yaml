@@ -63,7 +63,7 @@ spec:
 {{- end }}
 ---
 {{- end }}
-{{- range .Values.windows }}
+{{- range .Values.windows.agents }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:

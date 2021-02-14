@@ -36,6 +36,8 @@ services:
     image: agent
     replicas: 1
 
-# windows:
-#   - name: one
-#     image: agent
+windows:
+  image: windows1909:local
+  agents:
+    - name: one
+      image: agent

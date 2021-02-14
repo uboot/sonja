@@ -1,4 +1,4 @@
-{{- range .Values.windows }}
+{{- range .Values.windows.agents }}
 apiVersion: kubevirt.io/v1alpha3
 kind: VirtualMachineInstanceReplicaSet
 metadata:
@@ -12,8 +12,9 @@ spec:
       app: {{ template "conan-ci.fullname" $ }}-windows-docker-{{ .name }}
   template:
     metadata:
+      generation: 1
       labels:
-        kubevirt.io/os: win2k19
+        kubevirt.io/os: windows
         app: {{ template "conan-ci.fullname" $ }}-windows-docker-{{ .name }}
     spec:
       terminationGracePeriodSeconds: 30
@@ -23,24 +24,8 @@ spec:
         resources:
           requests:
             memory: 2048M
-        features:
-          acpi: {}
-          apic: {}
-          hyperv:
-            relaxed: {}
-            vapic: {}
-            spinlocks:
-              spinlocks: 8191
-        clock:
-          utc: {}
-          timer:
-            hpet:
-              present: false
-            pit:
-              tickPolicy: delay
-            rtc:
-              tickPolicy: catchup
-            hyperv: {}
+        machine:
+          type: q35
         devices:
           disks:
           - name: windows-server-1909
@@ -58,8 +43,7 @@ spec:
 #
 # https://kubevirt.io/user-guide/#/creation/disks-and-volumes?id=ephemeral
       - name: windows-server-1909
-        ephemeral:
-          persistentVolumeClaim:
-            claimName: windows-server-1909
+        containerDisk:
+          image: {{ $.Values.windows.image }}
 ---
 {{- end }}
