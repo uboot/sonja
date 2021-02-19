@@ -37,7 +37,7 @@ services:
     replicas: 1
 
 windows:
-  image: windows1909:local
+  image: localhost:32000/windows1909:local
   agents:
     - name: one
       image: agent

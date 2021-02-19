@@ -12,6 +12,7 @@ az vm create --resource-group vm --name vm --image UbuntuLTS --admin-username az
 Manage VM
 =========
 
+az vm open-port -g vm --name vm --port 16443 --priority 900
 az vm deallocate -g vm --name vm
 az vm start -g vm --name vm
 az vm list-ip-addresses -g vm --name vm --output table
@@ -137,4 +138,5 @@ az acr build --image windows1909:1.0 --registry <registry> --file Dockerfile.win
 
 ansible-galaxy collection install community.general
 ansible-galaxy collection install community.kubernetes
+ansible-galaxy collection install community.docker
 ansible-playbook -u azureuser -i <target>, deployment/playbook.yml

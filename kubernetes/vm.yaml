@@ -1,0 +1,31 @@
+apiVersion: kubevirt.io/v1alpha3
+kind: VirtualMachine
+metadata:
+  labels:
+    kubevirt.io/os: win2k19
+  name: vm1
+spec:
+  running: true
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: vm1
+    spec:
+      domain:
+        cpu:
+          cores: 2
+        devices:
+          disks:
+          - name: windows-server-1909
+            disk:
+              bus: virtio
+        machine:
+          type: q35
+        resources:
+          requests:
+            memory: 4096M
+      volumes:
+      - name: windows-server-1909
+        containerDisk:
+          image: localhost:32000/windows1909:local
+          #image: kubevirt/cirros-container-disk-demo

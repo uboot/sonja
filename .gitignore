@@ -1,4 +1,6 @@
 __pycache__ 
 .idea
 .venv
-temp
+/temp/
+/deployment/iso/*
+!/deployment/iso/.gitkeep
