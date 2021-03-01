@@ -11,9 +11,18 @@
     apt_repository: 
       repo: 'deb [arch=amd64] https://apt.releases.hashicorp.com {{ ansible_lsb.codename }} main' 
     become: yes
+  - name: Add azure repository signing key
+    apt_key:
+      url: https://packages.microsoft.com/keys/microsoft.asc
+    become: yes
+  - name: add azure apt repository
+    apt_repository: 
+      repo: 'deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ {{ ansible_lsb.codename }} main' 
+    become: yes
   - name: Install packages
     apt:
       pkg:
+      - azure-cli
       - docker.io
       - git
       - packer
@@ -26,7 +35,7 @@
       classic: yes
     become: yes
     notify:
-    - Remove /var/lib/kubelet/
+    - Remove device-plugins
   - name: Add "{{ ansible_user }}" to groups
     user:
       name: "{{ ansible_user }}"
@@ -39,8 +48,8 @@
     meta: flush_handlers
   - name: Create symlink to microk8s kubelet directory
     file:
-      path: /var/lib/kubelet
-      src: /var/snap/microk8s/common/var/lib/kubelet
+      path: /var/lib/kubelet/device-plugins
+      src: /var/snap/microk8s/common/var/lib/kubelet/device-plugins
       state: link
       force: yes
     become: yes
@@ -89,9 +98,9 @@
   handlers:
   - name: Reset connection
     meta: reset_connection
-  - name: Remove /var/lib/kubelet/
+  - name: Remove device-plugins
     file:
       state: absent
-      path: /var/lib/kubelet/
+      path: /var/lib/kubelet/device-plugins/
     become: yes
       

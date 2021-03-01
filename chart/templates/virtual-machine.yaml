@@ -28,7 +28,7 @@ spec:
           type: q35
         devices:
           disks:
-          - name: windows-server-1909
+          - name: windows-server
             disk:
               bus: virtio
       volumes:
@@ -42,7 +42,7 @@ spec:
 # virtctl image-upload dv windows-server-1909 --size=90Gi --image-path WindowsServer1909Docker --uploadproxy-url=https://127.0.0.1:18443 --insecure
 #
 # https://kubevirt.io/user-guide/#/creation/disks-and-volumes?id=ephemeral
-      - name: windows-server-1909
+      - name: windows-server
         containerDisk:
           image: {{ $.Values.windows.image }}
 ---
