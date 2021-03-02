@@ -8,6 +8,7 @@ Create VM
 az group create --name vm --location westeurope
 az vm create --resource-group vm --name vm --image UbuntuLTS --admin-username azureuser --size Standard_D2s_v3 --os-disk-size-gb 64
 (Note: --generate-ssh-keys to automatically create a SSH key on the host)
+ssh-copy-id -f -i <public-key> azureuser@<ip>
 
 Manage VM
 =========

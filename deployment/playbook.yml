@@ -34,8 +34,6 @@
       name: microk8s
       classic: yes
     become: yes
-    notify:
-    - Remove device-plugins
   - name: Add "{{ ansible_user }}" to groups
     user:
       name: "{{ ansible_user }}"
@@ -46,13 +44,6 @@
     - Reset connection
   - name: Re-login before continuing
     meta: flush_handlers
-  - name: Create symlink to microk8s kubelet directory
-    file:
-      path: /var/lib/kubelet/device-plugins
-      src: /var/snap/microk8s/common/var/lib/kubelet/device-plugins
-      state: link
-      force: yes
-    become: yes
   - name: Access .kube caching directory
     file:
       path: ~/.kube
@@ -60,6 +51,8 @@
       owner: "{{ ansible_user }}"
   - name: Start microk8s
     command: microk8s start
+    notify:
+    - Remove kubelet/
   - name: Enable microk8s addons
     command: microk8s enable dns ingress registry
   - name: Create alias for kubectl
@@ -95,12 +88,20 @@
       microk8s kubectl create namespace kubevirt
       microk8s kubectl apply -f https://github.com/kubevirt/kubevirt/releases/download/{{ kubevirt_version }}/kubevirt-operator.yaml
       microk8s kubectl apply -f https://github.com/kubevirt/kubevirt/releases/download/{{ kubevirt_version }}/kubevirt-cr.yaml
+  - name: Create symlink to microk8s kubelet directory
+    file:
+      path: /var/lib/kubelet
+      src: /var/snap/microk8s/common/var/lib/kubelet
+      state: link
+      mode: 755
+      force: yes
+    become: yes
   handlers:
   - name: Reset connection
     meta: reset_connection
-  - name: Remove device-plugins
+  - name: Remove kubelet/
     file:
       state: absent
-      path: /var/lib/kubelet/device-plugins/
+      path: /var/lib/kubelet
     become: yes
       
