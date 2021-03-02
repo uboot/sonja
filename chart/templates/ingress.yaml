@@ -21,22 +21,31 @@ spec:
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: {{ template "conan-ci.fullname" $ }}-ingress
+  name: {{ template "conan-ci.fullname" $ }}-ingress-phpmyadmin
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    traefik.ingress.kubernetes.io/request-modifier: "ReplacePathRegex: ^/phpmyadmin/(.*) /$1"
 spec:
   rules:
   - http:
       paths:
-      - path: /conan(/|$)(.*)
-        pathType: Prefix
-        backend:
-          serviceName: {{ .Release.Name }}-conan-server
-          servicePort: 9300
-  - http:
-      paths:
-      - path: /phpmyadmin(/|$)(.*)
+      - path: /phpmyadmin
         pathType: Prefix
         backend:
           serviceName: {{ .Release.Name }}-phpmyadmin
           servicePort: 80
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: {{ template "conan-ci.fullname" $ }}-ingress-conan
+  annotations:
+    traefik.ingress.kubernetes.io/request-modifier: "ReplacePathRegex: ^/conan/(.*) /$1"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /conan
+        pathType: Prefix
+        backend:
+          serviceName: {{ .Release.Name }}-conan-server
+          servicePort: 9300

@@ -3,4 +3,5 @@ __pycache__
 .venv
 /temp/
 /deployment/iso/*
+/deployment/k3s.yaml
 !/deployment/iso/.gitkeep

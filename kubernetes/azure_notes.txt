@@ -6,14 +6,15 @@ Create VM
 =========
 
 az group create --name vm --location westeurope
-az vm create --resource-group vm --name vm --image UbuntuLTS --admin-username azureuser --size Standard_D2s_v3 --os-disk-size-gb 64
+az vm create --resource-group vm --name vm --image UbuntuLTS --admin-username azureuser --public-ip-address-dns-name <name> --size Standard_D2s_v3 --os-disk-size-gb 64
 (Note: --generate-ssh-keys to automatically create a SSH key on the host)
 ssh-copy-id -f -i <public-key> azureuser@<ip>
 
 Manage VM
 =========
 
-az vm open-port -g vm --name vm --port 16443 --priority 900
+az vm open-port -g vm --name vm --port 80 --priority 800
+az vm open-port -g vm --name vm --port 6443 --priority 900
 az vm deallocate -g vm --name vm
 az vm start -g vm --name vm
 az vm list-ip-addresses -g vm --name vm --output table
@@ -137,7 +138,5 @@ az acr build --image windows1909:1.0 --registry <registry> --file Dockerfile.win
 # Ansible          #
 ####################
 
-ansible-galaxy collection install community.general
-ansible-galaxy collection install community.kubernetes
 ansible-galaxy collection install community.docker
 ansible-playbook -u azureuser -i <target>, deployment/playbook.yml

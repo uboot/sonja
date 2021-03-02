@@ -1,0 +1,6 @@
+# helm repo add twuni https://helm.twun.io
+# helm install -f deployment/registry-values.yaml registry twuni/docker-registry
+ingress:
+  enabled: true
+  hosts:
+  - registry.localhost

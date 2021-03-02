@@ -1,3 +1,4 @@
+# ansible-galaxy collection install community.docker
 # ansible-playbook -u azureuser -i <ip>, deployment/playbook.yml
 - hosts: all
   vars:
@@ -29,79 +30,64 @@
       - python-docker
       - qemu-system-x86
     become: yes
-  - name: Install microk8s
-    community.general.snap:
-      name: microk8s
-      classic: yes
-    become: yes
   - name: Add "{{ ansible_user }}" to groups
     user:
       name: "{{ ansible_user }}"
-      groups: docker,kvm,microk8s
+      groups: docker,kvm
       append: yes
     become: yes
     notify:
     - Reset connection
   - name: Re-login before continuing
     meta: flush_handlers
-  - name: Access .kube caching directory
-    file:
-      path: ~/.kube
-      state: directory
-      owner: "{{ ansible_user }}"
-  - name: Start microk8s
-    command: microk8s start
-    notify:
-    - Remove kubelet/
-  - name: Enable microk8s addons
-    command: microk8s enable dns ingress registry
-  - name: Create alias for kubectl
-    lineinfile:
-      path:  ~/.bash_aliases
-      line: alias kubectl='microk8s kubectl'
-      create: yes
+  - name: Install k3s
+    shell: |
+      curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE=644 sh -
+    args:
+      warn: false
+      creates: /etc/rancher/k3s/k3s.yaml
+    become: yes
+  - name: Get cluster credentials
+    fetch:
+      src: /etc/rancher/k3s/k3s.yaml
+      dest: ./
+      flat: yes
+  - name: Install kubevirt
+    shell: |
+      kubectl create namespace kubevirt
+      kubectl apply -f https://github.com/kubevirt/kubevirt/releases/download/{{ kubevirt_version }}/kubevirt-operator.yaml
+      kubectl apply -f https://github.com/kubevirt/kubevirt/releases/download/{{ kubevirt_version }}/kubevirt-cr.yaml
   - name: Clone packer repo
     git:
       repo: 'https://github.com/uboot/packer-windows'
       dest: /home/{{ ansible_user }}/packer-windows
       version: win-1909-qemu
-  - name: Copy installation ISOs
-    copy:
-      src: iso/
-      dest: /home/{{ ansible_user }}/packer-windows/iso/
+  # - name: Copy installation ISOs
+  #   copy:
+  #     src: iso/
+  #     dest: /home/{{ ansible_user }}/packer-windows/iso/
   - name: Build Windows qcow2 image
     command: packer build --only=qemu --except=vagrant --var headless=true --var virtio_win_iso=./iso/virtio-win-0.1.190.iso --var iso_url=./iso/en_windows_server_version_20h2_updated_feb_2021_x64_dvd_4bfbe45a.iso --var iso_checksum=8323A6EDC3F03911E328CD3F2953502B8F21E15056F3D870A6AB074E37DDE303 windows_server_20h2_docker.json
     args:
       chdir: /home/{{ ansible_user }}/packer-windows
       creates: /home/{{ ansible_user }}/packer-windows/windows_server_20h2_docker/WindowsServer20H2Docker
+  - name: Run local docker repository
+    community.docker.docker_container:
+      name: registry
+      image: registry:2
+      ports:
+      - 5000:5000
+      restart_policy: always
+      container_default_behavior: no_defaults
   - name: Build docker image and push it to local repo
     community.docker.docker_image:
       build:
         path: /home/{{ ansible_user }}/packer-windows/windows_server_20h2_docker
         dockerfile: /home/{{ ansible_user }}/packer-windows/Dockerfile.windows_20h2_docker
-      name: localhost:32000/windows20h2
+      name: localhost:5000/windows20h2
       tag: local
       push: yes
       source: build
-  - name: Install kubevirt
-    shell: |
-      microk8s kubectl create namespace kubevirt
-      microk8s kubectl apply -f https://github.com/kubevirt/kubevirt/releases/download/{{ kubevirt_version }}/kubevirt-operator.yaml
-      microk8s kubectl apply -f https://github.com/kubevirt/kubevirt/releases/download/{{ kubevirt_version }}/kubevirt-cr.yaml
-  - name: Create symlink to microk8s kubelet directory
-    file:
-      path: /var/lib/kubelet
-      src: /var/snap/microk8s/common/var/lib/kubelet
-      state: link
-      mode: 755
-      force: yes
-    become: yes
   handlers:
   - name: Reset connection
     meta: reset_connection
-  - name: Remove kubelet/
-    file:
-      state: absent
-      path: /var/lib/kubelet
-    become: yes
-      

@@ -5,6 +5,7 @@ metadata:
   name: {{ template "conan-ci.fullname" $ }}-windows-docker-{{ .name }}
   labels:
     app: {{ template "conan-ci.fullname" $ }}-windows-docker-{{ .name }}
+    kubevirt.io/os: win2k19
 spec:
   replicas: 1
   selector:
@@ -23,7 +24,7 @@ spec:
           cores: 2
         resources:
           requests:
-            memory: 2048M
+            memory: 4096M
         machine:
           type: q35
         devices:
