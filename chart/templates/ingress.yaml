@@ -1,24 +1,33 @@
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ template "conan-ci.fullname" $ }}-ingress-frontend
   annotations:
 spec:
+  tls:
+  - hosts:
+    - {{ .Values.hostName }}
+    secretName: {{ .Release.Name }}
   rules:
-  - http:
+  - host: {{ .Values.hostName }}
+    http:
       paths:
       - path: /
         pathType: Prefix
         backend:
-          serviceName: {{ template "conan-ci.fullname" $ }}-frontend
-          servicePort: 8080
+          service:
+            name: {{ template "conan-ci.fullname" $ }}-frontend
+            port: 
+              number: 8080
       - path: /api/v1
         pathType: Prefix
         backend:
-          serviceName: {{ template "conan-ci.fullname" $ }}-public
-          servicePort: 8080
+          service:
+            name: {{ template "conan-ci.fullname" $ }}-public
+            port: 
+              number: 8080
 ---
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ template "conan-ci.fullname" $ }}-ingress-phpmyadmin
@@ -26,15 +35,18 @@ metadata:
     traefik.ingress.kubernetes.io/request-modifier: "ReplacePathRegex: ^/phpmyadmin/(.*) /$1"
 spec:
   rules:
-  - http:
+  - host: {{ .Values.hostName }}
+    http:
       paths:
       - path: /phpmyadmin
         pathType: Prefix
         backend:
-          serviceName: {{ .Release.Name }}-phpmyadmin
-          servicePort: 80
+          service:
+            name: {{ .Release.Name }}-phpmyadmin
+            port: 
+              number: 80
 ---
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ template "conan-ci.fullname" $ }}-ingress-conan
@@ -42,10 +54,13 @@ metadata:
     traefik.ingress.kubernetes.io/request-modifier: "ReplacePathRegex: ^/conan/(.*) /$1"
 spec:
   rules:
-  - http:
+  - host: {{ .Values.hostName }}
+    http:
       paths:
       - path: /conan
         pathType: Prefix
         backend:
-          serviceName: {{ .Release.Name }}-conan-server
-          servicePort: 9300
+          service:
+            name: {{ .Release.Name }}-conan-server
+            port:
+              number: 9300

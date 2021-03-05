@@ -2,12 +2,12 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-host: conan-ci
+hostName: conan-ci
 
 user: conanci
 
 conan-server:
-  host_name: conan.conan-ci
+  hostName: conan.conan-ci
   user: agent
   password: demo
   # persistence:
