@@ -2,16 +2,16 @@
 
 from conanci.config import app, connect_to_database, setup_logging
 from conanci.database import populate_database
-from swagger_server import encoder
+from swagger_server import encoder, auth
 import os.path
 
 swagger_api = os.path.join(os.path.dirname(__file__), 'swagger', 'swagger.yaml')
-
 
 def main():
     app.add_api(swagger_api, arguments={'title': 'Conan CI Linux Agent'}, pythonic_params=True)
     app.app.json_encoder = encoder.JSONEncoder
     setup_logging()
+    auth.setup_login(app.app)
     connect_to_database()
     #populate_database()
     app.run(port=8080)

@@ -24,6 +24,7 @@ from swagger_server.models.commit_relationships_builds_data import CommitRelatio
 from swagger_server.models.commit_relationships_channel import CommitRelationshipsChannel
 from swagger_server.models.commit_relationships_repo import CommitRelationshipsRepo
 from swagger_server.models.commit_relationships_repo_data import CommitRelationshipsRepoData
+from swagger_server.models.credentials import Credentials
 from swagger_server.models.ecosystem import Ecosystem
 from swagger_server.models.ecosystem_attributes import EcosystemAttributes
 from swagger_server.models.ecosystem_data import EcosystemData

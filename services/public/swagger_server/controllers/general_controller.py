@@ -1,8 +1,11 @@
+import connexion
 import os
 
 from conanci import database
 from conanci.swagger_client import ApiClient, Configuration, CrawlerApi
+from flask_login import login_user
 from urllib3.exceptions import MaxRetryError
+from swagger_server import auth, models
 
 
 crawler_url = os.environ.get('CONANCI_CRAWLER_URL', '127.0.0.1')
@@ -33,6 +36,36 @@ def clear_ecosystems():  # noqa: E501
     """
     database.clear_ecosystems()
     return 'success'
+
+
+def login(body=None):  # noqa: E501
+    """log in
+
+     # noqa: E501
+
+    :param body: login credentials
+    :type body: dict | bytes
+
+    :rtype: None
+    """
+    if connexion.request.is_json:
+        body = models.Credentials.from_dict(connexion.request.get_json())  # noqa: E501
+
+    user = auth.User(body.user)
+    login_user(user)
+
+    return 'do some magic!'
+
+
+def logout():  # noqa: E501
+    """log out
+
+     # noqa: E501
+
+
+    :rtype: None
+    """
+    return 'do some magic!'
 
 
 def ping():  # noqa: E501

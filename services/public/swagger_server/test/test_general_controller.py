@@ -4,6 +4,8 @@ from __future__ import absolute_import
 
 from conanci import database
 from conanci.test import util
+from flask import json
+from swagger_server import models
 from swagger_server.test import BaseTestCase
 
 
@@ -14,6 +16,31 @@ class TestGeneralController(BaseTestCase):
         with database.session_scope() as session:
             ecosystem = util.create_ecosystem()
             session.add(ecosystem)
+
+    def test_login(self):
+        """Test case for login
+
+        log in
+        """
+        body = models.Credentials(user="user", password="password")
+        response = self.client.open(
+            '/api/v1/login',
+            method='POST',
+            data=json.dumps(body),
+            content_type='application/json')
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
+    def test_logout(self):
+        """Test case for logout
+
+        log out
+        """
+        response = self.client.open(
+            '/api/v1/logout',
+            method='GET')
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
 
     def test_clear_database(self):
         """Test case for clear_database

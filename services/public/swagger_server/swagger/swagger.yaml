@@ -4,9 +4,11 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-  version: 1.0.0
+  version: 2.0.0
 servers:
 - url: /api/v1
+security:
+- ApiKey: []
 paths:
   /ping:
     get:
@@ -14,6 +16,33 @@ paths:
       - General
       summary: ping the service
       operationId: ping
+      responses:
+        "200":
+          description: success
+      x-openapi-router-controller: swagger_server.controllers.general_controller
+  /login:
+    post:
+      tags:
+      - General
+      summary: log in
+      operationId: login
+      requestBody:
+        description: login credentials
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Credentials'
+      responses:
+        "200":
+          description: success
+      security: []
+      x-openapi-router-controller: swagger_server.controllers.general_controller
+  /logout:
+    get:
+      tags:
+      - General
+      summary: log out
+      operationId: logout
       responses:
         "200":
           description: success
@@ -656,6 +685,18 @@ paths:
       x-openapi-router-controller: swagger_server.controllers.build_controller
 components:
   schemas:
+    Credentials:
+      required:
+      - password
+      - user
+      type: object
+      properties:
+        user:
+          type: string
+          example: user
+        password:
+          type: string
+          example: paSSwOrd
     Ecosystem:
       required:
       - type
@@ -1626,4 +1667,10 @@ components:
           data:
             id: "1"
             type: commits
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      name: session
+      in: cookie
+      x-apikeyInfoFunc: swagger_server.controllers.authorization_controller.check_ApiKey
 
