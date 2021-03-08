@@ -3,7 +3,8 @@ import os
 
 from conanci import database
 from conanci.swagger_client import ApiClient, Configuration, CrawlerApi
-from flask_login import login_user
+from flask import abort
+from flask_login import login_user, logout_user
 from urllib3.exceptions import MaxRetryError
 from swagger_server import auth, models
 
@@ -52,9 +53,12 @@ def login(body=None):  # noqa: E501
         body = models.Credentials.from_dict(connexion.request.get_json())  # noqa: E501
 
     user = auth.User(body.user)
-    login_user(user)
 
-    return 'do some magic!'
+    if not auth.authorize(user, body.password):
+        abort(401, 'Wrong credentials')
+
+    login_user(user)
+    return 'logged in'
 
 
 def logout():  # noqa: E501
@@ -65,7 +69,9 @@ def logout():  # noqa: E501
 
     :rtype: None
     """
-    return 'do some magic!'
+
+    logout_user();
+    return 'logged out'
 
 
 def ping():  # noqa: E501

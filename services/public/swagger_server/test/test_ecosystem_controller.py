@@ -13,6 +13,7 @@ class TestEcosystemController(BaseTestCase):
     """EcosystemController integration test stubs"""
 
     def setUp(self):
+        self.login()
         with database.session_scope() as session:
             ecosystem = util.create_ecosystem()
             session.add(ecosystem)

@@ -8,6 +8,9 @@ https://connexion.readthedocs.io/en/latest/security.html
 @login_required
 def check_ApiKey(api_key, required_scopes):
     user = current_user
-    return {'test_key': 'test_value'}
+    if user and user.id:
+        return {'sub': user.id}
+
+    return None
 
 

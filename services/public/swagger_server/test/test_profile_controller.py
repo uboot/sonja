@@ -13,6 +13,7 @@ class TestProfileController(BaseTestCase):
     """ProfileController integration test stubs"""
 
     def setUp(self):
+        self.login()
         with database.session_scope() as session:
             profile = util.create_profile()
             session.add(profile)

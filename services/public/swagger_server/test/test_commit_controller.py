@@ -11,6 +11,7 @@ class TestCommitController(BaseTestCase):
     """CommitController integration test stubs"""
 
     def setUp(self):
+        self.login()
         with database.session_scope() as session:
             commit = util.create_commit()
             session.add(commit)

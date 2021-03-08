@@ -19,6 +19,7 @@ paths:
       responses:
         "200":
           description: success
+      security: []
       x-openapi-router-controller: swagger_server.controllers.general_controller
   /login:
     post:

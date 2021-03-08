@@ -13,6 +13,7 @@ class TestRepoController(BaseTestCase):
     """RepoController integration test stubs"""
 
     def setUp(self):
+        self.login()
         with database.session_scope() as session:
             repo = util.create_repo()
             session.add(repo)

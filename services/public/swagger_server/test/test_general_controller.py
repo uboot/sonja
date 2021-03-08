@@ -22,7 +22,7 @@ class TestGeneralController(BaseTestCase):
 
         log in
         """
-        body = models.Credentials(user="user", password="password")
+        body = models.Credentials(user="user", password="paSSwOrd")
         response = self.client.open(
             '/api/v1/login',
             method='POST',
@@ -36,6 +36,7 @@ class TestGeneralController(BaseTestCase):
 
         log out
         """
+        self.login()
         response = self.client.open(
             '/api/v1/logout',
             method='GET')
@@ -47,6 +48,7 @@ class TestGeneralController(BaseTestCase):
 
         remove all entries from the database
         """
+        self.login()
         response = self.client.open(
             '/api/v1/clear-database',
             method='GET')
@@ -58,6 +60,7 @@ class TestGeneralController(BaseTestCase):
 
         remove all entries but the ecosystems from the database
         """
+        self.login()
         response = self.client.open(
             '/api/v1/clear-ecosystems',
             method='GET')
@@ -80,6 +83,7 @@ class TestGeneralController(BaseTestCase):
 
         populate the database with sample data
         """
+        self.login()
         response = self.client.open(
             '/api/v1/populate-database',
             method='GET')
@@ -91,6 +95,7 @@ class TestGeneralController(BaseTestCase):
 
         scan repos for new commits
         """
+        self.login()
         response = self.client.open(
             '/api/v1/process-repos',
             method='GET')
