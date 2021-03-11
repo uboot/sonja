@@ -1,7 +1,7 @@
 import base64
 import os
 
-from flask_login import LoginManager, UserMixin
+from flask_login import current_user, LoginManager, UserMixin
 
 
 master_password = os.environ.get('PASSWORD', None)
@@ -25,3 +25,7 @@ def setup_login(app):
 
 def authorize(user, password):
     return password == master_password
+
+
+def restore(user):
+    return current_user.id == user and current_user.is_authenticated

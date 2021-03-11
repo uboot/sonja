@@ -39,8 +39,51 @@ class TestGeneralController(BaseTestCase):
         self.login()
         response = self.client.open(
             '/api/v1/logout',
-            method='GET')
+            method='POST')
         self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
+    def test_restore(self):
+        """Test case for restore
+
+        log out
+        """
+        body = models.User(user="user")
+        self.login()
+        response = self.client.open(
+            '/api/v1/restore',
+            method='POST',
+            data=json.dumps(body),
+            content_type='application/json')
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
+    def test_restore_not_authenticated(self):
+        """Test case for restore
+
+        log out
+        """
+        body = models.User(user="user")
+        response = self.client.open(
+            '/api/v1/restore',
+            method='POST',
+            data=json.dumps(body),
+            content_type='application/json')
+        self.assert401(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
+    def test_restore_wrong_user(self):
+        """Test case for restore
+
+        log out
+        """
+        body = models.User(user="wrong_user")
+        response = self.client.open(
+            '/api/v1/restore',
+            method='POST',
+            data=json.dumps(body),
+            content_type='application/json')
+        self.assert401(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
     def test_clear_database(self):

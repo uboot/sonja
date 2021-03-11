@@ -36,10 +36,34 @@ paths:
       responses:
         "200":
           description: success
+        "401":
+          description: wrong credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
       security: []
       x-openapi-router-controller: swagger_server.controllers.general_controller
+  /restore:
+    post:
+      tags:
+      - General
+      summary: restore session
+      operationId: restore
+      requestBody:
+        description: user data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        "200":
+          description: success
+        "401":
+          description: not logged in
+      x-openapi-router-controller: swagger_server.controllers.general_controller
   /logout:
-    get:
+    post:
       tags:
       - General
       summary: log out
@@ -698,6 +722,14 @@ components:
         password:
           type: string
           example: paSSwOrd
+    User:
+      required:
+      - user
+      type: object
+      properties:
+        user:
+          type: string
+          example: user
     Ecosystem:
       required:
       - type

@@ -52,3 +52,4 @@ from swagger_server.models.repo_relationships_commits import RepoRelationshipsCo
 from swagger_server.models.repo_relationships_commits_links import RepoRelationshipsCommitsLinks
 from swagger_server.models.repo_relationships_ecosystem import RepoRelationshipsEcosystem
 from swagger_server.models.repo_relationships_ecosystem_data import RepoRelationshipsEcosystemData
+from swagger_server.models.user import User

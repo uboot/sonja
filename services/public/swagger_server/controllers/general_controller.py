@@ -74,6 +74,22 @@ def logout():  # noqa: E501
     return 'logged out'
 
 
+def restore(body=None):  # noqa: E501
+    """restore session
+
+     # noqa: E501
+
+    :param body: user data
+    :type body: dict | bytes
+
+    :rtype: None
+    """
+    if not auth.restore(body['user']):
+        abort(401, 'Wrong user')
+
+    return 'logged in'
+
+
 def ping():  # noqa: E501
     """ping the service
 
