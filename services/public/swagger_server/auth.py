@@ -29,3 +29,10 @@ def authorize(user, password):
 
 def restore(user):
     return current_user.id == user and current_user.is_authenticated
+
+
+def get_user():
+    if current_user:
+        return current_user.id
+
+    return None

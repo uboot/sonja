@@ -58,7 +58,8 @@ def login(body=None):  # noqa: E501
         abort(401, 'Wrong credentials')
 
     login_user(user)
-    return 'logged in'
+
+    return models.User(user=auth.get_user()), 200
 
 
 def logout():  # noqa: E501
@@ -71,7 +72,7 @@ def logout():  # noqa: E501
     """
 
     logout_user();
-    return 'logged out'
+    return 'logged out', 200
 
 
 def restore(body=None):  # noqa: E501
@@ -87,7 +88,7 @@ def restore(body=None):  # noqa: E501
     if not auth.restore(body['user']):
         abort(401, 'Wrong user')
 
-    return 'logged in'
+    return models.User(user=auth.get_user()), 200
 
 
 def ping():  # noqa: E501

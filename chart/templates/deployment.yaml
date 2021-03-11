@@ -50,14 +50,14 @@ spec:
           value: {{ index $.Values "conan-server" "password" }}
         - name: CONANCI_USER
           value: {{ $.Values.user }}
-{{ - if .secretKey }}
+{{- if .secretKey }}
         - name: SECRET_KEY
           value: {{ .secretKey }}
-{{ - end }}
-{{ - if .password }}
+{{- end }}
+{{- if .password }}
         - name: PASSWORD
           value: {{ .password }}
-{{ - end }}
+{{- end }}
 {{- if .docker }}
         - name: DOCKER_HOST
           value: 127.0.0.1:2375

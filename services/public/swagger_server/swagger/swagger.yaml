@@ -36,12 +36,12 @@ paths:
       responses:
         "200":
           description: success
-        "401":
-          description: wrong credentials
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+        "401":
+          description: wrong credentials
       security: []
       x-openapi-router-controller: swagger_server.controllers.general_controller
   /restore:
@@ -59,6 +59,10 @@ paths:
       responses:
         "200":
           description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
         "401":
           description: not logged in
       x-openapi-router-controller: swagger_server.controllers.general_controller
@@ -730,6 +734,8 @@ components:
         user:
           type: string
           example: user
+      example:
+        user: user
     Ecosystem:
       required:
       - type
