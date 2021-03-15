@@ -45,22 +45,3 @@ spec:
             name: {{ .Release.Name }}-phpmyadmin
             port: 
               number: 80
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: {{ template "conan-ci.fullname" $ }}-ingress-conan
-  annotations:
-    traefik.ingress.kubernetes.io/request-modifier: "ReplacePathRegex: ^/conan/(.*) /$1"
-spec:
-  rules:
-  - host: {{ .Values.hostName }}
-    http:
-      paths:
-      - path: /conan
-        pathType: Prefix
-        backend:
-          service:
-            name: {{ .Release.Name }}-conan-server
-            port:
-              number: 9300
