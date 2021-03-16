@@ -12,6 +12,8 @@ def __create_profile(record: database.Profile):
         attributes=models.ProfileAttributes(
             name=record.name,
             container=record.container,
+            docker_user=record.docker_user,
+            docker_password=record.docker_password,
             settings=[models.ProfileAttributesSettings(key=r.key, value=r.value) for r in record.settings]
         ),
         relationships=models.ProfileRelationships(
@@ -39,6 +41,8 @@ def add_profile(body=None):
         record.name = body.data.attributes.name
         record.ecosystem = ecosystem
         record.container = body.data.attributes.container
+        record.docker_user = body.data.attributes.docker_user
+        record.docker_password = body.data.attributes.docker_password
         record.settings = [database.Setting(s.key, s.value) for s in body.data.attributes.settings]
         session.add(record)
         session.commit()
@@ -73,5 +77,7 @@ def update_profile(profile_id, body=None):
 
         record.name = body.data.attributes.name
         record.container = body.data.attributes.container
+        record.docker_user = body.data.attributes.docker_user
+        record.docker_password = body.data.attributes.docker_password
         record.settings = [database.Setting(s.key, s.value) for s in body.data.attributes.settings]
         return models.ProfileData(data=__create_profile(record))

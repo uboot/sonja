@@ -4,7 +4,7 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-  version: 2.0.0
+  version: 1.0.0
 servers:
 - url: /api/v1
 security:
@@ -775,8 +775,11 @@ components:
           settings: ""
           known-hosts: Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN2hSR21kbm05dFVEYk85SURTd0JLNlRiUWErUFhZUENQeTZyYlRyVHR3N1BIa2NjS3JwcDB5VmhwNUhkRUljS3I2cExsVkRCZk9MWDlRVXN5Q09WMHd6ZmpJSk5sR0VZc2RsTEppekhoYm4ybVVqdlNBSFFxWkVUWVA4MWVGekxRTm5QSHQ0RVZWVWg3VmZERVNVODRLZXptRDVRbFdwWExtdlUzMS95TWYrU2U4eGhIVHZLU0NaSUZJbVd3b0c2bWJVb1dmOW56cElvYVNqQit3ZXFxVVVtcGFhYXNYVmFsNzJKK1VYMkIrMlJQVzNSY1QwZU96UWdxbEpMM1JLclRKdmRzakUzSkVBdkdxM2xHSFNaWHkyOEczc2t1YTJTbVZpL3c0eUNFNmdiT0RxblRXbGc3K3dDNjA0eWRHWEE4VkppUzVhcDQzSlhpVUZGQWFRPT0K
           name: My Company
+          conan-password: demo
+          conan-remote: http://test-conan-server:9300
           user: mycompany
           public-ssh-key: ""
+          conan-user: agent
         id: "1"
         type: ecosytems
     EcosystemData:
@@ -811,8 +814,11 @@ components:
             settings: ""
             known-hosts: Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN2hSR21kbm05dFVEYk85SURTd0JLNlRiUWErUFhZUENQeTZyYlRyVHR3N1BIa2NjS3JwcDB5VmhwNUhkRUljS3I2cExsVkRCZk9MWDlRVXN5Q09WMHd6ZmpJSk5sR0VZc2RsTEppekhoYm4ybVVqdlNBSFFxWkVUWVA4MWVGekxRTm5QSHQ0RVZWVWg3VmZERVNVODRLZXptRDVRbFdwWExtdlUzMS95TWYrU2U4eGhIVHZLU0NaSUZJbVd3b0c2bWJVb1dmOW56cElvYVNqQit3ZXFxVVVtcGFhYXNYVmFsNzJKK1VYMkIrMlJQVzNSY1QwZU96UWdxbEpMM1JLclRKdmRzakUzSkVBdkdxM2xHSFNaWHkyOEczc2t1YTJTbVZpL3c0eUNFNmdiT0RxblRXbGc3K3dDNjA0eWRHWEE4VkppUzVhcDQzSlhpVUZGQWFRPT0K
             name: My Company
+            conan-password: demo
+            conan-remote: http://test-conan-server:9300
             user: mycompany
             public-ssh-key: ""
+            conan-user: agent
           id: "1"
           type: ecosytems
     EcosystemList:
@@ -849,8 +855,11 @@ components:
             settings: ""
             known-hosts: Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN2hSR21kbm05dFVEYk85SURTd0JLNlRiUWErUFhZUENQeTZyYlRyVHR3N1BIa2NjS3JwcDB5VmhwNUhkRUljS3I2cExsVkRCZk9MWDlRVXN5Q09WMHd6ZmpJSk5sR0VZc2RsTEppekhoYm4ybVVqdlNBSFFxWkVUWVA4MWVGekxRTm5QSHQ0RVZWVWg3VmZERVNVODRLZXptRDVRbFdwWExtdlUzMS95TWYrU2U4eGhIVHZLU0NaSUZJbVd3b0c2bWJVb1dmOW56cElvYVNqQit3ZXFxVVVtcGFhYXNYVmFsNzJKK1VYMkIrMlJQVzNSY1QwZU96UWdxbEpMM1JLclRKdmRzakUzSkVBdkdxM2xHSFNaWHkyOEczc2t1YTJTbVZpL3c0eUNFNmdiT0RxblRXbGc3K3dDNjA0eWRHWEE4VkppUzVhcDQzSlhpVUZGQWFRPT0K
             name: My Company
+            conan-password: demo
+            conan-remote: http://test-conan-server:9300
             user: mycompany
             public-ssh-key: ""
+            conan-user: agent
           id: "1"
           type: ecosytems
         - relationships:
@@ -876,8 +885,11 @@ components:
             settings: ""
             known-hosts: Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN2hSR21kbm05dFVEYk85SURTd0JLNlRiUWErUFhZUENQeTZyYlRyVHR3N1BIa2NjS3JwcDB5VmhwNUhkRUljS3I2cExsVkRCZk9MWDlRVXN5Q09WMHd6ZmpJSk5sR0VZc2RsTEppekhoYm4ybVVqdlNBSFFxWkVUWVA4MWVGekxRTm5QSHQ0RVZWVWg3VmZERVNVODRLZXptRDVRbFdwWExtdlUzMS95TWYrU2U4eGhIVHZLU0NaSUZJbVd3b0c2bWJVb1dmOW56cElvYVNqQit3ZXFxVVVtcGFhYXNYVmFsNzJKK1VYMkIrMlJQVzNSY1QwZU96UWdxbEpMM1JLclRKdmRzakUzSkVBdkdxM2xHSFNaWHkyOEczc2t1YTJTbVZpL3c0eUNFNmdiT0RxblRXbGc3K3dDNjA0eWRHWEE4VkppUzVhcDQzSlhpVUZGQWFRPT0K
             name: My Company
+            conan-password: demo
+            conan-remote: http://test-conan-server:9300
             user: mycompany
             public-ssh-key: ""
+            conan-user: agent
           id: "1"
           type: ecosytems
     Repo:
@@ -994,13 +1006,15 @@ components:
               id: "1"
               type: ecosystems
         attributes:
-          container: conanio/gcc9
+          container: uboot/gcc9:latest
           settings:
           - value: Release
             key: build_type
           - value: Release
             key: build_type
+          docker-password: paSSw0rd
           name: GCC 9
+          docker-user: user
         id: "1"
         type: profiles
     ProfileData:
@@ -1018,13 +1032,15 @@ components:
                 id: "1"
                 type: ecosystems
           attributes:
-            container: conanio/gcc9
+            container: uboot/gcc9:latest
             settings:
             - value: Release
               key: build_type
             - value: Release
               key: build_type
+            docker-password: paSSw0rd
             name: GCC 9
+            docker-user: user
           id: "1"
           type: profiles
     Channel:
@@ -1300,6 +1316,15 @@ components:
         settings:
           type: string
           example: ""
+        conan-remote:
+          type: string
+          example: http://test-conan-server:9300
+        conan-user:
+          type: string
+          example: agent
+        conan-password:
+          type: string
+          example: demo
         public-ssh-key:
           type: string
           example: ""
@@ -1310,8 +1335,11 @@ components:
         settings: ""
         known-hosts: Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN2hSR21kbm05dFVEYk85SURTd0JLNlRiUWErUFhZUENQeTZyYlRyVHR3N1BIa2NjS3JwcDB5VmhwNUhkRUljS3I2cExsVkRCZk9MWDlRVXN5Q09WMHd6ZmpJSk5sR0VZc2RsTEppekhoYm4ybVVqdlNBSFFxWkVUWVA4MWVGekxRTm5QSHQ0RVZWVWg3VmZERVNVODRLZXptRDVRbFdwWExtdlUzMS95TWYrU2U4eGhIVHZLU0NaSUZJbVd3b0c2bWJVb1dmOW56cElvYVNqQit3ZXFxVVVtcGFhYXNYVmFsNzJKK1VYMkIrMlJQVzNSY1QwZU96UWdxbEpMM1JLclRKdmRzakUzSkVBdkdxM2xHSFNaWHkyOEczc2t1YTJTbVZpL3c0eUNFNmdiT0RxblRXbGc3K3dDNjA0eWRHWEE4VkppUzVhcDQzSlhpVUZGQWFRPT0K
         name: My Company
+        conan-password: demo
+        conan-remote: http://test-conan-server:9300
         user: mycompany
         public-ssh-key: ""
+        conan-user: agent
     Ecosystem_relationships_builds_links:
       type: object
       properties:
@@ -1517,19 +1545,27 @@ components:
           example: GCC 9
         container:
           type: string
-          example: conanio/gcc9
+          example: uboot/gcc9:latest
+        docker-user:
+          type: string
+          example: user
+        docker-password:
+          type: string
+          example: paSSw0rd
         settings:
           type: array
           items:
             $ref: '#/components/schemas/Profile_attributes_settings'
       example:
-        container: conanio/gcc9
+        container: uboot/gcc9:latest
         settings:
         - value: Release
           key: build_type
         - value: Release
           key: build_type
+        docker-password: paSSw0rd
         name: GCC 9
+        docker-user: user
     Profile_relationships:
       type: object
       properties:

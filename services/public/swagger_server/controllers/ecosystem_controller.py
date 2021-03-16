@@ -14,6 +14,9 @@ def __create_ecosystem(record: database.Ecosystem):
             name=record.name,
             user=record.user,
             settings=record.settings,
+            conan_remote=record.conan_remote,
+            conan_user=record.conan_user,
+            conan_password=record.conan_password,
             public_ssh_key=record.public_ssh_key,
             known_hosts=record.known_hosts
         ),
@@ -55,6 +58,9 @@ def add_ecosystem(body=None):
     record = database.Ecosystem()
     record.name = body.data.attributes.name
     record.user = body.data.attributes.user
+    record.conan_remote = body.data.attributes.conan_remote
+    record.conan_user = body.data.attributes.conan_user
+    record.conan_password = body.data.attributes.conan_password
     record.known_hosts = body.data.attributes.known_hosts
     private, public = generate_rsa_key()
     record.ssh_key = encode(private)
@@ -101,6 +107,9 @@ def update_ecosystem(ecosystem_id, body=None):
 
         record.name = body.data.attributes.name
         record.user = body.data.attributes.user
+        record.conan_remote = body.data.attributes.conan_remote
+        record.conan_user = body.data.attributes.conan_user
+        record.conan_password = body.data.attributes.conan_password
         record.known_hosts = body.data.attributes.known_hosts
         if body.data.attributes.public_ssh_key == '':
             private, public = generate_rsa_key()

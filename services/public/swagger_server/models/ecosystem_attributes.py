@@ -14,7 +14,7 @@ class EcosystemAttributes(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, name: str=None, user: str=None, settings: str=None, public_ssh_key: str=None, known_hosts: str=None):  # noqa: E501
+    def __init__(self, name: str=None, user: str=None, settings: str=None, conan_remote: str=None, conan_user: str=None, conan_password: str=None, public_ssh_key: str=None, known_hosts: str=None):  # noqa: E501
         """EcosystemAttributes - a model defined in Swagger
 
         :param name: The name of this EcosystemAttributes.  # noqa: E501
@@ -23,6 +23,12 @@ class EcosystemAttributes(Model):
         :type user: str
         :param settings: The settings of this EcosystemAttributes.  # noqa: E501
         :type settings: str
+        :param conan_remote: The conan_remote of this EcosystemAttributes.  # noqa: E501
+        :type conan_remote: str
+        :param conan_user: The conan_user of this EcosystemAttributes.  # noqa: E501
+        :type conan_user: str
+        :param conan_password: The conan_password of this EcosystemAttributes.  # noqa: E501
+        :type conan_password: str
         :param public_ssh_key: The public_ssh_key of this EcosystemAttributes.  # noqa: E501
         :type public_ssh_key: str
         :param known_hosts: The known_hosts of this EcosystemAttributes.  # noqa: E501
@@ -32,6 +38,9 @@ class EcosystemAttributes(Model):
             'name': str,
             'user': str,
             'settings': str,
+            'conan_remote': str,
+            'conan_user': str,
+            'conan_password': str,
             'public_ssh_key': str,
             'known_hosts': str
         }
@@ -40,12 +49,18 @@ class EcosystemAttributes(Model):
             'name': 'name',
             'user': 'user',
             'settings': 'settings',
+            'conan_remote': 'conan-remote',
+            'conan_user': 'conan-user',
+            'conan_password': 'conan-password',
             'public_ssh_key': 'public-ssh-key',
             'known_hosts': 'known-hosts'
         }
         self._name = name
         self._user = user
         self._settings = settings
+        self._conan_remote = conan_remote
+        self._conan_user = conan_user
+        self._conan_password = conan_password
         self._public_ssh_key = public_ssh_key
         self._known_hosts = known_hosts
 
@@ -122,6 +137,69 @@ class EcosystemAttributes(Model):
         """
 
         self._settings = settings
+
+    @property
+    def conan_remote(self) -> str:
+        """Gets the conan_remote of this EcosystemAttributes.
+
+
+        :return: The conan_remote of this EcosystemAttributes.
+        :rtype: str
+        """
+        return self._conan_remote
+
+    @conan_remote.setter
+    def conan_remote(self, conan_remote: str):
+        """Sets the conan_remote of this EcosystemAttributes.
+
+
+        :param conan_remote: The conan_remote of this EcosystemAttributes.
+        :type conan_remote: str
+        """
+
+        self._conan_remote = conan_remote
+
+    @property
+    def conan_user(self) -> str:
+        """Gets the conan_user of this EcosystemAttributes.
+
+
+        :return: The conan_user of this EcosystemAttributes.
+        :rtype: str
+        """
+        return self._conan_user
+
+    @conan_user.setter
+    def conan_user(self, conan_user: str):
+        """Sets the conan_user of this EcosystemAttributes.
+
+
+        :param conan_user: The conan_user of this EcosystemAttributes.
+        :type conan_user: str
+        """
+
+        self._conan_user = conan_user
+
+    @property
+    def conan_password(self) -> str:
+        """Gets the conan_password of this EcosystemAttributes.
+
+
+        :return: The conan_password of this EcosystemAttributes.
+        :rtype: str
+        """
+        return self._conan_password
+
+    @conan_password.setter
+    def conan_password(self, conan_password: str):
+        """Sets the conan_password of this EcosystemAttributes.
+
+
+        :param conan_password: The conan_password of this EcosystemAttributes.
+        :type conan_password: str
+        """
+
+        self._conan_password = conan_password
 
     @property
     def public_ssh_key(self) -> str:

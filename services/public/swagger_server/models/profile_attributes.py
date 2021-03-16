@@ -15,29 +15,39 @@ class ProfileAttributes(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, name: str=None, container: str=None, settings: List[ProfileAttributesSettings]=None):  # noqa: E501
+    def __init__(self, name: str=None, container: str=None, docker_user: str=None, docker_password: str=None, settings: List[ProfileAttributesSettings]=None):  # noqa: E501
         """ProfileAttributes - a model defined in Swagger
 
         :param name: The name of this ProfileAttributes.  # noqa: E501
         :type name: str
         :param container: The container of this ProfileAttributes.  # noqa: E501
         :type container: str
+        :param docker_user: The docker_user of this ProfileAttributes.  # noqa: E501
+        :type docker_user: str
+        :param docker_password: The docker_password of this ProfileAttributes.  # noqa: E501
+        :type docker_password: str
         :param settings: The settings of this ProfileAttributes.  # noqa: E501
         :type settings: List[ProfileAttributesSettings]
         """
         self.swagger_types = {
             'name': str,
             'container': str,
+            'docker_user': str,
+            'docker_password': str,
             'settings': List[ProfileAttributesSettings]
         }
 
         self.attribute_map = {
             'name': 'name',
             'container': 'container',
+            'docker_user': 'docker-user',
+            'docker_password': 'docker-password',
             'settings': 'settings'
         }
         self._name = name
         self._container = container
+        self._docker_user = docker_user
+        self._docker_password = docker_password
         self._settings = settings
 
     @classmethod
@@ -92,6 +102,48 @@ class ProfileAttributes(Model):
         """
 
         self._container = container
+
+    @property
+    def docker_user(self) -> str:
+        """Gets the docker_user of this ProfileAttributes.
+
+
+        :return: The docker_user of this ProfileAttributes.
+        :rtype: str
+        """
+        return self._docker_user
+
+    @docker_user.setter
+    def docker_user(self, docker_user: str):
+        """Sets the docker_user of this ProfileAttributes.
+
+
+        :param docker_user: The docker_user of this ProfileAttributes.
+        :type docker_user: str
+        """
+
+        self._docker_user = docker_user
+
+    @property
+    def docker_password(self) -> str:
+        """Gets the docker_password of this ProfileAttributes.
+
+
+        :return: The docker_password of this ProfileAttributes.
+        :rtype: str
+        """
+        return self._docker_password
+
+    @docker_password.setter
+    def docker_password(self, docker_password: str):
+        """Sets the docker_password of this ProfileAttributes.
+
+
+        :param docker_password: The docker_password of this ProfileAttributes.
+        :type docker_password: str
+        """
+
+        self._docker_password = docker_password
 
     @property
     def settings(self) -> List[ProfileAttributesSettings]:
