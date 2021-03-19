@@ -15,7 +15,7 @@ echo '# Clean remotes'
 conan remote clean; ThrowOnNonZero
 
 echo '# Add Conan server'
-conan remote add server http://$conan_url:9300; ThrowOnNonZero
+conan remote add server $conan_remote; ThrowOnNonZero
 
 echo '# Setup Conan user'
 conan user -r server -p $conan_password $conan_user; ThrowOnNonZero

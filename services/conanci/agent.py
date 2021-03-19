@@ -7,9 +7,6 @@ import os
 import string
 
 
-conan_server = os.environ.get("CONAN_SERVER_URL", "127.0.0.1")
-conan_user = os.environ.get("CONAN_SERVER_USER", "demo")
-conan_password = os.environ.get("CONAN_SERVER_PASSWORD", "demo")
 conanci_user = os.environ.get("CONANCI_USER", "conanci")
 conanci_os = os.environ.get("CONANCI_AGENT_OS", "Linux")
 ssh_dir = os.environ.get("SSH_DIR", "/config-map")
@@ -62,9 +59,9 @@ class Agent(Worker):
 
             container = build.profile.container
             parameters = {
-                "conan_url": conan_server,
-                "conan_user": conan_user,
-                "conan_password": conan_password,
+                "conan_url": build.profile.ecosystem.conan_remote,
+                "conan_user": build.profile.ecosystem.conan_user,
+                "conan_password": build.profile.ecosystem.conan_password,
                 "git_url": build.commit.repo.url,
                 "git_sha": build.commit.sha,
                 "conanci_user": conanci_user,
@@ -72,7 +69,9 @@ class Agent(Worker):
                 "path": os.path.join(build.commit.repo.path, "conanfile.py")
                         if build.commit.repo.path != "" else "conanfile.py",
                 "ssh_key": build.profile.ecosystem.ssh_key,
-                "known_hosts": build.profile.ecosystem.known_hosts
+                "known_hosts": build.profile.ecosystem.known_hosts,
+                "docker_user": build.profile.docker_user,
+                "docker_password": build.profile.docker_password
             }
 
         try:
@@ -130,6 +129,6 @@ class Agent(Worker):
 
     async def __run_build(self, builder, parameters):
         loop = asyncio.get_running_loop()
-        await loop.run_in_executor(None, builder.pull)
+        await loop.run_in_executor(None, builder.pull, parameters)
         await loop.run_in_executor(None, builder.setup, parameters)
         await loop.run_in_executor(None, builder.run)

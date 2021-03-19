@@ -53,7 +53,7 @@ def cancel_build(builder, seconds):
 
 def get_linux_build_parameters():
     return {
-        "conan_url": os.environ.get("CONAN_SERVER_URL", "127.0.0.1"),
+        "conan_remote": os.environ.get("CONAN_SERVER_URL", "http://127.0.0.1:9300"),
         "conan_user": "demo",
         "conan_password": "demo",
         "git_url": "git@github.com:uboot/conan-ci.git",
@@ -62,13 +62,15 @@ def get_linux_build_parameters():
         "channel": "latest",
         "path": "packages/hello/conanfile.py",
         "ssh_key": os.environ.get("SSH_KEY", ""),
-        "known_hosts": known_hosts
+        "known_hosts": known_hosts,
+        "docker_user": "",
+        "docker_password": ""
     }
 
 
 def get_windows_build_parameters():
     return {
-        "conan_url": os.environ.get("CONAN_SERVER_URL", "127.0.0.1"),
+        "conan_remote": os.environ.get("CONAN_SERVER_URL", "http://127.0.0.1:9300"),
         "conan_user": "demo",
         "conan_password": "demo",
         "git_url": "git@github.com:uboot/conan-ci.git",
@@ -77,7 +79,9 @@ def get_windows_build_parameters():
         "channel": "latest",
         "path": "packages/hello/conanfile.py",
         "ssh_key": os.environ.get("SSH_KEY", ""),
-        "known_hosts": known_hosts
+        "known_hosts": known_hosts,
+        "docker_user": "",
+        "docker_password": ""
     }
 
 
@@ -86,7 +90,7 @@ class BuilderTest(unittest.TestCase):
         docker_host = os.environ.get("LINUX_DOCKER_HOST", "")
         parameters = get_linux_build_parameters()
         with environment("DOCKER_HOST", docker_host), Builder("Linux", "uboot/gcc9:latest") as builder:
-            builder.pull()
+            builder.pull(parameters)
             builder.setup(parameters)
             builder.run()
 
@@ -96,7 +100,7 @@ class BuilderTest(unittest.TestCase):
         parameters["path"] = "packages/deadlock/conanfile.py"
         with environment("DOCKER_HOST", docker_host), Builder("Linux", "uboot/gcc9:latest") as builder:
             canceller = cancel_build(builder, 0)
-            builder.pull()
+            builder.pull(parameters)
             builder.setup(parameters)
             builder.run()
             canceller.join()
@@ -107,7 +111,7 @@ class BuilderTest(unittest.TestCase):
         parameters["path"] = "packages/deadlock/conanfile.py"
         with environment("DOCKER_HOST", docker_host), Builder("Linux", "uboot/gcc9:latest") as builder:
             canceller = cancel_build(builder, 3)
-            builder.pull()
+            builder.pull(parameters)
             builder.setup(parameters)
             builder.run()
             canceller.join()
@@ -115,8 +119,8 @@ class BuilderTest(unittest.TestCase):
     def test_run_windows(self):
         docker_host = os.environ.get("WINDOWS_DOCKER_HOST", "")
         parameters = get_windows_build_parameters()
-        with environment("DOCKER_HOST", docker_host), Builder("Windows", "msvc15:local") as builder:
-            builder.pull()
+        with environment("DOCKER_HOST", docker_host), Builder("Windows", "uboot/msvc15:latest") as builder:
+            builder.pull(parameters)
             builder.setup(parameters)
             builder.run()
 
@@ -124,9 +128,9 @@ class BuilderTest(unittest.TestCase):
         docker_host = os.environ.get("WINDOWS_DOCKER_HOST", "")
         parameters = get_windows_build_parameters()
         parameters["path"] = "packages/deadlock/conanfile.py"
-        with environment("DOCKER_HOST", docker_host), Builder("Windows", "msvc15:local") as builder:
+        with environment("DOCKER_HOST", docker_host), Builder("Windows", "uboot/msvc15:latest") as builder:
             canceller = cancel_build(builder, 3)
-            builder.pull()
+            builder.pull(parameters)
             builder.setup(parameters)
             builder.run()
             canceller.join()

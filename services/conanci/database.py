@@ -219,7 +219,7 @@ def populate_database():
         windows = Profile()
         windows.ecosystem = ecosystem
         windows.name = "MSVC 15"
-        windows.container = "msvc15:local"
+        windows.container = "uboot/msvc15:latest"
         windows.settings = [
             Setting("os", "Windows"),
             Setting("build_type", "Release")

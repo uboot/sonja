@@ -10,16 +10,16 @@ from conanci.ssh import decode
 from io import BytesIO
 
 
-docker_image_pattern = ("([a-z0-9\\.-]+(:[0-9]+)?/)?"
-                        "[a-z0-9\\.-/]+([:@][a-z0-9\\.-]+)$")
+docker_image_pattern = ("(([a-z0-9\\.-]+(:[0-9]+)?/)?"
+                        "[a-z0-9\\.-/]+)[:@]([a-z0-9\\.-]+)$")
 
-# docker run --name conan -d --rm -p 9300:9300 -v /path-to-server-config:/root/.conan_server conanio/conan_server:1.28.1
 
 def add_content_to_tar(tar, file_name, text_data):
     tarinfo = tarfile.TarInfo(file_name)
     content = BytesIO(bytes(text_data, "utf-8"))
     tarinfo.size = len(content.getbuffer())
     tar.addfile(tarinfo, content)
+
 
 def create_build_tar(build_os, parameters):
     if build_os == "Linux":
@@ -58,17 +58,26 @@ class Builder(object):
     def __enter__(self):
         return self
 
-    def pull(self):
+    def pull(self, parameters):
         m = re.match(docker_image_pattern, self.__image)
         if not m:
             raise Exception("The image '{0}' is not a valid "
                             "docker image name".format(self.__image))
-        if m.group(3) == ":local":
+        tag = m.group(4)
+        repository = m.group(1)
+        if tag == "local":
             logger.info("Do not pull local image '%s'", self.__image)
             return
 
+        auth_config = None
+        if parameters['docker_user']:
+            auth_config = {
+                "username": parameters['docker_user'],
+                "password": parameters['docker_password']
+            }
+
         logger.info("Pull docker image '%s'", self.__image)
-        self.__client.images.pull(self.__image)
+        self.__client.images.pull(repository=repository, tag=tag, auth_config=auth_config)
 
     def setup(self, parameters):
         logger.info("Setup docker container")

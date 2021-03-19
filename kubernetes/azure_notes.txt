@@ -124,7 +124,8 @@ Create Registry
 
 az group create --name registry --location westeurope
 az acr create --resource-group registry --name <registry> --sku Basic
-az acr login --name <registry>
+az acr login --name <registry> --expose-token
+az acr update -n <registry> --admin-enabled true
 az acr credential show --name <registry>
 
 Build Docker Images

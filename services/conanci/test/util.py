@@ -45,7 +45,7 @@ def create_commit(parameters=dict()):
 
 def create_channel(parameters=dict()):
     channel = database.Channel()
-    channel.ecosystem = parameters.get("ecosysstem", create_ecosystem(parameters))
+    channel.ecosystem = parameters.get("ecosystem", create_ecosystem(parameters))
     channel.branch = "master"
     channel.name = "stable"
     return channel
