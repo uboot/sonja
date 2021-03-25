@@ -13,7 +13,8 @@ ssh-copy-id -f -i <public-key> azureuser@<ip>
 Manage VM
 =========
 
-az vm open-port -g vm --name vm --port 80 --priority 800
+az vm open-port -g vm --name vm --port 80 --priority 700
+az vm open-port -g vm --name vm --port 443 --priority 800
 az vm open-port -g vm --name vm --port 6443 --priority 900
 az vm deallocate -g vm --name vm
 az vm start -g vm --name vm

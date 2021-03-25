@@ -3,6 +3,7 @@ kind: Ingress
 metadata:
   name: {{ template "conan-ci.fullname" $ }}-ingress-frontend
   annotations:
+    ingress.kubernetes.io/ssl-redirect: "true"
 spec:
   tls:
   - hosts:
@@ -33,6 +34,7 @@ metadata:
   name: {{ template "conan-ci.fullname" $ }}-ingress-phpmyadmin
   annotations:
     traefik.ingress.kubernetes.io/request-modifier: "ReplacePathRegex: ^/phpmyadmin/(.*) /$1"
+    ingress.kubernetes.io/ssl-redirect: "true"
 spec:
   rules:
   - host: {{ .Values.hostName }}
