@@ -4,21 +4,10 @@ from conanci.config import connect_to_database, logger
 from conanci.worker import Worker
 import asyncio
 import os
-import string
 
 
-conanci_user = os.environ.get("CONANCI_USER", "conanci")
-conanci_os = os.environ.get("CONANCI_AGENT_OS", "Linux")
-ssh_dir = os.environ.get("SSH_DIR", "/config-map")
-ssh_key = os.environ.get("SSH_KEY", "")
+conanci_os = os.environ.get("CONANCI_AGENT_OS", "Linux"))
 
-
-build_template = string.Template(
-"""sh -c \" \
-conan create $package_path $channel
-\"\
-"""
-)
 
 class Agent(Worker):
     def __init__(self):
@@ -64,7 +53,7 @@ class Agent(Worker):
                 "conan_password": build.profile.ecosystem.conan_password,
                 "git_url": build.commit.repo.url,
                 "git_sha": build.commit.sha,
-                "conanci_user": conanci_user,
+                "conanci_user": build.profile.ecosystem.user,
                 "channel": build.commit.channel.name,
                 "path": os.path.join(build.commit.repo.path, "conanfile.py")
                         if build.commit.repo.path != "" else "conanfile.py",
