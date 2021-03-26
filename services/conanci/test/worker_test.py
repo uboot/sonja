@@ -32,9 +32,10 @@ class AgentTest(unittest.TestCase):
             with database.session_scope() as session:
                 build = session.query(database.Build).first()
                 if build.status == status:
-                    return True
-            if time.time() - start > timeout:
-                return False
+                    return build.status
+                elif time.time() - start > timeout:
+                    return build.status
+            time.sleep(1)
 
     def test_start(self):
         self.agent.start()
@@ -48,7 +49,13 @@ class AgentTest(unittest.TestCase):
         with database.session_scope() as session:
             session.add(util.create_build())
         self.agent.start()
-        self.assertTrue(self.__wait_for_build_status(database.BuildStatus.active, 15))
+        self.assertEquals(self.__wait_for_build_status(database.BuildStatus.active, 15), database.BuildStatus.active)
+
+    def test_complete_build(self):
+        with database.session_scope() as session:
+            session.add(util.create_build())
+        self.agent.start()
+        self.assertEquals(self.__wait_for_build_status(database.BuildStatus.success, 15), database.BuildStatus.success)
 
     def test_stop_build(self):
         with database.session_scope() as session:
@@ -59,7 +66,7 @@ class AgentTest(unittest.TestCase):
         with database.session_scope() as session:
             build = session.query(database.Build).first()
             build.status = database.BuildStatus.stopping
-        self.assertTrue(self.__wait_for_build_status(database.BuildStatus.stopped, 15))
+        self.assertEqual(self.__wait_for_build_status(database.BuildStatus.stopped, 15), database.BuildStatus.stopped)
 
     def test_cancel_build(self):
         with database.session_scope() as session:
@@ -68,7 +75,7 @@ class AgentTest(unittest.TestCase):
         self.__wait_for_build_status(database.BuildStatus.active, 15)
         self.agent.cancel()
         self.agent.join()
-        self.assertTrue(self.__wait_for_build_status(database.BuildStatus.new, 15))
+        self.assertEquals(self.__wait_for_build_status(database.BuildStatus.new, 15), database.BuildStatus.new)
 
 
 class CrawlerTest(unittest.TestCase):

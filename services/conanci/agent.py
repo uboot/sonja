@@ -6,7 +6,7 @@ import asyncio
 import os
 
 
-conanci_os = os.environ.get("CONANCI_AGENT_OS", "Linux"))
+conanci_os = os.environ.get("CONANCI_AGENT_OS", "Linux")
 
 
 class Agent(Worker):
@@ -48,7 +48,7 @@ class Agent(Worker):
 
             container = build.profile.container
             parameters = {
-                "conan_url": build.profile.ecosystem.conan_remote,
+                "conan_remote": build.profile.ecosystem.conan_remote,
                 "conan_user": build.profile.ecosystem.conan_user,
                 "conan_password": build.profile.ecosystem.conan_password,
                 "git_url": build.commit.repo.url,
@@ -70,6 +70,7 @@ class Agent(Worker):
                 while True:
                     done, _ = await asyncio.wait({builder_task}, timeout=10)
                     if done:
+                        builder_task.result()
                         break
 
                     with database.session_scope() as session:
