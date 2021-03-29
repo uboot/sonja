@@ -61,7 +61,7 @@
     git:
       repo: 'https://github.com/uboot/packer-windows'
       dest: /home/{{ ansible_user }}/packer-windows
-      version: win-1909-qemu
+      version: win-qemu
   # - name: Copy installation ISOs
   #   copy:
   #     src: iso/
@@ -85,7 +85,7 @@
         path: /home/{{ ansible_user }}/packer-windows/windows_server_20h2_docker
         dockerfile: /home/{{ ansible_user }}/packer-windows/Dockerfile.windows_20h2_docker
       name: localhost:5000/windows20h2
-      tag: local
+      tag: latest
       push: yes
       source: build
   handlers:

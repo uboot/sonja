@@ -5,6 +5,12 @@ function ThrowOnNonZero {
     }
 }
 
+echo '### Setup MTU ###'
+$adapters = $(Get-NetAdapter | Where { $_.Name -Match 'Ethernet' }).Name
+$adapters | ForEach-Object({
+    netsh interface ipv4 set subinterface "$_" mtu=1450 store=persistent
+})
+
 echo '### Setup SSH ###'
 mkdir -p "$$env:userprofile\.ssh"; ThrowOnNonZero
 Copy-Item "C:\id_rsa" -Destination "$$env:userprofile\.ssh"; ThrowOnNonZero

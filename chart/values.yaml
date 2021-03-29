@@ -32,7 +32,7 @@ services:
     replicas: 1
 
 windows:
-  image: localhost:5000/windows20h2:local
+  image: localhost:5000/windows20h2:latest
   agents:
     - name: one
       image: agent
