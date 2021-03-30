@@ -63,7 +63,7 @@ data:
     #   internal/*@*/*: ?
     #   */*@*/*: *
     #
-    # By default all users can ead all blocks
+    # By default all users can read all blocks
     #
     [read_permissions]
     */*@*/*: *

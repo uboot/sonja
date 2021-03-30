@@ -54,6 +54,7 @@ def cancel_build(builder, seconds):
 def get_linux_build_parameters():
     return {
         "conan_remote": os.environ.get("CONAN_SERVER_URL", "http://127.0.0.1:9300"),
+        "conan_verify_ssl": "True",
         "conan_user": "demo",
         "conan_password": "demo",
         "git_url": "git@github.com:uboot/conan-ci.git",
@@ -71,6 +72,7 @@ def get_linux_build_parameters():
 def get_windows_build_parameters():
     return {
         "conan_remote": os.environ.get("CONAN_SERVER_URL", "http://127.0.0.1:9300"),
+        "conan_verify_ssl": "True",
         "conan_user": "demo",
         "conan_password": "demo",
         "git_url": "git@github.com:uboot/conan-ci.git",

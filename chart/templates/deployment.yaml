@@ -91,7 +91,6 @@ spec:
 {{- else }}
         image: uboot/{{ .name }}:latest
 {{- end }}
-        imagePullPolicy: Never
         livenessProbe:
           httpGet:
             path: /ping

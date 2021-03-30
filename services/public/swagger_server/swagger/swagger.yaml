@@ -151,7 +151,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/EcosystemData'
         "400":
-          description: invalid input, object invalid
+          description: "invalid input, object invalid"
         "409":
           description: an existing item already exists
       x-openapi-router-controller: swagger_server.controllers.ecosystem_controller
@@ -232,7 +232,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/EcosystemData'
         "400":
-          description: invalid input, object invalid
+          description: "invalid input, object invalid"
         "404":
           description: ecosystem not found
       x-openapi-router-controller: swagger_server.controllers.ecosystem_controller
@@ -281,7 +281,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/RepoData'
         "400":
-          description: invalid input, object invalid
+          description: "invalid input, object invalid"
         "409":
           description: an existing item already exists
       x-openapi-router-controller: swagger_server.controllers.repo_controller
@@ -362,7 +362,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/RepoData'
         "400":
-          description: invalid input, object invalid
+          description: "invalid input, object invalid"
         "404":
           description: repo not found
       x-openapi-router-controller: swagger_server.controllers.repo_controller
@@ -386,7 +386,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProfileData'
         "400":
-          description: invalid input, object invalid
+          description: "invalid input, object invalid"
         "409":
           description: an existing item already exists
       x-openapi-router-controller: swagger_server.controllers.profile_controller
@@ -467,7 +467,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProfileData'
         "400":
-          description: invalid input, object invalid
+          description: "invalid input, object invalid"
         "404":
           description: profile not found
       x-openapi-router-controller: swagger_server.controllers.profile_controller
@@ -543,7 +543,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ChannelData'
         "400":
-          description: invalid input, object invalid
+          description: "invalid input, object invalid"
         "409":
           description: an existing item already exists
       x-openapi-router-controller: swagger_server.controllers.channel_controller
@@ -624,7 +624,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ChannelData'
         "400":
-          description: invalid input, object invalid
+          description: "invalid input, object invalid"
         "404":
           description: channel not found
       x-openapi-router-controller: swagger_server.controllers.channel_controller
@@ -708,7 +708,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/BuildData'
         "400":
-          description: invalid input, object invalid
+          description: "invalid input, object invalid"
         "404":
           description: build not found
       x-openapi-router-controller: swagger_server.controllers.build_controller
@@ -774,6 +774,7 @@ components:
         attributes:
           settings: ""
           known-hosts: Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN2hSR21kbm05dFVEYk85SURTd0JLNlRiUWErUFhZUENQeTZyYlRyVHR3N1BIa2NjS3JwcDB5VmhwNUhkRUljS3I2cExsVkRCZk9MWDlRVXN5Q09WMHd6ZmpJSk5sR0VZc2RsTEppekhoYm4ybVVqdlNBSFFxWkVUWVA4MWVGekxRTm5QSHQ0RVZWVWg3VmZERVNVODRLZXptRDVRbFdwWExtdlUzMS95TWYrU2U4eGhIVHZLU0NaSUZJbVd3b0c2bWJVb1dmOW56cElvYVNqQit3ZXFxVVVtcGFhYXNYVmFsNzJKK1VYMkIrMlJQVzNSY1QwZU96UWdxbEpMM1JLclRKdmRzakUzSkVBdkdxM2xHSFNaWHkyOEczc2t1YTJTbVZpL3c0eUNFNmdiT0RxblRXbGc3K3dDNjA0eWRHWEE4VkppUzVhcDQzSlhpVUZGQWFRPT0K
+          conan-verify-ssl: true
           name: My Company
           conan-password: demo
           conan-remote: http://test-conan-server:9300
@@ -813,6 +814,7 @@ components:
           attributes:
             settings: ""
             known-hosts: Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN2hSR21kbm05dFVEYk85SURTd0JLNlRiUWErUFhZUENQeTZyYlRyVHR3N1BIa2NjS3JwcDB5VmhwNUhkRUljS3I2cExsVkRCZk9MWDlRVXN5Q09WMHd6ZmpJSk5sR0VZc2RsTEppekhoYm4ybVVqdlNBSFFxWkVUWVA4MWVGekxRTm5QSHQ0RVZWVWg3VmZERVNVODRLZXptRDVRbFdwWExtdlUzMS95TWYrU2U4eGhIVHZLU0NaSUZJbVd3b0c2bWJVb1dmOW56cElvYVNqQit3ZXFxVVVtcGFhYXNYVmFsNzJKK1VYMkIrMlJQVzNSY1QwZU96UWdxbEpMM1JLclRKdmRzakUzSkVBdkdxM2xHSFNaWHkyOEczc2t1YTJTbVZpL3c0eUNFNmdiT0RxblRXbGc3K3dDNjA0eWRHWEE4VkppUzVhcDQzSlhpVUZGQWFRPT0K
+            conan-verify-ssl: true
             name: My Company
             conan-password: demo
             conan-remote: http://test-conan-server:9300
@@ -854,6 +856,7 @@ components:
           attributes:
             settings: ""
             known-hosts: Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN2hSR21kbm05dFVEYk85SURTd0JLNlRiUWErUFhZUENQeTZyYlRyVHR3N1BIa2NjS3JwcDB5VmhwNUhkRUljS3I2cExsVkRCZk9MWDlRVXN5Q09WMHd6ZmpJSk5sR0VZc2RsTEppekhoYm4ybVVqdlNBSFFxWkVUWVA4MWVGekxRTm5QSHQ0RVZWVWg3VmZERVNVODRLZXptRDVRbFdwWExtdlUzMS95TWYrU2U4eGhIVHZLU0NaSUZJbVd3b0c2bWJVb1dmOW56cElvYVNqQit3ZXFxVVVtcGFhYXNYVmFsNzJKK1VYMkIrMlJQVzNSY1QwZU96UWdxbEpMM1JLclRKdmRzakUzSkVBdkdxM2xHSFNaWHkyOEczc2t1YTJTbVZpL3c0eUNFNmdiT0RxblRXbGc3K3dDNjA0eWRHWEE4VkppUzVhcDQzSlhpVUZGQWFRPT0K
+            conan-verify-ssl: true
             name: My Company
             conan-password: demo
             conan-remote: http://test-conan-server:9300
@@ -884,6 +887,7 @@ components:
           attributes:
             settings: ""
             known-hosts: Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN2hSR21kbm05dFVEYk85SURTd0JLNlRiUWErUFhZUENQeTZyYlRyVHR3N1BIa2NjS3JwcDB5VmhwNUhkRUljS3I2cExsVkRCZk9MWDlRVXN5Q09WMHd6ZmpJSk5sR0VZc2RsTEppekhoYm4ybVVqdlNBSFFxWkVUWVA4MWVGekxRTm5QSHQ0RVZWVWg3VmZERVNVODRLZXptRDVRbFdwWExtdlUzMS95TWYrU2U4eGhIVHZLU0NaSUZJbVd3b0c2bWJVb1dmOW56cElvYVNqQit3ZXFxVVVtcGFhYXNYVmFsNzJKK1VYMkIrMlJQVzNSY1QwZU96UWdxbEpMM1JLclRKdmRzakUzSkVBdkdxM2xHSFNaWHkyOEczc2t1YTJTbVZpL3c0eUNFNmdiT0RxblRXbGc3K3dDNjA0eWRHWEE4VkppUzVhcDQzSlhpVUZGQWFRPT0K
+            conan-verify-ssl: true
             name: My Company
             conan-password: demo
             conan-remote: http://test-conan-server:9300
@@ -1319,6 +1323,9 @@ components:
         conan-remote:
           type: string
           example: http://test-conan-server:9300
+        conan-verify-ssl:
+          type: boolean
+          example: true
         conan-user:
           type: string
           example: agent
@@ -1334,6 +1341,7 @@ components:
       example:
         settings: ""
         known-hosts: Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN2hSR21kbm05dFVEYk85SURTd0JLNlRiUWErUFhZUENQeTZyYlRyVHR3N1BIa2NjS3JwcDB5VmhwNUhkRUljS3I2cExsVkRCZk9MWDlRVXN5Q09WMHd6ZmpJSk5sR0VZc2RsTEppekhoYm4ybVVqdlNBSFFxWkVUWVA4MWVGekxRTm5QSHQ0RVZWVWg3VmZERVNVODRLZXptRDVRbFdwWExtdlUzMS95TWYrU2U4eGhIVHZLU0NaSUZJbVd3b0c2bWJVb1dmOW56cElvYVNqQit3ZXFxVVVtcGFhYXNYVmFsNzJKK1VYMkIrMlJQVzNSY1QwZU96UWdxbEpMM1JLclRKdmRzakUzSkVBdkdxM2xHSFNaWHkyOEczc2t1YTJTbVZpL3c0eUNFNmdiT0RxblRXbGc3K3dDNjA0eWRHWEE4VkppUzVhcDQzSlhpVUZGQWFRPT0K
+        conan-verify-ssl: true
         name: My Company
         conan-password: demo
         conan-remote: http://test-conan-server:9300

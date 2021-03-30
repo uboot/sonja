@@ -17,6 +17,7 @@ def create_ecosystem(parameters=dict()):
     ecosystem.ssh_key = os.environ.get("SSH_KEY", "")
     ecosystem.public_ssh_key = os.environ.get("PUBLIC_SSH_KEY", "")
     ecosystem.conan_remote = os.environ.get("CONAN_SERVER_URL", "http://127.0.0.1:9300")
+    ecosystem.conan_verify_ssl = True
     ecosystem.conan_user = "demo"
     ecosystem.conan_password = "demo"
     parameters["ecosystem"] = ecosystem

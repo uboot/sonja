@@ -49,6 +49,7 @@ class Agent(Worker):
             container = build.profile.container
             parameters = {
                 "conan_remote": build.profile.ecosystem.conan_remote,
+                "conan_verify_ssl": build.profile.ecosystem.conan_verify_ssl,
                 "conan_user": build.profile.ecosystem.conan_user,
                 "conan_password": build.profile.ecosystem.conan_password,
                 "git_url": build.commit.repo.url,

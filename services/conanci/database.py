@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Enum, ForeignKey, Integer, String, Table, Text
+from sqlalchemy import Boolean, create_engine, Column, Enum, ForeignKey, Integer, String, Table, Text
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref, relationship, sessionmaker
@@ -38,6 +38,7 @@ class Ecosystem(Base):
     ssh_key = Column(Text())
     known_hosts = Column(Text())
     conan_remote = Column(String(255))
+    conan_verify_ssl = Column(Boolean())
     conan_user = Column(String(255))
     conan_password = Column(String(255))
     settings = Column(Text())

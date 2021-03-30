@@ -6,9 +6,9 @@ function ThrowOnNonZero {
 }
 
 echo '### Setup MTU ###'
-$adapters = $(Get-NetAdapter | Where { $_.Name -Match 'Ethernet' }).Name
-$adapters | ForEach-Object({
-    netsh interface ipv4 set subinterface "$_" mtu=1450 store=persistent
+$$adapters = $$(Get-NetAdapter | Where { $$_.Name -Match 'Ethernet' }).Name
+$$adapters | ForEach-Object({
+    netsh interface ipv4 set subinterface "$$_" mtu=1450 store=persistent
 })
 
 echo '### Setup SSH ###'
@@ -21,7 +21,7 @@ echo '# Clean remotes'
 conan remote clean; ThrowOnNonZero
 
 echo '# Add Conan server'
-conan remote add server $conan_remote; ThrowOnNonZero
+conan remote add server $conan_remote $conan_verify_ssl; ThrowOnNonZero
 
 echo '# Setup Conan user'
 conan user -r server -p $conan_password $conan_user; ThrowOnNonZero

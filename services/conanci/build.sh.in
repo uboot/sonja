@@ -12,7 +12,7 @@ echo '# Clean remotes'
 conan remote clean
 
 echo '# Add Conan server'
-conan remote add server $conan_remote
+conan remote add server $conan_remote $conan_verify_ssl
 
 echo '# Setup Conan user'
 conan user -r server -p $conan_password $conan_user
