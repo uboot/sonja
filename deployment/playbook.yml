@@ -62,15 +62,15 @@
       repo: 'https://github.com/uboot/packer-windows'
       dest: /home/{{ ansible_user }}/packer-windows
       version: win-qemu
-  # - name: Copy installation ISOs
-  #   copy:
-  #     src: iso/
-  #     dest: /home/{{ ansible_user }}/packer-windows/iso/
+  - name: Copy installation ISOs
+    copy:
+      src: iso/
+      dest: /home/{{ ansible_user }}/packer-windows/iso/
   - name: Build Windows qcow2 image
     command: packer build --only=qemu --except=vagrant --var headless=true --var virtio_win_iso=./iso/virtio-win-0.1.190.iso --var iso_url=./iso/en_windows_server_version_20h2_updated_feb_2021_x64_dvd_4bfbe45a.iso --var iso_checksum=8323A6EDC3F03911E328CD3F2953502B8F21E15056F3D870A6AB074E37DDE303 windows_server_20h2_docker.json
     args:
       chdir: /home/{{ ansible_user }}/packer-windows
-      creates: /home/{{ ansible_user }}/packer-windows/windows_server_20h2_docker/WindowsServer20H2Docker
+      creates: /home/{{ ansible_user }}/packer-windows/windows_server_20h2_docker
   - name: Run local docker repository
     community.docker.docker_container:
       name: registry
