@@ -4,8 +4,6 @@
 
 hostName: conan-ci
 
-user: conanci
-
 mysql:
   imageTag: 8.0.21
   mysqlRootPassword: secret

@@ -42,8 +42,6 @@ spec:
           value: {{ template "conan-ci.fullname" $ }}-linux-agent
         - name: CONANCI_WINDOWSAGENT_URL
           value: {{ template "conan-ci.fullname" $ }}-windows-agent
-        - name: CONANCI_USER
-          value: {{ $.Values.user }}
 {{- if .secretKey }}
         - name: SECRET_KEY
           value: {{ .secretKey }}
@@ -117,8 +115,6 @@ spec:
           value: {{ index $.Values "conan-server" "user" }}
         - name: CONAN_SERVER_PASSWORD
           value: {{ index $.Values "conan-server" "password" }}
-        - name: CONANCI_USER
-          value: {{ $.Values.user }}
         - name: DOCKER_HOST
           value: {{ template "conan-ci.fullname" $ }}-windows-docker-{{ .name }}:2375
 ---
