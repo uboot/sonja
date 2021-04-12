@@ -1124,6 +1124,7 @@ components:
             - id: "1"
               type: builds
         attributes:
+          message: Initial commit
           sha: 2777a37dc82e296d55c23f738b79f139e627920c
         id: "1"
         type: commits
@@ -1152,6 +1153,7 @@ components:
               - id: "1"
                 type: builds
           attributes:
+            message: Initial commit
             sha: 2777a37dc82e296d55c23f738b79f139e627920c
           id: "1"
           type: commits
@@ -1182,6 +1184,7 @@ components:
               - id: "1"
                 type: builds
           attributes:
+            message: Initial commit
             sha: 2777a37dc82e296d55c23f738b79f139e627920c
           id: "1"
           type: commits
@@ -1201,6 +1204,7 @@ components:
               - id: "1"
                 type: builds
           attributes:
+            message: Initial commit
             sha: 2777a37dc82e296d55c23f738b79f139e627920c
           id: "1"
           type: commits
@@ -1602,7 +1606,11 @@ components:
         sha:
           type: string
           example: 2777a37dc82e296d55c23f738b79f139e627920c
+        message:
+          type: string
+          example: Initial commit
       example:
+        message: Initial commit
         sha: 2777a37dc82e296d55c23f738b79f139e627920c
     Commit_relationships_repo_data:
       type: object

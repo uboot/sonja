@@ -43,6 +43,7 @@ def create_commit(parameters=dict()):
     commit.repo = create_repo(parameters)
     commit.channel = create_channel(parameters)
     commit.sha = "08979da6c039dd919292f7408785e2ad711b2fd5"
+    commit.message = "Initial commit\n\nVery long and verbose description"
     commit.status = parameters.get("commit.status", database.CommitStatus.new)
     return commit
 

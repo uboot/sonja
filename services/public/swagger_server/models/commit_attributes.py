@@ -14,20 +14,25 @@ class CommitAttributes(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, sha: str=None):  # noqa: E501
+    def __init__(self, sha: str=None, message: str=None):  # noqa: E501
         """CommitAttributes - a model defined in Swagger
 
         :param sha: The sha of this CommitAttributes.  # noqa: E501
         :type sha: str
+        :param message: The message of this CommitAttributes.  # noqa: E501
+        :type message: str
         """
         self.swagger_types = {
-            'sha': str
+            'sha': str,
+            'message': str
         }
 
         self.attribute_map = {
-            'sha': 'sha'
+            'sha': 'sha',
+            'message': 'message'
         }
         self._sha = sha
+        self._message = message
 
     @classmethod
     def from_dict(cls, dikt) -> 'CommitAttributes':
@@ -60,3 +65,24 @@ class CommitAttributes(Model):
         """
 
         self._sha = sha
+
+    @property
+    def message(self) -> str:
+        """Gets the message of this CommitAttributes.
+
+
+        :return: The message of this CommitAttributes.
+        :rtype: str
+        """
+        return self._message
+
+    @message.setter
+    def message(self, message: str):
+        """Sets the message of this CommitAttributes.
+
+
+        :param message: The message of this CommitAttributes.
+        :type message: str
+        """
+
+        self._message = message

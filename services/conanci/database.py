@@ -105,6 +105,7 @@ class Commit(Base):
     id = Column(Integer, primary_key=True)
     status = Column(Enum(CommitStatus), nullable=False)
     sha = Column(String(255), nullable=False)
+    message = Column(String(255))
     repo_id = Column(Integer, ForeignKey('repo.id'),
                         nullable=False)
     repo = relationship('Repo', backref='commits')

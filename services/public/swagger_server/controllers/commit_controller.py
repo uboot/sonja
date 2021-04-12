@@ -8,7 +8,8 @@ def __create_commit(record: database.Commit):
         id=record.id,
         type="commits",
         attributes=models.CommitAttributes(
-            sha=record.sha
+            sha=record.sha,
+            message=record.message
         ),
         relationships=models.CommitRelationships(
             repo=models.CommitRelationshipsRepo(

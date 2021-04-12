@@ -69,6 +69,15 @@ class RepoController(object):
         repo = git.Repo(self.repo_dir)
         return repo.head.commit.hexsha
 
+    def get_message(self):
+        repo = git.Repo(self.repo_dir)
+        message = repo.head.commit.message
+        if not len(message):
+            return ''
+
+        first_line = message.splitlines()[0]
+        return first_line[:255] if len(first_line) > 255 else first_line
+
 
 class Crawler(Worker):
     def __init__(self, scheduler):
@@ -114,6 +123,7 @@ class Crawler(Worker):
                             logger.info("Checkout branch '%s'", channel.branch)
                             controller.checkout(channel.branch)
                             sha = controller.get_sha()
+                            message = controller.get_message()
 
                             commits = session.query(database.Commit).filter_by(repo=repo,
                                 sha=sha, channel=channel)
@@ -126,6 +136,7 @@ class Crawler(Worker):
                             logger.info("Add commit '%s'", sha[:7])
                             commit = database.Commit()
                             commit.sha = sha
+                            commit.message = message
                             commit.repo = repo
                             commit.channel = channel
                             commit.status = database.CommitStatus.new
