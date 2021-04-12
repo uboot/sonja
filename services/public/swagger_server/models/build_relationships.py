@@ -7,6 +7,7 @@ from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
 from swagger_server.models.build_relationships_commit import BuildRelationshipsCommit  # noqa: F401,E501
+from swagger_server.models.build_relationships_log import BuildRelationshipsLog  # noqa: F401,E501
 from swagger_server.models.build_relationships_profile import BuildRelationshipsProfile  # noqa: F401,E501
 from swagger_server.models.repo_relationships_ecosystem import RepoRelationshipsEcosystem  # noqa: F401,E501
 from swagger_server import util
@@ -17,7 +18,7 @@ class BuildRelationships(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, ecosystem: RepoRelationshipsEcosystem=None, commit: BuildRelationshipsCommit=None, profile: BuildRelationshipsProfile=None):  # noqa: E501
+    def __init__(self, ecosystem: RepoRelationshipsEcosystem=None, commit: BuildRelationshipsCommit=None, profile: BuildRelationshipsProfile=None, log: BuildRelationshipsLog=None):  # noqa: E501
         """BuildRelationships - a model defined in Swagger
 
         :param ecosystem: The ecosystem of this BuildRelationships.  # noqa: E501
@@ -26,21 +27,26 @@ class BuildRelationships(Model):
         :type commit: BuildRelationshipsCommit
         :param profile: The profile of this BuildRelationships.  # noqa: E501
         :type profile: BuildRelationshipsProfile
+        :param log: The log of this BuildRelationships.  # noqa: E501
+        :type log: BuildRelationshipsLog
         """
         self.swagger_types = {
             'ecosystem': RepoRelationshipsEcosystem,
             'commit': BuildRelationshipsCommit,
-            'profile': BuildRelationshipsProfile
+            'profile': BuildRelationshipsProfile,
+            'log': BuildRelationshipsLog
         }
 
         self.attribute_map = {
             'ecosystem': 'ecosystem',
             'commit': 'commit',
-            'profile': 'profile'
+            'profile': 'profile',
+            'log': 'log'
         }
         self._ecosystem = ecosystem
         self._commit = commit
         self._profile = profile
+        self._log = log
 
     @classmethod
     def from_dict(cls, dikt) -> 'BuildRelationships':
@@ -115,3 +121,24 @@ class BuildRelationships(Model):
         """
 
         self._profile = profile
+
+    @property
+    def log(self) -> BuildRelationshipsLog:
+        """Gets the log of this BuildRelationships.
+
+
+        :return: The log of this BuildRelationships.
+        :rtype: BuildRelationshipsLog
+        """
+        return self._log
+
+    @log.setter
+    def log(self, log: BuildRelationshipsLog):
+        """Sets the log of this BuildRelationships.
+
+
+        :param log: The log of this BuildRelationships.
+        :type log: BuildRelationshipsLog
+        """
+
+        self._log = log

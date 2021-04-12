@@ -76,12 +76,19 @@ def create_profile(parameters=dict()):
     return profile
 
 
+def create_log(parameters=dict()):
+    log = database.Log()
+    log.logs = "Start build\nRun Build\nUpload..."
+    return log
+
+
 def create_build(parameters=dict()):
     build = database.Build()
     parameters["commit.status"] = database.CommitStatus.building
     build.commit = create_commit(parameters)
     build.profile = create_profile(parameters)
     build.status = database.BuildStatus.new
+    build.log = create_log(parameters)
     return build
 
 

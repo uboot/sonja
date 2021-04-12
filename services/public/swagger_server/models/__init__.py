@@ -11,6 +11,8 @@ from swagger_server.models.build_relationships import BuildRelationships
 from swagger_server.models.build_relationships_commit import BuildRelationshipsCommit
 from swagger_server.models.build_relationships_commit_data import BuildRelationshipsCommitData
 from swagger_server.models.build_relationships_profile import BuildRelationshipsProfile
+from swagger_server.models.build_relationships_log import BuildRelationshipsLog
+from swagger_server.models.build_relationships_log_data import BuildRelationshipsLogData
 from swagger_server.models.channel import Channel
 from swagger_server.models.channel_attributes import ChannelAttributes
 from swagger_server.models.channel_data import ChannelData
@@ -38,6 +40,9 @@ from swagger_server.models.ecosystem_relationships_profiles import EcosystemRela
 from swagger_server.models.ecosystem_relationships_profiles_data import EcosystemRelationshipsProfilesData
 from swagger_server.models.ecosystem_relationships_repos import EcosystemRelationshipsRepos
 from swagger_server.models.ecosystem_relationships_repos_links import EcosystemRelationshipsReposLinks
+from swagger_server.models.log import Log
+from swagger_server.models.log_attributes import LogAttributes
+from swagger_server.models.log_data import LogData
 from swagger_server.models.profile import Profile
 from swagger_server.models.profile_attributes import ProfileAttributes
 from swagger_server.models.profile_attributes_settings import ProfileAttributesSettings

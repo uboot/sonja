@@ -712,6 +712,33 @@ paths:
         "404":
           description: build not found
       x-openapi-router-controller: swagger_server.controllers.build_controller
+  /log/{logId}:
+    get:
+      tags:
+      - Log
+      summary: get a log
+      operationId: get_log
+      parameters:
+      - name: logId
+        in: path
+        description: log ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: log
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogData'
+        "400":
+          description: invalid ID supplied
+        "404":
+          description: log not found
+      x-openapi-router-controller: swagger_server.controllers.log_controller
 components:
   schemas:
     Credentials:
@@ -1229,6 +1256,10 @@ components:
             data:
               id: "1"
               type: ecosystems
+          log:
+            data:
+              id: "1"
+              type: logs
           profile:
             data:
               id: "1"
@@ -1255,6 +1286,10 @@ components:
               data:
                 id: "1"
                 type: ecosystems
+            log:
+              data:
+                id: "1"
+                type: logs
             profile:
               data:
                 id: "1"
@@ -1283,6 +1318,10 @@ components:
               data:
                 id: "1"
                 type: ecosystems
+            log:
+              data:
+                id: "1"
+                type: logs
             profile:
               data:
                 id: "1"
@@ -1300,6 +1339,10 @@ components:
               data:
                 id: "1"
                 type: ecosystems
+            log:
+              data:
+                id: "1"
+                type: logs
             profile:
               data:
                 id: "1"
@@ -1312,6 +1355,37 @@ components:
             status: new
           id: "1"
           type: builds
+    Log:
+      required:
+      - type
+      type: object
+      properties:
+        id:
+          type: string
+          example: "1"
+        type:
+          type: string
+          example: logs
+        attributes:
+          $ref: '#/components/schemas/Log_attributes'
+      example:
+        attributes:
+          logs: Start build\nRun Build\nUpload...
+        id: "1"
+        type: logs
+    LogData:
+      required:
+      - data
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Log'
+      example:
+        data:
+          attributes:
+            logs: Start build\nRun Build\nUpload...
+          id: "1"
+          type: logs
     Ecosystem_attributes:
       type: object
       properties:
@@ -1736,6 +1810,27 @@ components:
         data:
           id: "1"
           type: profiles
+    Build_relationships_log_data:
+      type: object
+      properties:
+        type:
+          type: string
+          example: logs
+        id:
+          type: string
+          example: "1"
+      example:
+        id: "1"
+        type: logs
+    Build_relationships_log:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Build_relationships_log_data'
+      example:
+        data:
+          id: "1"
+          type: logs
     Build_relationships:
       type: object
       properties:
@@ -1745,11 +1840,17 @@ components:
           $ref: '#/components/schemas/Build_relationships_commit'
         profile:
           $ref: '#/components/schemas/Build_relationships_profile'
+        log:
+          $ref: '#/components/schemas/Build_relationships_log'
       example:
         ecosystem:
           data:
             id: "1"
             type: ecosystems
+        log:
+          data:
+            id: "1"
+            type: logs
         profile:
           data:
             id: "1"
@@ -1758,6 +1859,14 @@ components:
           data:
             id: "1"
             type: commits
+    Log_attributes:
+      type: object
+      properties:
+        logs:
+          type: string
+          example: Start build\nRun Build\nUpload...
+      example:
+        logs: Start build\nRun Build\nUpload...
   securitySchemes:
     ApiKey:
       type: apiKey

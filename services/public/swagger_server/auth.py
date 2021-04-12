@@ -4,8 +4,8 @@ import os
 from flask_login import current_user, LoginManager, UserMixin
 
 
-master_password = os.environ.get('PASSWORD', None)
-secret_key = os.environ.get('SECRET_KEY', None)
+master_password = os.environ.get('PASSWORD', '')
+secret_key = os.environ.get('SECRET_KEY', 'MDAwMDAwMDAwMDAwMDAwMA==')
 
 
 class User(UserMixin):

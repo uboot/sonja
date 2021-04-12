@@ -40,6 +40,12 @@ def __create_build(record: database.Build):
                     id=record.profile_id,
                     type="profiles"
                 )
+            ),
+            log=models.BuildRelationshipsLog(
+                data=models.BuildRelationshipsLogData(
+                    id=record.log_id,
+                    type="logs"
+                )
             )
         )
     )

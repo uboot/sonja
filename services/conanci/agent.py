@@ -66,12 +66,13 @@ class Agent(Worker):
 
         try:
             with Builder(conanci_os, container) as builder:
+                logs = ''
                 builder_task = asyncio.create_task(self.__run_build(builder, parameters))
                 # while running the build check if the build is set to stopping
                 while True:
                     done, _ = await asyncio.wait({builder_task}, timeout=10)
                     if done:
-                        builder_task.result()
+                        logs = builder_task.result()
                         break
 
                     with database.session_scope() as session:
@@ -87,7 +88,7 @@ class Agent(Worker):
                             return True
 
                 logger.info("Set status of build '%d' to 'success'", self.__build_id)
-                self.__set_build_status(database.BuildStatus.success)
+                self.__set_build_status(database.BuildStatus.success, logs)
                 self.__build_id = None
         except Exception as e:
             logger.error(e)
@@ -104,7 +105,7 @@ class Agent(Worker):
         logger.info("Set status of build '%d' to 'new'", self.__build_id)
         self.__set_build_status(database.BuildStatus.new)
 
-    def __set_build_status(self, status):
+    def __set_build_status(self, status, logs=''):
         if not self.__build_id:
             return
 
@@ -113,7 +114,10 @@ class Agent(Worker):
                 .filter_by(id=self.__build_id) \
                 .first()
             if build:
+                log = database.Log()
+                log.logs = logs
                 build.status = status
+                build.log = log
                 self.__build_id = None
             else:
                 logger.error("Failed to find build '%d' in database", self.__build_id)
@@ -122,4 +126,4 @@ class Agent(Worker):
         loop = asyncio.get_running_loop()
         await loop.run_in_executor(None, builder.pull, parameters)
         await loop.run_in_executor(None, builder.setup, parameters)
-        await loop.run_in_executor(None, builder.run)
+        return await loop.run_in_executor(None, builder.run)

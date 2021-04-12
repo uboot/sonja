@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 from conanci.config import app, connect_to_database, setup_logging
-from conanci.database import populate_database
 from swagger_server import encoder, auth
 import os.path
 
@@ -13,7 +12,6 @@ def main():
     setup_logging()
     auth.setup_login(app.app)
     connect_to_database()
-    #populate_database()
     app.run(port=8080)
 
 if __name__ == '__main__':

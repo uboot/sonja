@@ -1,4 +1,5 @@
 from sqlalchemy import Boolean, create_engine, Column, Enum, ForeignKey, Integer, String, Table, Text
+from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref, relationship, sessionmaker
@@ -146,10 +147,19 @@ class Build(Base):
     package = relationship("Package", backref="builds")
     profile_id = Column(Integer, ForeignKey('profile.id'), nullable=False)
     profile = relationship("Profile")
+    log_id = Column(Integer, ForeignKey('log.id'))
+    log = relationship("Log")
     dependencies = relationship('Package', secondary=dependencies,
         backref=backref('dependencies'))
     missing = relationship('Pattern', secondary=missing,
         backref=backref('missing'))
+
+
+class Log(Base):
+    __tablename__ = 'log'
+
+    id = Column(Integer, primary_key=True)
+    logs = Column(LONGTEXT, nullable=False)
 
 
 class Package(Base):

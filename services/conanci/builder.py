@@ -106,6 +106,7 @@ class Builder(object):
                             .format(self.__container.short_id))
 
     def run(self):
+        lines = []
         with self.__cancel_lock:
             if self.__cancelled:
                 logger.info("Build was cancelled")
@@ -114,18 +115,22 @@ class Builder(object):
                         .format(self.__container.short_id))
             self.__container.start()
             self.__logs = self.__container.logs(stream=True, follow=True)
-        for line in self.__logs:
-            logger.info(line.decode("utf-8").strip("\n\r"))
+        for bytes in self.__logs:
+            line = bytes.decode("utf-8").strip("\n\r")
+            logger.info(line)
+            lines.append(line)
         with self.__cancel_lock:
             self.__logs = None
             if self.__cancelled:
                 logger.info("Build was cancelled")
-                return
+                return '\n'.join(lines)
 
         result = self.__container.wait()
         if result.get("StatusCode"):
             raise Exception("Build in container '{0}' failed with status '{1}'".format(
                             self.__container.short_id, result.get("StatusCode")))
+
+        return '\n'.join(lines)
 
     def cancel(self):
         with self.__cancel_lock:
