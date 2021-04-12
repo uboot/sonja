@@ -80,3 +80,21 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Create a daemon.json for Docker for Windows
+*/}}
+{{- define "conan-ci.daemonJson" -}}
+{
+    "hosts": ["tcp://0.0.0.0:2375", "npipe://"],
+    "insecure-registries": {{ $.Values.insecureRegistries | toJson }},
+    "mtu": {{ .Values.mtu | default 1500 }}
+}
+{{- end }}
+
+{{/*
+Create a Base64 encoded daemon.json for Docker for Windows
+*/}}
+{{- define "conan-ci.daemonJsonB64" -}}
+{{ include "conan-ci.daemonJson" . | b64enc }}
+{{- end }}

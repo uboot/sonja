@@ -32,6 +32,9 @@ spec:
           - name: windows-server
             disk:
               bus: virtio
+          - name: cloudinitdisk
+            cdrom:
+              bus: sata
       volumes:
 # https://kubevirt.io/user-guide/#/installation/image-upload
 # export VERSION=$(curl -s https://github.com/kubevirt/containerized-data-importer/releases/latest | grep -o "v[0-9]\.[0-9]*\.[0-9]*")
@@ -46,5 +49,16 @@ spec:
       - name: windows-server
         containerDisk:
           image: {{ $.Values.windows.image }}
+      - name: cloudinitdisk
+        cloudInitConfigDrive:
+          userData: |
+            #cloud-config
+            write_files:
+            - encoding: b64
+              content: {{ template "conan-ci.daemonJsonB64" $ }}
+              path: C:\ProgramData\Docker\config\daemon.json
+              permissions: '0644'
+            runcmd:
+            - 'powershell "Restart-Service docker"'
 ---
 {{- end }}

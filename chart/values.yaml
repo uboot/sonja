@@ -15,6 +15,9 @@ phpmyadmin:
   db:
     chartName: mysql
 
+mtu: 1450
+insecureRegistries: []
+
 services:
   - name: public
     pingUrl: /api/v1/ping

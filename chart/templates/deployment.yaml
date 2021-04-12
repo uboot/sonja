@@ -57,7 +57,16 @@ spec:
 {{- if .docker }}
       - name: docker
         image: docker:19.03.12-dind
-        command: ["dockerd", "--mtu", "1450", "-H", "tcp://"]
+        command: 
+        - "dockerd"
+        - "--mtu"
+        - {{ $.Values.mtu | quote }}
+{{- range $.Values.insecureRegistries }}
+        - "--insecure-registry"
+        - {{ . | quote }}
+{{- end }}
+        - "-H"
+        - "tcp://"
         securityContext:
           privileged: true
 {{- end }}
