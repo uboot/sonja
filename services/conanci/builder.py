@@ -8,6 +8,7 @@ import threading
 from conanci.config import logger
 from conanci.ssh import decode
 from io import BytesIO
+from queue import Empty, SimpleQueue
 
 
 docker_image_pattern = ("(([a-z0-9\\.-]+(:[0-9]+)?/)?"
@@ -51,9 +52,10 @@ class Builder(object):
         self.__image = image
         self.__build_os = build_os
         self.__container = None
-        self.__logs = None
+        self.__container_logs = None
         self.__cancel_lock = threading.Lock()
         self.__cancelled = False
+        self.__logs = SimpleQueue()
 
     def __enter__(self):
         return self
@@ -106,7 +108,6 @@ class Builder(object):
                             .format(self.__container.short_id))
 
     def run(self):
-        lines = []
         with self.__cancel_lock:
             if self.__cancelled:
                 logger.info("Build was cancelled")
@@ -114,31 +115,29 @@ class Builder(object):
             logger.info("Start build in container '{0}'" \
                         .format(self.__container.short_id))
             self.__container.start()
-            self.__logs = self.__container.logs(stream=True, follow=True)
-        for bytes in self.__logs:
-            line = bytes.decode("utf-8").strip("\n\r")
+            self.__container_logs = self.__container.logs(stream=True, follow=True)
+        for bytes in self.__container_logs:
+            line = bytes.decode("utf-8").strip('\n\r')
             logger.info(line)
-            lines.append(line)
+            self.__logs.put(line)
         with self.__cancel_lock:
-            self.__logs = None
+            self.__container_logs = None
             if self.__cancelled:
                 logger.info("Build was cancelled")
-                return '\n'.join(lines)
+                return
 
         result = self.__container.wait()
         if result.get("StatusCode"):
             raise Exception("Build in container '{0}' failed with status '{1}'".format(
                             self.__container.short_id, result.get("StatusCode")))
 
-        return '\n'.join(lines)
-
     def cancel(self):
         with self.__cancel_lock:
             logger.info("Cancel build")
             self.__cancelled = True
-            if self.__logs:
+            if self.__container_logs:
                 logger.info("Close logs")
-                self.__logs.close()
+                self.__container_logs.close()
 
     def __exit__(self, type, value, traceback):
         if not self.__container:
@@ -154,4 +153,11 @@ class Builder(object):
             logger.info("Remove docker container '%s'", self.__container.short_id)
             self.__container.remove()
         except docker.errors.APIError:
+            pass
+
+    def get_log_lines(self):
+        try:
+            while True:
+                yield self.__logs.get_nowait()
+        except Empty:
             pass

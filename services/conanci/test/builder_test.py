@@ -94,8 +94,9 @@ class BuilderTest(unittest.TestCase):
         with environment("DOCKER_HOST", docker_host), Builder("Linux", "uboot/gcc9:latest") as builder:
             builder.pull(parameters)
             builder.setup(parameters)
-            logs = builder.run()
-            self.assertIsNot(logs, "")
+            builder.run()
+            logs = [line for line in builder.get_log_lines()]
+            self.assertGreater(len(logs), 0)
 
     def test_cancel_linux_immediately(self):
         docker_host = os.environ.get("LINUX_DOCKER_HOST", "")
@@ -125,8 +126,7 @@ class BuilderTest(unittest.TestCase):
         with environment("DOCKER_HOST", docker_host), Builder("Windows", "uboot/msvc15:latest") as builder:
             builder.pull(parameters)
             builder.setup(parameters)
-            logs = builder.run()
-            self.assertIsNot(logs, "")
+            builder.run()
 
     def test_cancel_windows(self):
         docker_host = os.environ.get("WINDOWS_DOCKER_HOST", "")
