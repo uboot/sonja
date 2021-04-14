@@ -25,8 +25,13 @@ def generate_rsa_key():
 
 
 def encode(raw):
+    if not raw:
+        return ""
     return str(base64.b64encode(raw.encode("utf-8")), "utf-8")
 
 
 def decode(encoded):
+    if not encoded:
+        return ""
+
     return str(base64.b64decode(encoded), "utf-8")

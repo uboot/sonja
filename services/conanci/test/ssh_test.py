@@ -12,5 +12,11 @@ class SshTest(unittest.TestCase):
     def test_encode(self):
         self.assertEqual("aGVsbG8=", ssh.encode("hello"))
 
+    def test_encode_none(self):
+        self.assertEqual("", ssh.encode(None))
+
     def test_decode(self):
         self.assertEqual("hello", ssh.decode("aGVsbG8="))
+
+    def test_decode_none(self):
+        self.assertEqual("", ssh.decode(None))
