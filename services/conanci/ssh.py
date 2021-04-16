@@ -6,7 +6,6 @@ from cryptography.hazmat.primitives import serialization
 
 
 def generate_rsa_key():
-    # return ("abc", "123")
     key = rsa.generate_private_key(
         public_exponent=65537,
         key_size=4096,
