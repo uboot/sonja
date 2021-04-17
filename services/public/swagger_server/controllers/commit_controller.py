@@ -9,7 +9,9 @@ def __create_commit(record: database.Commit):
         type="commits",
         attributes=models.CommitAttributes(
             sha=record.sha,
-            message=record.message
+            message=record.message,
+            user_name=record.user_name,
+            user_email=record.user_email
         ),
         relationships=models.CommitRelationships(
             repo=models.CommitRelationshipsRepo(

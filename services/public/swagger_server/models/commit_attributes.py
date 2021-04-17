@@ -14,25 +14,35 @@ class CommitAttributes(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, sha: str=None, message: str=None):  # noqa: E501
+    def __init__(self, sha: str=None, message: str=None, user_name: str=None, user_email: str=None):  # noqa: E501
         """CommitAttributes - a model defined in Swagger
 
         :param sha: The sha of this CommitAttributes.  # noqa: E501
         :type sha: str
         :param message: The message of this CommitAttributes.  # noqa: E501
         :type message: str
+        :param user_name: The user_name of this CommitAttributes.  # noqa: E501
+        :type user_name: str
+        :param user_email: The user_email of this CommitAttributes.  # noqa: E501
+        :type user_email: str
         """
         self.swagger_types = {
             'sha': str,
-            'message': str
+            'message': str,
+            'user_name': str,
+            'user_email': str
         }
 
         self.attribute_map = {
             'sha': 'sha',
-            'message': 'message'
+            'message': 'message',
+            'user_name': 'user-name',
+            'user_email': 'user-email'
         }
         self._sha = sha
         self._message = message
+        self._user_name = user_name
+        self._user_email = user_email
 
     @classmethod
     def from_dict(cls, dikt) -> 'CommitAttributes':
@@ -86,3 +96,45 @@ class CommitAttributes(Model):
         """
 
         self._message = message
+
+    @property
+    def user_name(self) -> str:
+        """Gets the user_name of this CommitAttributes.
+
+
+        :return: The user_name of this CommitAttributes.
+        :rtype: str
+        """
+        return self._user_name
+
+    @user_name.setter
+    def user_name(self, user_name: str):
+        """Sets the user_name of this CommitAttributes.
+
+
+        :param user_name: The user_name of this CommitAttributes.
+        :type user_name: str
+        """
+
+        self._user_name = user_name
+
+    @property
+    def user_email(self) -> str:
+        """Gets the user_email of this CommitAttributes.
+
+
+        :return: The user_email of this CommitAttributes.
+        :rtype: str
+        """
+        return self._user_email
+
+    @user_email.setter
+    def user_email(self, user_email: str):
+        """Sets the user_email of this CommitAttributes.
+
+
+        :param user_email: The user_email of this CommitAttributes.
+        :type user_email: str
+        """
+
+        self._user_email = user_email

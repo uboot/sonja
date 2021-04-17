@@ -29,6 +29,20 @@ engine = create_engine(connection_string, echo=False)
 Session = sessionmaker(engine)
 
 
+@contextmanager
+def session_scope():
+    """Provide a transactional scope around a series of operations."""
+    session = Session()
+    try:
+        yield session
+        session.commit()
+    except:
+        session.rollback()
+        raise
+    finally:
+        session.close()
+
+
 class Ecosystem(Base):
     __tablename__ = 'ecosystem'
 
@@ -107,6 +121,8 @@ class Commit(Base):
     status = Column(Enum(CommitStatus), nullable=False)
     sha = Column(String(255), nullable=False)
     message = Column(String(255))
+    user_name = Column(String(255))
+    user_email = Column(String(255))
     repo_id = Column(Integer, ForeignKey('repo.id'),
                         nullable=False)
     repo = relationship('Repo', backref='commits')
@@ -178,20 +194,6 @@ class Pattern(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(255), nullable=False)
     version = Column(String(255), nullable=False)
-
-
-@contextmanager
-def session_scope():
-    """Provide a transactional scope around a series of operations."""
-    session = Session()
-    try:
-        yield session
-        session.commit()
-    except:
-        session.rollback()
-        raise
-    finally:
-        session.close()
 
 
 def reset_database():

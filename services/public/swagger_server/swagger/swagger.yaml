@@ -1151,6 +1151,8 @@ components:
             - id: "1"
               type: builds
         attributes:
+          user-email: joe.smith@acme.com
+          user-name: Joe Smith
           message: Initial commit
           sha: 2777a37dc82e296d55c23f738b79f139e627920c
         id: "1"
@@ -1180,6 +1182,8 @@ components:
               - id: "1"
                 type: builds
           attributes:
+            user-email: joe.smith@acme.com
+            user-name: Joe Smith
             message: Initial commit
             sha: 2777a37dc82e296d55c23f738b79f139e627920c
           id: "1"
@@ -1211,6 +1215,8 @@ components:
               - id: "1"
                 type: builds
           attributes:
+            user-email: joe.smith@acme.com
+            user-name: Joe Smith
             message: Initial commit
             sha: 2777a37dc82e296d55c23f738b79f139e627920c
           id: "1"
@@ -1231,6 +1237,8 @@ components:
               - id: "1"
                 type: builds
           attributes:
+            user-email: joe.smith@acme.com
+            user-name: Joe Smith
             message: Initial commit
             sha: 2777a37dc82e296d55c23f738b79f139e627920c
           id: "1"
@@ -1683,7 +1691,15 @@ components:
         message:
           type: string
           example: Initial commit
+        user-name:
+          type: string
+          example: Joe Smith
+        user-email:
+          type: string
+          example: joe.smith@acme.com
       example:
+        user-email: joe.smith@acme.com
+        user-name: Joe Smith
         message: Initial commit
         sha: 2777a37dc82e296d55c23f738b79f139e627920c
     Commit_relationships_repo_data:
