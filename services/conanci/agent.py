@@ -62,6 +62,7 @@ class Agent(Worker):
                 "conan_verify_ssl": build.profile.ecosystem.conan_verify_ssl,
                 "conan_user": build.profile.ecosystem.conan_user,
                 "conan_password": build.profile.ecosystem.conan_password,
+                "conan_settings": build.profile.ecosystem.settings,
                 "git_url": build.commit.repo.url,
                 "git_sha": build.commit.sha,
                 "conanci_user": build.profile.ecosystem.user,

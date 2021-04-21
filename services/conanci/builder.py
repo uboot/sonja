@@ -22,7 +22,7 @@ def add_content_to_tar(tar, file_name, text_data):
     tar.addfile(tarinfo, content)
 
 
-def create_build_tar(build_os, parameters):
+def create_build_tar(build_os: str, parameters: dict):
     if build_os == "Linux":
         script_template_name = "build.sh.in"
     else:
@@ -41,6 +41,8 @@ def create_build_tar(build_os, parameters):
     add_content_to_tar(tar, script_name, script)
     add_content_to_tar(tar, "id_rsa", decode(parameters["ssh_key"]))
     add_content_to_tar(tar, "known_hosts", decode(parameters["known_hosts"]))
+    if "conan_settings" in parameters.keys() and parameters["conan_settings"]:
+        add_content_to_tar(tar, "settings.yml", decode(parameters["conan_settings"]))
     tar.close()
     f.seek(0)
     return f

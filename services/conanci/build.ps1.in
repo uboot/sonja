@@ -1,6 +1,5 @@
 function ThrowOnNonZero {
-    if (-not $$?)
-    {
+    if (-not $$?) {
         throw 'Last command failed'
     }
 }
@@ -14,9 +13,15 @@ $$adapters | ForEach-Object({
 echo '### Setup SSH ###'
 mkdir -p "$$env:userprofile\.ssh"; ThrowOnNonZero
 Copy-Item "C:\id_rsa" -Destination "$$env:userprofile\.ssh"; ThrowOnNonZero
-Copy-Item C:\known_hosts -Destination "$$env:userprofile\.ssh"; ThrowOnNonZero
+Copy-Item "C:\known_hosts" -Destination "$$env:userprofile\.ssh"; ThrowOnNonZero
 
 echo '### Setup Conan ###'
+if (Test-Path -Path "C:\settings.yml" -PathType Leaf) {
+    echo '# Copy Conan settings'
+    mkdir -p "$$env:userprofile\.conan"; ThrowOnNonZero
+    Copy-Item "C:\settings.yml" -Destination "$$env:userprofile\.conan"; ThrowOnNonZero
+}
+
 echo '# Clean remotes'
 conan remote clean; ThrowOnNonZero
 

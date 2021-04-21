@@ -8,6 +8,12 @@ chmod 600 ~/.ssh/id_rsa
 cp /known_hosts ~/.ssh
 
 echo '### Setup Conan ###'
+if [ -f '/settings.yml' ]; then
+    echo '# Copy Conan settings'
+    mkdir -p ~/.conan
+    cp /settings.yml ~/.conan
+fi
+
 echo '# Clean remotes'
 conan remote clean
 

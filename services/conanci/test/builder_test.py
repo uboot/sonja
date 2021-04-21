@@ -1,5 +1,6 @@
 from conanci.builder import Builder
 
+import base64
 import os
 import time
 import threading
@@ -27,6 +28,10 @@ known_hosts = ("Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVB
                "bWJVb1dmOW56cElvYVNqQit3ZXFxVVVtcGFhYXNYVmFsNzJKK1VYMkIrMlJQVzNSY1QwZU96UWdxbEpMM1JLc"
                "lRKdmRzakUzSkVBdkdxM2xHSFNaWHkyOEczc2t1YTJTbVZpL3c0eUNFNmdiT0RxblRXbGc3K3dDNjA0eWRHWE"
                "E4VkppUzVhcDQzSlhpVUZGQWFRPT0K")
+
+conan_settings_file = os.path.join(os.path.dirname(__file__), "conan_settings.yml")
+with open(conan_settings_file) as f:
+    conan_settings = str(base64.b64encode(f.read().encode("utf-8")), "utf-8")
 
 @contextmanager
 def environment(key, value):
@@ -57,6 +62,7 @@ def get_linux_build_parameters():
         "conan_verify_ssl": "True",
         "conan_user": "demo",
         "conan_password": "demo",
+        "conan_settings": conan_settings,
         "git_url": "git@github.com:uboot/conan-ci.git",
         "git_sha": "08979da6c039dd919292f7408785e2ad711b2fd5",
         "conanci_user": "conanci",
@@ -75,6 +81,7 @@ def get_windows_build_parameters():
         "conan_verify_ssl": "True",
         "conan_user": "demo",
         "conan_password": "demo",
+        "conan_settings": conan_settings,
         "git_url": "git@github.com:uboot/conan-ci.git",
         "git_sha": "ca8ac0c42b0487a160ef3ac8200de0053b27716c",
         "conanci_user": "conanci",
