@@ -64,7 +64,8 @@ def create_profile(parameters=dict()):
         profile.container = "uboot/gcc9:latest"
         profile.settings = [
             database.Setting("os", "Linux"),
-            database.Setting("build_type", "Release")
+            database.Setting("build_type", "Debug"),
+            database.Setting("compiler.libcxx", "libstdc++11")
         ]
     else:
         profile.name = "MSVC 15"

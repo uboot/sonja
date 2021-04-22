@@ -13,10 +13,11 @@ from queue import Empty, SimpleQueue
 
 docker_image_pattern = ("(([a-z0-9\\.-]+(:[0-9]+)?/)?"
                         "[a-z0-9\\.-/]+)[:@]([a-z0-9\\.-]+)$")
+build_package_dir = "conan_build_package"
 
 
 def add_content_to_tar(tar, file_name, text_data):
-    tarinfo = tarfile.TarInfo(file_name)
+    tarinfo = tarfile.TarInfo("{0}/{1}".format(build_package_dir, file_name))
     content = BytesIO(bytes(text_data, "utf-8"))
     tarinfo.size = len(content.getbuffer())
     tar.addfile(tarinfo, content)
@@ -33,7 +34,7 @@ def create_build_tar(build_os: str, parameters: dict):
     setup_file_path = os.path.join(os.path.dirname(__file__), script_template_name)
     with open(setup_file_path) as setup_template_file:
         template = string.Template(setup_template_file.read())
-    script = template.substitute(parameters)
+    script = template.substitute({**parameters, "build_package_dir": build_package_dir})
 
     # place into archive
     f = BytesIO()
@@ -92,9 +93,9 @@ class Builder(object):
         # build_tar.seek(0)
 
         if self.__build_os == "Linux":
-            command = "sh /build.sh"
+            command = "sh /{0}/build.sh".format(build_package_dir)
         else:
-            command = 'cmd /s /c "powershell -File C:\\build.ps1"'
+            command = 'cmd /s /c "powershell -File C:\\{0}\\build.ps1"'.format(build_package_dir)
 
         self.__container = self.__client.containers.create(image=self.__image,
                                                            command=command)

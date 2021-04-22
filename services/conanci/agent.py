@@ -66,6 +66,8 @@ class Agent(Worker):
                 "git_url": build.commit.repo.url,
                 "git_sha": build.commit.sha,
                 "conanci_user": build.profile.ecosystem.user,
+                "conan_args": " ".join(["-s {0}={1}".format(setting.key, setting.value)
+                                        for setting in build.profile.settings]),
                 "channel": build.commit.channel.name,
                 "path": os.path.join(build.commit.repo.path, "conanfile.py")
                         if build.commit.repo.path != "" else "conanfile.py",

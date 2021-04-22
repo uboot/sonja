@@ -3,15 +3,15 @@ set -e
 
 echo '### Setup SSH ###'
 mkdir -p ~/.ssh
-cp /id_rsa ~/.ssh
+cp /$build_package_dir/id_rsa ~/.ssh
 chmod 600 ~/.ssh/id_rsa
-cp /known_hosts ~/.ssh
+cp /$build_package_dir/known_hosts ~/.ssh
 
 echo '### Setup Conan ###'
-if [ -f '/settings.yml' ]; then
+mkdir -p ~/.conan
+if [ -f '/$build_package_dir/settings.yml' ]; then
     echo '# Copy Conan settings'
-    mkdir -p ~/.conan
-    cp /settings.yml ~/.conan
+    cp /$build_package_dir/settings.yml ~/.conan
 fi
 
 echo '# Clean remotes'
@@ -37,5 +37,5 @@ git checkout FETCH_HEAD
 echo '### Build package ###'
 package_name=$$(conan inspect --raw name $path)
 package_version=$$(conan inspect --raw version $path)
-conan create $path @$conanci_user/$channel
+conan create $conan_args $path @$conanci_user/$channel
 conan upload $$package_name/$$package_version@$conanci_user/$channel --all --confirm -r server
