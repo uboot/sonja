@@ -134,9 +134,13 @@ class Crawler(Worker):
 
                     branches = controller.get_remote_branches()
                     for channel in channels:
-                        if channel.branch in branches:
-                            logger.info("Checkout branch '%s'", channel.branch)
-                            controller.checkout(channel.branch)
+                        for branch in branches:
+                            if not re.fullmatch(channel.branch, branch):
+                                continue
+
+                            logger.info("Branch '%s' matches '%s'", branch, channel.branch)
+                            logger.info("Checkout branch '%s'", branch)
+                            controller.checkout(branch)
                             sha = controller.get_sha()
 
                             commits = session.query(database.Commit).filter_by(repo=repo,
