@@ -7,46 +7,54 @@ import threading
 
 from conanci.config import logger
 from conanci.ssh import decode
-from io import BytesIO
+from io import BytesIO, FileIO
 from queue import Empty, SimpleQueue
 
 
 docker_image_pattern = ("(([a-z0-9\\.-]+(:[0-9]+)?/)?"
                         "[a-z0-9\\.-/]+)[:@]([a-z0-9\\.-]+)$")
-build_package_dir = "conan_build_package"
+build_package_dir_name = "conan_build_package"
+build_output_dir_name = "conan_output"
 
 
-def add_content_to_tar(tar, file_name, text_data):
-    tarinfo = tarfile.TarInfo("{0}/{1}".format(build_package_dir, file_name))
-    content = BytesIO(bytes(text_data, "utf-8"))
-    tarinfo.size = len(content.getbuffer())
-    tar.addfile(tarinfo, content)
+def create_build_tar(script_template_name: str, parameters: dict):
 
+    def add_content(tar_archive, file_name, text_data):
+        tar_info = tarfile.TarInfo("{0}/{1}".format(build_package_dir_name, file_name))
+        content = BytesIO(bytes(text_data, "utf-8"))
+        tar_info.size = len(content.getbuffer())
+        tar_archive.addfile(tar_info, content)
 
-def create_build_tar(build_os: str, parameters: dict):
-    if build_os == "Linux":
-        script_template_name = "build.sh.in"
-    else:
-        script_template_name = "build.ps1.in"
-    script_name = script_template_name[:-3]
-
-    # read and configure build script
     setup_file_path = os.path.join(os.path.dirname(__file__), script_template_name)
     with open(setup_file_path) as setup_template_file:
         template = string.Template(setup_template_file.read())
-    script = template.substitute({**parameters, "build_package_dir": build_package_dir})
+    script = template.substitute(parameters)
 
     # place into archive
     f = BytesIO()
     tar = tarfile.open(mode="w", fileobj=f, dereference=True)
-    add_content_to_tar(tar, script_name, script)
-    add_content_to_tar(tar, "id_rsa", decode(parameters["ssh_key"]))
-    add_content_to_tar(tar, "known_hosts", decode(parameters["known_hosts"]))
+    script_name = script_template_name[:-3]
+    add_content(tar, script_name, script)
+    add_content(tar, "id_rsa", decode(parameters["ssh_key"]))
+    add_content(tar, "known_hosts", decode(parameters["known_hosts"]))
     if "conan_settings" in parameters.keys() and parameters["conan_settings"]:
-        add_content_to_tar(tar, "settings.yml", decode(parameters["conan_settings"]))
+        add_content(tar, "settings.yml", decode(parameters["conan_settings"]))
     tar.close()
     f.seek(0)
     return f
+
+
+def extract_output_tar(data: FileIO):
+    f = BytesIO()
+    for bytes in data:
+        f.write(bytes)
+    f.seek(0)
+    tar = tarfile.open(fileobj=f)
+    try:
+        output = tar.extractfile("{0}/create.json".format(build_output_dir_name))
+        return str(output.read(), "utf-8")
+    except KeyError:
+        return ""
 
 
 class Builder(object):
@@ -59,9 +67,52 @@ class Builder(object):
         self.__cancel_lock = threading.Lock()
         self.__cancelled = False
         self.__logs = SimpleQueue()
+        self.build_output = ""
 
     def __enter__(self):
         return self
+
+    @property
+    def script_template(self):
+        if self.__build_os == "Linux":
+            return "build.sh.in"
+        else:
+            return "build.ps1.in"
+
+    @property
+    def build_package_dir(self):
+        if self.__build_os == "Linux":
+            return "/{0}".format(build_package_dir_name)
+        else:
+            return "C:\\{0}".format(build_package_dir_name)
+
+    @property
+    def build_package_dir(self):
+        if self.__build_os == "Linux":
+            return "/{0}".format(build_package_dir_name)
+        else:
+            return "C:\\{0}".format(build_package_dir_name)
+
+    @property
+    def root_dir(self):
+        if self.__build_os == "Linux":
+            return "/"
+        else:
+            return "C:\\"
+
+    @property
+    def build_output_dir(self):
+        if self.__build_os == "Linux":
+            return "/tmp/{0}".format(build_output_dir_name)
+        else:
+            return "C:\\{0}".format(build_output_dir_name)
+
+    @property
+    def build_command(self):
+        if self.__build_os == "Linux":
+            return "sh {0}/build.sh".format(self.build_package_dir)
+        else:
+            return 'cmd /s /c "powershell -File {0}\\build.ps1"'.format(self.build_package_dir)
 
     def pull(self, parameters):
         m = re.match(docker_image_pattern, self.__image)
@@ -86,29 +137,26 @@ class Builder(object):
 
     def setup(self, parameters):
         logger.info("Setup docker container")
-        build_tar = create_build_tar(self.__build_os, parameters)
 
         # with open("build.tar", "wb") as f:
         #     f.write(build_tar.read())
         # build_tar.seek(0)
 
-        if self.__build_os == "Linux":
-            command = "sh /{0}/build.sh".format(build_package_dir)
-        else:
-            command = 'cmd /s /c "powershell -File C:\\{0}\\build.ps1"'.format(build_package_dir)
-
         self.__container = self.__client.containers.create(image=self.__image,
-                                                           command=command)
+                                                           command=self.build_command)
         logger.info("Created docker container '%s'", self.__container.short_id)
 
-        if self.__build_os == "Linux":
-            build_data_dir = "/"
-        else:
-            build_data_dir = "C:\\"
-        result = self.__container.put_archive(build_data_dir, data=build_tar)
+        patched_parameters = {
+            **parameters,
+            "build_package_dir": self.build_package_dir,
+            "build_output_dir": self.build_output_dir
+        }
+        build_tar = create_build_tar(self.script_template, patched_parameters)
+        result = self.__container.put_archive(self.root_dir, data=build_tar)
         if not result:
             raise Exception("Failed to copy build files to container '{0}'"\
                             .format(self.__container.short_id))
+        logger.info("Copied build files to container '%s'", self.__container.short_id)
 
     def run(self):
         with self.__cancel_lock:
@@ -130,6 +178,13 @@ class Builder(object):
                 return
 
         result = self.__container.wait()
+
+        try:
+            data, _ = self.__container.get_archive(self.build_output_dir)
+            self.build_output = extract_output_tar(data)
+        except docker.errors.APIError:
+            logger.error("Failed to obtain build output from container '%s'", self.__container.short_id)
+
         if result.get("StatusCode"):
             raise Exception("Build in container '{0}' failed with status '{1}'".format(
                             self.__container.short_id, result.get("StatusCode")))
@@ -152,7 +207,7 @@ class Builder(object):
         except docker.errors.APIError:
             pass
 
-        try:
+        try: 
             logger.info("Remove docker container '%s'", self.__container.short_id)
             self.__container.remove()
         except docker.errors.APIError:
