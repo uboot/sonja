@@ -167,8 +167,8 @@ class Builder(object):
                         .format(self.__container.short_id))
             self.__container.start()
             self.__container_logs = self.__container.logs(stream=True, follow=True)
-        for bytes in self.__container_logs:
-            line = bytes.decode("utf-8").strip('\n\r')
+        for byte_data in self.__container_logs:
+            line = byte_data.decode("utf-8").strip('\n\r')
             logger.info(line)
             self.__logs.put(line)
         with self.__cancel_lock:

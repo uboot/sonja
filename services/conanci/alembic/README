@@ -1,1 +1,6 @@
 Generic single-database configuration.
+
+Create a new revision:
+```
+alembic revision -m "some message"
+```

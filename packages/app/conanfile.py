@@ -1,8 +1,8 @@
 from conans import ConanFile, CMake, tools
 
 
-class DependencyConan(ConanFile):
-    name = "dependency"
+class AppConan(ConanFile):
+    name = "app"
     version = "1.2.3"
     license = "<Put the package license here>"
     author = "<Put your name here> <And your email here>"

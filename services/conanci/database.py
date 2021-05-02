@@ -91,7 +91,7 @@ class Profile(Base):
     docker_user = Column(String(255))
     docker_password = Column(String(255))
     settings = relationship('Setting', backref='profile', lazy=True,
-                               cascade="all, delete, delete-orphan")
+                            cascade="all, delete, delete-orphan")
 
 
 class Setting(Base):
@@ -100,8 +100,7 @@ class Setting(Base):
     id = Column(Integer, primary_key=True)
     key = Column(String(255), nullable=False)
     value = Column(String(255), nullable=False)
-    profile_id = Column(Integer, ForeignKey('profile.id'),
-                           nullable=False)
+    profile_id = Column(Integer, ForeignKey('profile.id'), nullable=False)
 
     def __init__(self, key, value):
         self.key = key
@@ -123,11 +122,9 @@ class Commit(Base):
     message = Column(String(255))
     user_name = Column(String(255))
     user_email = Column(String(255))
-    repo_id = Column(Integer, ForeignKey('repo.id'),
-                        nullable=False)
+    repo_id = Column(Integer, ForeignKey('repo.id'), nullable=False)
     repo = relationship('Repo', backref='commits')
-    channel_id = Column(Integer, ForeignKey('channel.id'),
-                           nullable=False)
+    channel_id = Column(Integer, ForeignKey('channel.id'), nullable=False)
     channel = relationship('Channel', backref='commits')
 
 
@@ -140,14 +137,15 @@ class BuildStatus(enum.Enum):
     stopped = 6
 
 
-dependencies = Table('dependencies', Base.metadata,
-    Column('package_id', Integer, ForeignKey('package.id'), primary_key=True),
-    Column('build_id', Integer, ForeignKey('build.id'), primary_key=True)
+missing_recipe = Table('missing_recipe', Base.metadata,
+    Column('build_id', Integer, ForeignKey('build.id'), primary_key=True),
+    Column('recipe_id', Integer, ForeignKey('recipe.id'), primary_key=True)
 )
 
-missing = Table('missing', Base.metadata,
-    Column('pattern_id', Integer, ForeignKey('pattern.id'), primary_key=True),
-    Column('build_id', Integer, ForeignKey('build.id'), primary_key=True)
+
+missing_package = Table('missing_package', Base.metadata,
+    Column('build_id', Integer, ForeignKey('build.id'), primary_key=True),
+    Column('package_id', Integer, ForeignKey('package.id'), primary_key=True)
 )
 
 
@@ -165,10 +163,10 @@ class Build(Base):
     profile = relationship("Profile")
     log_id = Column(Integer, ForeignKey('log.id'))
     log = relationship("Log")
-    dependencies = relationship('Package', secondary=dependencies,
-        backref=backref('dependencies'))
-    missing = relationship('Pattern', secondary=missing,
-        backref=backref('missing'))
+    missing_recipes = relationship('Recipe', secondary=missing_recipe,
+        backref=backref('built_by'))
+    missing_packages = relationship('Package', secondary=missing_package,
+        backref=backref('built_by'))
 
 
 class Log(Base):
@@ -178,22 +176,35 @@ class Log(Base):
     logs = Column(LONGTEXT, nullable=False)
 
 
+class Recipe(Base):
+    __tablename__ = 'recipe'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(255), nullable=False)
+    version = Column(String(255), nullable=False)
+    user = Column(String(255), nullable=False)
+    channel = Column(String(255), nullable=False)
+    revision = Column(String(255), nullable=False)
+
+
+package_requirement = Table('package_requirement', Base.metadata,
+    Column('package_id', Integer, ForeignKey('package.id'), primary_key=True),
+    Column('requirement_id', Integer, ForeignKey('package.id'), primary_key=True)
+)
+
+
 class Package(Base):
     __tablename__ = 'package'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String(255), nullable=False)
-    version = Column(String(255), nullable=False)
-    recipe_revision = Column(String(255), nullable=False)
-    package_revision = Column(String(255), nullable=False)
-    
-
-class Pattern(Base):
-    __tablename__ = 'pattern'
-
-    id = Column(Integer, primary_key=True)
-    name = Column(String(255), nullable=False)
-    version = Column(String(255), nullable=False)
+    package_id = Column(String(255), nullable=False)
+    recipe_id = Column(Integer, ForeignKey('recipe.id'),
+                       nullable=False)
+    recipe = relationship('Recipe', backref='packages')
+    requires = relationship('Package', secondary=package_requirement,
+                            primaryjoin=package_requirement.c.package_id == id,
+                            secondaryjoin=package_requirement.c.requirement_id == id,
+                            backref='required_by')
 
 
 def reset_database():
@@ -275,6 +286,9 @@ def clear_database():
 
 def clear_ecosystems():
     with session_scope() as session:
+        session.query(Package).delete()
+        session.query(Recipe).delete()
+        session.query(Log).delete()
         session.query(Build).delete()
         session.query(Commit).delete()
         session.query(Channel).delete()
