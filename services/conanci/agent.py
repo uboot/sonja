@@ -1,4 +1,4 @@
-from conanci import database
+from conanci import database, manager
 from conanci.builder import Builder
 from conanci.config import connect_to_database, logger
 from conanci.worker import Worker
@@ -94,6 +94,9 @@ class Agent(Worker):
                     # if necessary
                     if self.__cancel_stopping_build(builder):
                         return True
+
+                logger.info("Process build output")
+                manager.process(self.__build_id, builder.build_output)
 
                 logger.info("Set status of build '%d' to 'success'", self.__build_id)
                 self.__set_build_status(database.BuildStatus.success)

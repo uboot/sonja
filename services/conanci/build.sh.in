@@ -38,5 +38,10 @@ echo '### Build package ###'
 mkdir -p $build_output_dir
 package_name=$$(conan inspect --raw name $path)
 package_version=$$(conan inspect --raw version $path)
+
+echo '### Collect package data ###'
 conan create $conan_args --json $build_output_dir/create.json $path @$conanci_user/$channel
+conan info $conan_args --json $build_output_dir/info.json $path
+
+echo '### Upload package ###'
 conan upload $$package_name/$$package_version@$conanci_user/$channel --all --confirm -r server

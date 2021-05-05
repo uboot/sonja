@@ -12,6 +12,7 @@ class HelloConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [True, False]}
     default_options = {"shared": False}
+    requires = ("base/1.2.3@mycompany/stable")
     generators = "cmake"
     revision_mode = "scm"
 

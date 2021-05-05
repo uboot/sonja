@@ -94,26 +94,18 @@ def create_build(parameters=dict()):
 
 
 def create_recipe(parameters=dict()):
-    hello = database.Recipe()
-    hello.name = parameters.get("recipe.name", "hello")
-    hello.version = "1.2.3"
-    hello.user = "conanci"
-    hello.channel = "stable"
-    hello.revision = "08979da6c039dd919292f7408785e2ad711b2fd5"
-
-    return hello
+    recipe = database.Recipe()
+    recipe.name = parameters.get("recipe.name", "app")
+    recipe.version = "1.2.3"
+    recipe.user = None
+    recipe.channel = None
+    recipe.revision = "2b44d2dde63878dd279ebe5d38c60dfaa97153fb"
+    return recipe
 
 
 def create_package(parameters=dict()):
     recipe = create_recipe(parameters)
     package = database.Package()
-    package.package_id = "cda61897af86d277c61b93fa40c92da744abdf33"
+    package.package_id = "227220812d7ea3aa060187bae41abbc9911dfdfd"
     package.recipe = recipe
-
-    if parameters.get("package.requirement", False):
-        app = database.Package()
-        app.requires.append(package)
-        app.recipe = create_recipe({"recipe.name": "app"})
-        app.package_id = "cda61897af86d277c61b93fa40c92da744abdf33"
-
     return package

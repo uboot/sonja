@@ -181,10 +181,10 @@ class Recipe(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(255), nullable=False)
-    version = Column(String(255), nullable=False)
-    user = Column(String(255), nullable=False)
-    channel = Column(String(255), nullable=False)
-    revision = Column(String(255), nullable=False)
+    version = Column(String(255))
+    user = Column(String(255))
+    channel = Column(String(255))
+    revision = Column(String(255))
 
 
 package_requirement = Table('package_requirement', Base.metadata,

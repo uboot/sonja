@@ -106,7 +106,8 @@ class BuilderTest(unittest.TestCase):
             builder.run()
             logs = [line for line in builder.get_log_lines()]
             self.assertGreater(len(logs), 0)
-            self.assertNotEqual(builder.build_output, "")
+            self.assertTrue("create" in builder.build_output.keys())
+            self.assertTrue("info" in builder.build_output.keys())
 
     def test_cancel_linux_immediately(self):
         docker_host = os.environ.get("LINUX_DOCKER_HOST", "")
@@ -139,7 +140,8 @@ class BuilderTest(unittest.TestCase):
             builder.run()
             logs = [line for line in builder.get_log_lines()]
             self.assertGreater(len(logs), 0)
-            self.assertNotEqual(builder.build_output, "")
+            self.assertTrue("create" in builder.build_output.keys())
+            self.assertTrue("info" in builder.build_output.keys())
 
     def test_cancel_windows(self):
         docker_host = os.environ.get("WINDOWS_DOCKER_HOST", "")

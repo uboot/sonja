@@ -50,11 +50,15 @@ def extract_output_tar(data: FileIO):
         f.write(bytes)
     f.seek(0)
     tar = tarfile.open(fileobj=f)
-    try:
-        output = tar.extractfile("{0}/create.json".format(build_output_dir_name))
-        return str(output.read(), "utf-8")
-    except KeyError:
-        return ""
+    output_files = ["create", "info"]
+    result = dict()
+    for output_file in output_files:
+        try:
+            result[output_file] = tar.extractfile("{0}/{1}.json".format(build_output_dir_name, output_file)).read()
+        except KeyError:
+            pass
+
+    return result
 
 
 class Builder(object):
@@ -67,7 +71,7 @@ class Builder(object):
         self.__cancel_lock = threading.Lock()
         self.__cancelled = False
         self.__logs = SimpleQueue()
-        self.build_output = ""
+        self.build_output = dict()
 
     def __enter__(self):
         return self
