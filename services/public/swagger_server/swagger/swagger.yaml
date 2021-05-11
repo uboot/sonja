@@ -739,6 +739,85 @@ paths:
         "404":
           description: log not found
       x-openapi-router-controller: swagger_server.controllers.log_controller
+  /ecosystem/{ecosystemId}/recipe:
+    get:
+      tags:
+      - Recipe
+      summary: get all recipes
+      operationId: get_recipes
+      parameters:
+      - name: ecosystemId
+        in: path
+        description: ecosystem
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: list of recipes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecipeList'
+        "400":
+          description: bad input parameter
+      x-openapi-router-controller: swagger_server.controllers.recipe_controller
+  /recipe/{recipeId}:
+    get:
+      tags:
+      - Recipe
+      summary: get a recipe
+      operationId: get_recipe
+      parameters:
+      - name: recipeId
+        in: path
+        description: recipe ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: recipe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecipeData'
+        "400":
+          description: invalid ID supplied
+        "404":
+          description: recipe not found
+      x-openapi-router-controller: swagger_server.controllers.recipe_controller
+  /package/{packageId}:
+    get:
+      tags:
+      - Package
+      summary: get a package
+      operationId: get_package
+      parameters:
+      - name: packageId
+        in: path
+        description: package ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: package
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PackageData'
+        "400":
+          description: invalid ID supplied
+        "404":
+          description: package not found
+      x-openapi-router-controller: swagger_server.controllers.package_controller
 components:
   schemas:
     Credentials:
@@ -780,6 +859,9 @@ components:
           $ref: '#/components/schemas/Ecosystem_relationships'
       example:
         relationships:
+          recipes:
+            links:
+              related: recipe
           channels:
             data:
             - id: "1"
@@ -788,10 +870,10 @@ components:
               type: channels
           repos:
             links:
-              related: repos
+              related: repo
           builds:
             links:
-              related: builds
+              related: build
           profiles:
             data:
             - id: "1"
@@ -820,6 +902,9 @@ components:
       example:
         data:
           relationships:
+            recipes:
+              links:
+                related: recipe
             channels:
               data:
               - id: "1"
@@ -828,10 +913,10 @@ components:
                 type: channels
             repos:
               links:
-                related: repos
+                related: repo
             builds:
               links:
-                related: builds
+                related: build
             profiles:
               data:
               - id: "1"
@@ -862,6 +947,9 @@ components:
       example:
         data:
         - relationships:
+            recipes:
+              links:
+                related: recipe
             channels:
               data:
               - id: "1"
@@ -870,10 +958,10 @@ components:
                 type: channels
             repos:
               links:
-                related: repos
+                related: repo
             builds:
               links:
-                related: builds
+                related: build
             profiles:
               data:
               - id: "1"
@@ -893,6 +981,9 @@ components:
           id: "1"
           type: ecosytems
         - relationships:
+            recipes:
+              links:
+                related: recipe
             channels:
               data:
               - id: "1"
@@ -901,10 +992,10 @@ components:
                 type: channels
             repos:
               links:
-                related: repos
+                related: repo
             builds:
               links:
-                related: builds
+                related: build
             profiles:
               data:
               - id: "1"
@@ -1260,10 +1351,20 @@ components:
           $ref: '#/components/schemas/Build_relationships'
       example:
         relationships:
+          package:
+            data:
+              id: "1"
+              type: packages
           ecosystem:
             data:
               id: "1"
               type: ecosystems
+          missing-recipes:
+            data:
+            - id: "1"
+              type: recipes
+            - id: "1"
+              type: recipes
           log:
             data:
               id: "1"
@@ -1276,6 +1377,10 @@ components:
             data:
               id: "1"
               type: commits
+          missing-packages:
+            data:
+            - null
+            - null
         attributes:
           status: new
         id: "1"
@@ -1290,10 +1395,20 @@ components:
       example:
         data:
           relationships:
+            package:
+              data:
+                id: "1"
+                type: packages
             ecosystem:
               data:
                 id: "1"
                 type: ecosystems
+            missing-recipes:
+              data:
+              - id: "1"
+                type: recipes
+              - id: "1"
+                type: recipes
             log:
               data:
                 id: "1"
@@ -1306,6 +1421,10 @@ components:
               data:
                 id: "1"
                 type: commits
+            missing-packages:
+              data:
+              - null
+              - null
           attributes:
             status: new
           id: "1"
@@ -1322,10 +1441,20 @@ components:
       example:
         data:
         - relationships:
+            package:
+              data:
+                id: "1"
+                type: packages
             ecosystem:
               data:
                 id: "1"
                 type: ecosystems
+            missing-recipes:
+              data:
+              - id: "1"
+                type: recipes
+              - id: "1"
+                type: recipes
             log:
               data:
                 id: "1"
@@ -1338,15 +1467,29 @@ components:
               data:
                 id: "1"
                 type: commits
+            missing-packages:
+              data:
+              - null
+              - null
           attributes:
             status: new
           id: "1"
           type: builds
         - relationships:
+            package:
+              data:
+                id: "1"
+                type: packages
             ecosystem:
               data:
                 id: "1"
                 type: ecosystems
+            missing-recipes:
+              data:
+              - id: "1"
+                type: recipes
+              - id: "1"
+                type: recipes
             log:
               data:
                 id: "1"
@@ -1359,6 +1502,10 @@ components:
               data:
                 id: "1"
                 type: commits
+            missing-packages:
+              data:
+              - null
+              - null
           attributes:
             status: new
           id: "1"
@@ -1394,6 +1541,163 @@ components:
             logs: Start build\nRun Build\nUpload...
           id: "1"
           type: logs
+    Recipe:
+      required:
+      - type
+      type: object
+      properties:
+        id:
+          type: string
+          example: "1"
+        type:
+          type: string
+          example: recipe
+        attributes:
+          $ref: '#/components/schemas/Recipe_attributes'
+        relationships:
+          $ref: '#/components/schemas/Recipe_relationships'
+      example:
+        relationships:
+          ecosystem:
+            data:
+              id: "1"
+              type: ecosystems
+          packages:
+            data:
+            - null
+            - null
+        attributes:
+          name: hello
+          channel: stable
+          version: 1.2.3
+          user: conanci
+          revision: 08979da6c039dd919292f7408785e2ad711b2fd5
+        id: "1"
+        type: recipe
+    RecipeData:
+      required:
+      - data
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Recipe'
+      example:
+        data:
+          relationships:
+            ecosystem:
+              data:
+                id: "1"
+                type: ecosystems
+            packages:
+              data:
+              - null
+              - null
+          attributes:
+            name: hello
+            channel: stable
+            version: 1.2.3
+            user: conanci
+            revision: 08979da6c039dd919292f7408785e2ad711b2fd5
+          id: "1"
+          type: recipe
+    RecipeList:
+      required:
+      - data
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Recipe'
+      example:
+        data:
+        - relationships:
+            ecosystem:
+              data:
+                id: "1"
+                type: ecosystems
+            packages:
+              data:
+              - null
+              - null
+          attributes:
+            name: hello
+            channel: stable
+            version: 1.2.3
+            user: conanci
+            revision: 08979da6c039dd919292f7408785e2ad711b2fd5
+          id: "1"
+          type: recipe
+        - relationships:
+            ecosystem:
+              data:
+                id: "1"
+                type: ecosystems
+            packages:
+              data:
+              - null
+              - null
+          attributes:
+            name: hello
+            channel: stable
+            version: 1.2.3
+            user: conanci
+            revision: 08979da6c039dd919292f7408785e2ad711b2fd5
+          id: "1"
+          type: recipe
+    Package:
+      required:
+      - type
+      type: object
+      properties:
+        id:
+          type: string
+          example: "1"
+        type:
+          type: string
+          example: recipe
+        attributes:
+          $ref: '#/components/schemas/Package_attributes'
+        relationships:
+          $ref: '#/components/schemas/Package_relationships'
+      example:
+        relationships:
+          required-by: null
+          recipe:
+            data:
+              id: "1"
+              type: recipes
+          requires:
+            data:
+            - null
+            - null
+        attributes:
+          package_id: cda61897af86d277c61b93fa40c92da744abdf33
+        id: "1"
+        type: recipe
+    PackageData:
+      required:
+      - data
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Package'
+      example:
+        data:
+          relationships:
+            required-by: null
+            recipe:
+              data:
+                id: "1"
+                type: recipes
+            requires:
+              data:
+              - null
+              - null
+          attributes:
+            package_id: cda61897af86d277c61b93fa40c92da744abdf33
+          id: "1"
+          type: recipe
     Ecosystem_attributes:
       type: object
       properties:
@@ -1440,9 +1744,9 @@ components:
         related:
           type: string
           format: uri
-          example: builds
+          example: build
       example:
-        related: builds
+        related: build
     Ecosystem_relationships_builds:
       type: object
       properties:
@@ -1450,7 +1754,7 @@ components:
           $ref: '#/components/schemas/Ecosystem_relationships_builds_links'
       example:
         links:
-          related: builds
+          related: build
     Ecosystem_relationships_channels_data:
       type: object
       properties:
@@ -1506,9 +1810,9 @@ components:
         related:
           type: string
           format: uri
-          example: repos
+          example: repo
       example:
-        related: repos
+        related: repo
     Ecosystem_relationships_repos:
       type: object
       properties:
@@ -1516,7 +1820,24 @@ components:
           $ref: '#/components/schemas/Ecosystem_relationships_repos_links'
       example:
         links:
-          related: repos
+          related: repo
+    Ecosystem_relationships_recipes_links:
+      type: object
+      properties:
+        related:
+          type: string
+          format: uri
+          example: recipe
+      example:
+        related: recipe
+    Ecosystem_relationships_recipes:
+      type: object
+      properties:
+        links:
+          $ref: '#/components/schemas/Ecosystem_relationships_recipes_links'
+      example:
+        links:
+          related: recipe
     Ecosystem_relationships:
       type: object
       properties:
@@ -1528,7 +1849,12 @@ components:
           $ref: '#/components/schemas/Ecosystem_relationships_profiles'
         repos:
           $ref: '#/components/schemas/Ecosystem_relationships_repos'
+        recipes:
+          $ref: '#/components/schemas/Ecosystem_relationships_recipes'
       example:
+        recipes:
+          links:
+            related: recipe
         channels:
           data:
           - id: "1"
@@ -1537,10 +1863,10 @@ components:
             type: channels
         repos:
           links:
-            related: repos
+            related: repo
         builds:
           links:
-            related: builds
+            related: build
         profiles:
           data:
           - id: "1"
@@ -1847,6 +2173,63 @@ components:
         data:
           id: "1"
           type: logs
+    Build_relationships_package_data:
+      type: object
+      properties:
+        type:
+          type: string
+          example: packages
+        id:
+          type: string
+          example: "1"
+      example:
+        id: "1"
+        type: packages
+    Build_relationships_package:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Build_relationships_package_data'
+      example:
+        data:
+          id: "1"
+          type: packages
+    Build_relationships_missingrecipes_data:
+      type: object
+      properties:
+        type:
+          type: string
+          example: recipes
+        id:
+          type: string
+          example: "1"
+      example:
+        id: "1"
+        type: recipes
+    Build_relationships_missingrecipes:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Build_relationships_missingrecipes_data'
+      example:
+        data:
+        - id: "1"
+          type: recipes
+        - id: "1"
+          type: recipes
+    Build_relationships_missingpackages:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Build_relationships_package_data'
+      example:
+        data:
+        - null
+        - null
     Build_relationships:
       type: object
       properties:
@@ -1858,11 +2241,27 @@ components:
           $ref: '#/components/schemas/Build_relationships_profile'
         log:
           $ref: '#/components/schemas/Build_relationships_log'
+        package:
+          $ref: '#/components/schemas/Build_relationships_package'
+        missing-recipes:
+          $ref: '#/components/schemas/Build_relationships_missingrecipes'
+        missing-packages:
+          $ref: '#/components/schemas/Build_relationships_missingpackages'
       example:
+        package:
+          data:
+            id: "1"
+            type: packages
         ecosystem:
           data:
             id: "1"
             type: ecosystems
+        missing-recipes:
+          data:
+          - id: "1"
+            type: recipes
+          - id: "1"
+            type: recipes
         log:
           data:
             id: "1"
@@ -1875,6 +2274,10 @@ components:
           data:
             id: "1"
             type: commits
+        missing-packages:
+          data:
+          - null
+          - null
     Log_attributes:
       type: object
       properties:
@@ -1883,6 +2286,82 @@ components:
           example: Start build\nRun Build\nUpload...
       example:
         logs: Start build\nRun Build\nUpload...
+    Recipe_attributes:
+      type: object
+      properties:
+        name:
+          type: string
+          example: hello
+        version:
+          type: string
+          example: 1.2.3
+        user:
+          type: string
+          example: conanci
+        channel:
+          type: string
+          example: stable
+        revision:
+          type: string
+          example: 08979da6c039dd919292f7408785e2ad711b2fd5
+      example:
+        name: hello
+        channel: stable
+        version: 1.2.3
+        user: conanci
+        revision: 08979da6c039dd919292f7408785e2ad711b2fd5
+    Recipe_relationships:
+      type: object
+      properties:
+        ecosystem:
+          $ref: '#/components/schemas/Repo_relationships_ecosystem'
+        packages:
+          $ref: '#/components/schemas/Build_relationships_missingpackages'
+      example:
+        ecosystem:
+          data:
+            id: "1"
+            type: ecosystems
+        packages:
+          data:
+          - null
+          - null
+    Package_attributes:
+      type: object
+      properties:
+        package_id:
+          type: string
+          example: cda61897af86d277c61b93fa40c92da744abdf33
+      example:
+        package_id: cda61897af86d277c61b93fa40c92da744abdf33
+    Package_relationships_recipe:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Build_relationships_missingrecipes_data'
+      example:
+        data:
+          id: "1"
+          type: recipes
+    Package_relationships:
+      type: object
+      properties:
+        recipe:
+          $ref: '#/components/schemas/Package_relationships_recipe'
+        requires:
+          $ref: '#/components/schemas/Build_relationships_missingpackages'
+        required-by:
+          $ref: '#/components/schemas/Build_relationships_missingpackages'
+      example:
+        required-by: null
+        recipe:
+          data:
+            id: "1"
+            type: recipes
+        requires:
+          data:
+          - null
+          - null
   securitySchemes:
     ApiKey:
       type: apiKey

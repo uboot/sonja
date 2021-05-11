@@ -26,7 +26,7 @@ def create_ecosystem(parameters=dict()):
 
 def create_repo(parameters=dict()):
     repo = database.Repo()
-    repo.ecosystem = parameters.get("ecosysstem", create_ecosystem(parameters))
+    repo.ecosystem = parameters.get("ecosystem", create_ecosystem(parameters))
     if parameters.get("repo.invalid", False):
         repo.url = "https://github.com/uboot/nonsense.git"
     else:
@@ -58,7 +58,7 @@ def create_channel(parameters=dict()):
 
 def create_profile(parameters=dict()):
     profile = database.Profile()
-    profile.ecosystem = parameters.get("ecosysstem", create_ecosystem(parameters))
+    profile.ecosystem = parameters.get("ecosystem", create_ecosystem(parameters))
     if parameters.get("profile.os", "Linux") == "Linux":
         profile.name = "GCC 9"
         profile.container = "uboot/gcc9:latest"
@@ -90,11 +90,16 @@ def create_build(parameters=dict()):
     build.profile = create_profile(parameters)
     build.status = database.BuildStatus.new
     build.log = create_log(parameters)
+    if parameters.get("build.with_dependencies", False):
+        build.package = create_package()
+        build.missing_packages = [create_package()]
+        build.missing_recipes = [create_recipe()]
     return build
 
 
 def create_recipe(parameters=dict()):
     recipe = database.Recipe()
+    recipe.ecosystem = parameters.get("ecosystem", create_ecosystem(parameters))
     recipe.name = parameters.get("recipe.name", "app")
     recipe.version = "1.2.3"
     recipe.user = None

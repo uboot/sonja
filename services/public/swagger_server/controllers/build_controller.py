@@ -46,6 +46,28 @@ def __create_build(record: database.Build):
                     id=record.log_id,
                     type="logs"
                 )
+            ),
+            package=models.BuildRelationshipsPackage(
+                data=models.BuildRelationshipsPackageData(
+                    id=record.package_id,
+                    type="packages"
+                )
+            ),
+            missing_recipes=models.BuildRelationshipsMissingrecipes(
+                data=[
+                    models.BuildRelationshipsMissingrecipesData(
+                        id=recipe.id,
+                        type="recipes"
+                    ) for recipe in record.missing_recipes
+                ]
+            ),
+            missing_packages=models.BuildRelationshipsMissingpackages(
+                data=[
+                    models.BuildRelationshipsPackageData(
+                        id=package.id,
+                        type="packages"
+                    ) for package in record.missing_packages
+                ]
             )
         )
     )

@@ -47,6 +47,11 @@ def __create_ecosystem(record: database.Ecosystem):
                 links=models.EcosystemRelationshipsReposLinks(
                     related="repo"
                 )
+            ),
+            recipes=models.EcosystemRelationshipsRecipes(
+                links=models.EcosystemRelationshipsRecipesLinks(
+                    related="recipe"
+                )
             )
         )
     )

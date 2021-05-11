@@ -9,6 +9,7 @@ from swagger_server.models.base_model_ import Model
 from swagger_server.models.ecosystem_relationships_builds import EcosystemRelationshipsBuilds  # noqa: F401,E501
 from swagger_server.models.ecosystem_relationships_channels import EcosystemRelationshipsChannels  # noqa: F401,E501
 from swagger_server.models.ecosystem_relationships_profiles import EcosystemRelationshipsProfiles  # noqa: F401,E501
+from swagger_server.models.ecosystem_relationships_recipes import EcosystemRelationshipsRecipes  # noqa: F401,E501
 from swagger_server.models.ecosystem_relationships_repos import EcosystemRelationshipsRepos  # noqa: F401,E501
 from swagger_server import util
 
@@ -18,7 +19,7 @@ class EcosystemRelationships(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, builds: EcosystemRelationshipsBuilds=None, channels: EcosystemRelationshipsChannels=None, profiles: EcosystemRelationshipsProfiles=None, repos: EcosystemRelationshipsRepos=None):  # noqa: E501
+    def __init__(self, builds: EcosystemRelationshipsBuilds=None, channels: EcosystemRelationshipsChannels=None, profiles: EcosystemRelationshipsProfiles=None, repos: EcosystemRelationshipsRepos=None, recipes: EcosystemRelationshipsRecipes=None):  # noqa: E501
         """EcosystemRelationships - a model defined in Swagger
 
         :param builds: The builds of this EcosystemRelationships.  # noqa: E501
@@ -29,24 +30,29 @@ class EcosystemRelationships(Model):
         :type profiles: EcosystemRelationshipsProfiles
         :param repos: The repos of this EcosystemRelationships.  # noqa: E501
         :type repos: EcosystemRelationshipsRepos
+        :param recipes: The recipes of this EcosystemRelationships.  # noqa: E501
+        :type recipes: EcosystemRelationshipsRecipes
         """
         self.swagger_types = {
             'builds': EcosystemRelationshipsBuilds,
             'channels': EcosystemRelationshipsChannels,
             'profiles': EcosystemRelationshipsProfiles,
-            'repos': EcosystemRelationshipsRepos
+            'repos': EcosystemRelationshipsRepos,
+            'recipes': EcosystemRelationshipsRecipes
         }
 
         self.attribute_map = {
             'builds': 'builds',
             'channels': 'channels',
             'profiles': 'profiles',
-            'repos': 'repos'
+            'repos': 'repos',
+            'recipes': 'recipes'
         }
         self._builds = builds
         self._channels = channels
         self._profiles = profiles
         self._repos = repos
+        self._recipes = recipes
 
     @classmethod
     def from_dict(cls, dikt) -> 'EcosystemRelationships':
@@ -142,3 +148,24 @@ class EcosystemRelationships(Model):
         """
 
         self._repos = repos
+
+    @property
+    def recipes(self) -> EcosystemRelationshipsRecipes:
+        """Gets the recipes of this EcosystemRelationships.
+
+
+        :return: The recipes of this EcosystemRelationships.
+        :rtype: EcosystemRelationshipsRecipes
+        """
+        return self._recipes
+
+    @recipes.setter
+    def recipes(self, recipes: EcosystemRelationshipsRecipes):
+        """Sets the recipes of this EcosystemRelationships.
+
+
+        :param recipes: The recipes of this EcosystemRelationships.
+        :type recipes: EcosystemRelationshipsRecipes
+        """
+
+        self._recipes = recipes

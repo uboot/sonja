@@ -4,19 +4,21 @@ import re
 from conanci import database
 
 
-def _process_recipe(session: database.Session, recipe_data: dict) -> database.Recipe:
+def _process_recipe(session: database.Session, recipe_data: dict, build: database.Build) -> database.Recipe:
     if recipe_data["dependency"]:
         return None
-    m = re.match("[\\w\\+\\.-]+/[\\w\\+\\.-]+(?:@\\w+/\\w+)?#(\\w+)", recipe_data["id"])
-    revision = None
-    if m:
-        revision = m.group(1)
+    ecosystem_id = build.profile.ecosystem_id
     name = recipe_data["name"]
     version = recipe_data["version"]
     user = recipe_data.get("user", None)
     channel = recipe_data.get("channel", None)
+    m = re.match("[\\w\\+\\.-]+/[\\w\\+\\.-]+(?:@\\w+/\\w+)?#(\\w+)", recipe_data["id"])
+    revision = None
+    if m:
+        revision = m.group(1)
 
     recipe = session.query(database.Recipe).filter_by(
+        ecosystem_id=ecosystem_id,
         name=name,
         version=version,
         user=user,
@@ -28,6 +30,7 @@ def _process_recipe(session: database.Session, recipe_data: dict) -> database.Re
         return recipe
 
     recipe = database.Recipe()
+    recipe.ecosystem = build.profile.ecosystem
     recipe.name = name
     recipe.version = version
     recipe.user = user
@@ -59,7 +62,7 @@ def process(build_id, build_output):
         build = session.query(database.Build).filter_by(id=build_id).first()
         for recipe_compound in data["installed"]:
             recipe_data = recipe_compound["recipe"]
-            recipe = _process_recipe(session, recipe_data)
+            recipe = _process_recipe(session, recipe_data, build)
             if not recipe:
                 continue
             for package_data in recipe_compound["packages"]:

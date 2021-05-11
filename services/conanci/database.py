@@ -163,10 +163,8 @@ class Build(Base):
     profile = relationship("Profile")
     log_id = Column(Integer, ForeignKey('log.id'))
     log = relationship("Log")
-    missing_recipes = relationship('Recipe', secondary=missing_recipe,
-        backref=backref('built_by'))
-    missing_packages = relationship('Package', secondary=missing_package,
-        backref=backref('built_by'))
+    missing_recipes = relationship('Recipe', secondary=missing_recipe)
+    missing_packages = relationship('Package', secondary=missing_package)
 
 
 class Log(Base):
@@ -180,6 +178,8 @@ class Recipe(Base):
     __tablename__ = 'recipe'
 
     id = Column(Integer, primary_key=True)
+    ecosystem_id = Column(Integer, ForeignKey('ecosystem.id'))
+    ecosystem = relationship("Ecosystem", backref="recipes")
     name = Column(String(255), nullable=False)
     version = Column(String(255))
     user = Column(String(255))
@@ -256,24 +256,6 @@ def populate_database():
         channel.branch = "master"
         channel.name = "stable"
         session.add(channel)
-
-        # commit = Commit()
-        # commit.repo = repo
-        # commit.sha = "2777a37dc82e296d55c23f738b79f139e627920c"
-        # commit.channel = channel
-        # commit.status = CommitStatus.new
-
-        # linux_build = Build()
-        # linux_build.commit = commit
-        # linux_build.profile = linux
-        # linux_build.status = BuildStatus.active
-        # session.add(linux_build)
-
-        # windows_build = Build()
-        # windows_build.commit = commit
-        # windows_build.profile = windows
-        # windows_build.status = BuildStatus.active
-        # session.add(windows_build)
 
         session.commit()
 
