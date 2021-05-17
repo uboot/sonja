@@ -25,7 +25,7 @@ class PackageAttributes(Model):
         }
 
         self.attribute_map = {
-            'package_id': 'package_id'
+            'package_id': 'package-id'
         }
         self._package_id = package_id
 

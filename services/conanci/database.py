@@ -211,7 +211,6 @@ def reset_database():
         try:
             Base.metadata.drop_all(engine)
             Base.metadata.create_all(engine)
-            return
         except OperationalError:
             logger.warning("Failed to connect to database")
             raise
@@ -224,32 +223,66 @@ def populate_database():
         if not ecosystem:
             raise Exception("Found no ecosystem with ID=1")
 
-        repo = Repo()
-        repo.name = "Hello"
-        repo.ecosystem = ecosystem
-        repo.url = "git@github.com:uboot/conan-ci.git"
-        repo.path = "packages/hello"
-        session.add(repo)
+        hello = Repo()
+        hello.name = "Hello"
+        hello.ecosystem = ecosystem
+        hello.url = "git@github.com:uboot/conan-ci.git"
+        hello.path = "packages/hello"
+        session.add(hello)
 
-        linux = Profile()
-        linux.ecosystem = ecosystem
-        linux.name = "GCC 9"
-        linux.container = "uboot/gcc9:latest"
-        linux.settings = [
+        base = Repo()
+        base.name = "Base"
+        base.ecosystem = ecosystem
+        base.url = "git@github.com:uboot/conan-ci.git"
+        base.path = "packages/base"
+        session.add(hello)
+
+        app = Repo()
+        app.name = "App"
+        app.ecosystem = ecosystem
+        app.url = "git@github.com:uboot/conan-ci.git"
+        app.path = "packages/app"
+        session.add(hello)
+
+        linux_release = Profile()
+        linux_release.ecosystem = ecosystem
+        linux_release.name = "GCC 9 Release"
+        linux_release.container = "uboot/gcc9:latest"
+        linux_release.settings = [
             Setting("os", "Linux"),
             Setting("build_type", "Release")
         ]
-        session.add(linux)
+        session.add(linux_release)
 
-        windows = Profile()
-        windows.ecosystem = ecosystem
-        windows.name = "MSVC 15"
-        windows.container = "uboot/msvc15:latest"
-        windows.settings = [
+        linux_debug = Profile()
+        linux_debug.ecosystem = ecosystem
+        linux_debug.name = "GCC 9 Debug"
+        linux_debug.container = "uboot/gcc9:latest"
+        linux_debug.settings = [
+            Setting("os", "Linux"),
+            Setting("build_type", "Debug")
+        ]
+        session.add(linux_debug)
+
+        windows_release = Profile()
+        windows_release.ecosystem = ecosystem
+        windows_release.name = "MSVC 15 Release"
+        windows_release.container = "uboot/msvc15:latest"
+        windows_release.settings = [
             Setting("os", "Windows"),
             Setting("build_type", "Release")
         ]
-        session.add(windows)
+        session.add(windows_release)
+
+        windows_debug = Profile()
+        windows_debug.ecosystem = ecosystem
+        windows_debug.name = "MSVC 15 Debug"
+        windows_debug.container = "uboot/msvc15:latest"
+        windows_debug.settings = [
+            Setting("os", "Windows"),
+            Setting("build_type", "Debug")
+        ]
+        session.add(windows_debug)
 
         channel = Channel()
         channel.ecosystem = ecosystem
@@ -261,19 +294,31 @@ def populate_database():
 
 
 def clear_database():
-    clear_ecosystems()
-    with session_scope() as session:
-        session.query(Ecosystem).delete()
+    reset_database()
 
 
 def clear_ecosystems():
-    with session_scope() as session:
-        session.query(Package).delete()
-        session.query(Recipe).delete()
-        session.query(Log).delete()
-        session.query(Build).delete()
-        session.query(Commit).delete()
-        session.query(Channel).delete()
-        session.query(Setting).delete()
-        session.query(Profile).delete()
-        session.query(Repo).delete()
+    def drop_table(table):
+        try:
+            table.drop(engine)
+        except OperationalError as e:
+            logger.warning("Failed to drop table %s", table.name)
+
+    drop_table(missing_recipe)
+    drop_table(missing_package)
+    drop_table(Build.__table__)
+    drop_table(Log.__table__)
+    drop_table(package_requirement)
+    drop_table(Package.__table__)
+    drop_table(Recipe.__table__)
+    drop_table(Commit.__table__)
+    drop_table(Channel.__table__)
+    drop_table(Setting.__table__)
+    drop_table(Profile.__table__)
+    drop_table(Repo.__table__)
+
+    try:
+        Base.metadata.create_all(engine)
+    except OperationalError:
+        logger.warning("Failed to connect to database")
+        raise

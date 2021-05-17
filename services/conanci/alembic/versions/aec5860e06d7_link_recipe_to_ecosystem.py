@@ -19,7 +19,7 @@ depends_on = None
 def upgrade():
     op.add_column(
         'recipe',
-        sa.Column('ecosystem_id', sa.Integer())
+        sa.Column('ecosystem_id', sa.Integer(), sa.ForeignKey('ecosystem.id'))
     )
 
 

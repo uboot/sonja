@@ -110,6 +110,19 @@ class TestGeneralController(BaseTestCase):
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
+    def test_clear_ecosystems_no_tables(self):
+        """Test case for clear_ecosystems
+
+        remove all entries but the ecosystems from the database
+        """
+        self.login()
+        database.clear_ecosystems()
+        response = self.client.open(
+            '/api/v1/clear-ecosystems',
+            method='GET')
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
     def test_ping(self):
         """Test case for ping
 

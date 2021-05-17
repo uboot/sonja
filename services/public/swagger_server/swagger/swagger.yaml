@@ -1672,7 +1672,7 @@ components:
             - null
             - null
         attributes:
-          package_id: cda61897af86d277c61b93fa40c92da744abdf33
+          package-id: cda61897af86d277c61b93fa40c92da744abdf33
         id: "1"
         type: recipe
     PackageData:
@@ -1695,7 +1695,7 @@ components:
               - null
               - null
           attributes:
-            package_id: cda61897af86d277c61b93fa40c92da744abdf33
+            package-id: cda61897af86d277c61b93fa40c92da744abdf33
           id: "1"
           type: recipe
     Ecosystem_attributes:
@@ -2329,11 +2329,11 @@ components:
     Package_attributes:
       type: object
       properties:
-        package_id:
+        package-id:
           type: string
           example: cda61897af86d277c61b93fa40c92da744abdf33
       example:
-        package_id: cda61897af86d277c61b93fa40c92da744abdf33
+        package-id: cda61897af86d277c61b93fa40c92da744abdf33
     Package_relationships_recipe:
       type: object
       properties:
