@@ -13,6 +13,7 @@ class TestBuildController(BaseTestCase):
     """BuildController integration test stubs"""
 
     def setUp(self):
+        super().setUp()
         self.login()
         with database.session_scope() as session:
             build = util.create_build({"build.with_dependencies": True})

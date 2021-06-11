@@ -14,7 +14,7 @@ class RecipeAttributes(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, name: str=None, version: str=None, user: str=None, channel: str=None, revision: str=None):  # noqa: E501
+    def __init__(self, name: str=None, version: str=None, user: str=None, channel: str=None):  # noqa: E501
         """RecipeAttributes - a model defined in Swagger
 
         :param name: The name of this RecipeAttributes.  # noqa: E501
@@ -25,29 +25,24 @@ class RecipeAttributes(Model):
         :type user: str
         :param channel: The channel of this RecipeAttributes.  # noqa: E501
         :type channel: str
-        :param revision: The revision of this RecipeAttributes.  # noqa: E501
-        :type revision: str
         """
         self.swagger_types = {
             'name': str,
             'version': str,
             'user': str,
-            'channel': str,
-            'revision': str
+            'channel': str
         }
 
         self.attribute_map = {
             'name': 'name',
             'version': 'version',
             'user': 'user',
-            'channel': 'channel',
-            'revision': 'revision'
+            'channel': 'channel'
         }
         self._name = name
         self._version = version
         self._user = user
         self._channel = channel
-        self._revision = revision
 
     @classmethod
     def from_dict(cls, dikt) -> 'RecipeAttributes':
@@ -143,24 +138,3 @@ class RecipeAttributes(Model):
         """
 
         self._channel = channel
-
-    @property
-    def revision(self) -> str:
-        """Gets the revision of this RecipeAttributes.
-
-
-        :return: The revision of this RecipeAttributes.
-        :rtype: str
-        """
-        return self._revision
-
-    @revision.setter
-    def revision(self, revision: str):
-        """Sets the revision of this RecipeAttributes.
-
-
-        :param revision: The revision of this RecipeAttributes.
-        :type revision: str
-        """
-
-        self._revision = revision

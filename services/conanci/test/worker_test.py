@@ -47,13 +47,13 @@ class AgentTest(unittest.TestCase):
 
     def test_start_build(self):
         with database.session_scope() as session:
-            session.add(util.create_build())
+            session.add(util.create_build(dict()))
         self.agent.start()
         self.assertEquals(self.__wait_for_build_status(database.BuildStatus.active, 15), database.BuildStatus.active)
 
     def test_complete_build(self):
         with database.session_scope() as session:
-            session.add(util.create_build())
+            session.add(util.create_build(dict()))
         self.agent.start()
         self.assertEquals(self.__wait_for_build_status(database.BuildStatus.success, 15), database.BuildStatus.success)
 
@@ -70,7 +70,7 @@ class AgentTest(unittest.TestCase):
 
     def test_cancel_build(self):
         with database.session_scope() as session:
-            session.add(util.create_build())
+            session.add(util.create_build(dict()))
         self.agent.start()
         self.__wait_for_build_status(database.BuildStatus.active, 15)
         self.agent.cancel()
@@ -191,7 +191,7 @@ class SchedulerTest(unittest.TestCase):
 
     def test_start_new_builds(self):
         with database.session_scope() as session:
-            session.add(util.create_build())
+            session.add(util.create_build(dict()))
         self.scheduler.start()
         time.sleep(1)
         self.scheduler.cancel()

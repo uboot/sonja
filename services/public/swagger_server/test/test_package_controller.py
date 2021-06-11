@@ -11,9 +11,10 @@ class TestPackageController(BaseTestCase):
     """PackageController integration test stubs"""
 
     def setUp(self):
+        super().setUp()
         self.login()
         with database.session_scope() as session:
-            ecosystem = util.create_package()
+            ecosystem = util.create_package(dict())
             session.add(ecosystem)
 
     def test_get_package(self):

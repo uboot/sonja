@@ -137,18 +137,6 @@ class BuildStatus(enum.Enum):
     stopped = 6
 
 
-missing_recipe = Table('missing_recipe', Base.metadata,
-    Column('build_id', Integer, ForeignKey('build.id'), primary_key=True),
-    Column('recipe_id', Integer, ForeignKey('recipe.id'), primary_key=True)
-)
-
-
-missing_package = Table('missing_package', Base.metadata,
-    Column('build_id', Integer, ForeignKey('build.id'), primary_key=True),
-    Column('package_id', Integer, ForeignKey('package.id'), primary_key=True)
-)
-
-
 class Build(Base):
     __tablename__ = 'build'
 
@@ -163,8 +151,6 @@ class Build(Base):
     profile = relationship("Profile")
     log_id = Column(Integer, ForeignKey('log.id'))
     log = relationship("Log")
-    missing_recipes = relationship('Recipe', secondary=missing_recipe)
-    missing_packages = relationship('Package', secondary=missing_package)
 
 
 class Log(Base):
@@ -187,6 +173,15 @@ class Recipe(Base):
     revision = Column(String(255))
 
 
+class RecipeRevision(Base):
+    __tablename__ = 'recipe_revision'
+
+    id = Column(Integer, primary_key=True)
+    recipe_id = Column(Integer, ForeignKey('recipe.id'))
+    recipe = relationship("Recipe", backref="revisions")
+    revision = Column(String(255))
+
+
 package_requirement = Table('package_requirement', Base.metadata,
     Column('package_id', Integer, ForeignKey('package.id'), primary_key=True),
     Column('requirement_id', Integer, ForeignKey('package.id'), primary_key=True)
@@ -198,9 +193,9 @@ class Package(Base):
 
     id = Column(Integer, primary_key=True)
     package_id = Column(String(255), nullable=False)
-    recipe_id = Column(Integer, ForeignKey('recipe.id'),
-                       nullable=False)
-    recipe = relationship('Recipe', backref='packages')
+    recipe_revision_id = Column(Integer, ForeignKey('recipe_revision.id'),
+                         nullable=False)
+    recipe_revision = relationship('RecipeRevision', backref='packages')
     requires = relationship('Package', secondary=package_requirement,
                             primaryjoin=package_requirement.c.package_id == id,
                             secondaryjoin=package_requirement.c.requirement_id == id,
@@ -304,12 +299,11 @@ def clear_ecosystems():
         except OperationalError as e:
             logger.warning("Failed to drop table %s", table.name)
 
-    drop_table(missing_recipe)
-    drop_table(missing_package)
     drop_table(Build.__table__)
     drop_table(Log.__table__)
     drop_table(package_requirement)
     drop_table(Package.__table__)
+    drop_table(RecipeRevision.__table__)
     drop_table(Recipe.__table__)
     drop_table(Commit.__table__)
     drop_table(Channel.__table__)

@@ -11,13 +11,13 @@ def __create_package(record: database.Package):
             package_id=record.package_id
         ),
         relationships=models.PackageRelationships(
-            recipe=models.PackageRelationshipsRecipe(
-                data=models.BuildRelationshipsMissingrecipesData(
-                    id=record.recipe_id,
-                    type="recipes"
+            recipe_revision=models.PackageRelationshipsReciperevision(
+                data=models.PackageRelationshipsReciperevisionData(
+                    id=record.recipe_revision_id,
+                    type="recipe-revisions"
                 )
             ),
-            requires=models.BuildRelationshipsMissingpackages(
+            requires=models.RecipeRevisionRelationshipsPackages(
                 data=[
                     models.BuildRelationshipsPackageData(
                         id=package.id,
@@ -25,7 +25,7 @@ def __create_package(record: database.Package):
                     ) for package in record.requires
                 ]
             ),
-            required_by=models.BuildRelationshipsMissingpackages(
+            required_by=models.RecipeRevisionRelationshipsPackages(
                 data=[
                     models.BuildRelationshipsPackageData(
                         id=package.id,

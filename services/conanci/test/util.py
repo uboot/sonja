@@ -3,7 +3,7 @@ from conanci import database
 import os
 
 
-def create_ecosystem(parameters=dict()):
+def create_ecosystem(parameters):
     ecosystem = database.Ecosystem()
     ecosystem.name = "Conan CI"
     ecosystem.user = "conanci"
@@ -24,9 +24,12 @@ def create_ecosystem(parameters=dict()):
     return ecosystem
 
 
-def create_repo(parameters=dict()):
+def create_repo(parameters):
     repo = database.Repo()
-    repo.ecosystem = parameters.get("ecosystem", create_ecosystem(parameters))
+    if "ecosystem" in parameters.keys():
+        repo.ecosystem = parameters["ecosystem"]
+    else:
+        repo.ecosystem = create_ecosystem(parameters)
     if parameters.get("repo.invalid", False):
         repo.url = "https://github.com/uboot/nonsense.git"
     else:
@@ -38,7 +41,7 @@ def create_repo(parameters=dict()):
     return repo
 
 
-def create_commit(parameters=dict()):
+def create_commit(parameters):
     commit = database.Commit()
     commit.repo = create_repo(parameters)
     commit.channel = create_channel(parameters)
@@ -48,17 +51,23 @@ def create_commit(parameters=dict()):
     return commit
 
 
-def create_channel(parameters=dict()):
+def create_channel(parameters):
     channel = database.Channel()
-    channel.ecosystem = parameters.get("ecosystem", create_ecosystem(parameters))
+    if "ecosystem" in parameters.keys():
+        channel.ecosystem = parameters["ecosystem"]
+    else:
+        channel.ecosystem = create_ecosystem(parameters)
     channel.branch = parameters.get("channel.branch", "master")
     channel.name = "stable"
     return channel
 
 
-def create_profile(parameters=dict()):
+def create_profile(parameters):
     profile = database.Profile()
-    profile.ecosystem = parameters.get("ecosystem", create_ecosystem(parameters))
+    if "ecosystem" in parameters.keys():
+        profile.ecosystem = parameters["ecosystem"]
+    else:
+        profile.ecosystem = create_ecosystem(parameters)
     if parameters.get("profile.os", "Linux") == "Linux":
         profile.name = "GCC 9"
         profile.container = "uboot/gcc9:latest"
@@ -77,13 +86,13 @@ def create_profile(parameters=dict()):
     return profile
 
 
-def create_log(parameters=dict()):
+def create_log(parameters):
     log = database.Log()
     log.logs = "Start build\nRun Build\nUpload..."
     return log
 
 
-def create_build(parameters=dict()):
+def create_build(parameters):
     build = database.Build()
     parameters["commit.status"] = database.CommitStatus.building
     build.commit = create_commit(parameters)
@@ -91,26 +100,34 @@ def create_build(parameters=dict()):
     build.status = database.BuildStatus.new
     build.log = create_log(parameters)
     if parameters.get("build.with_dependencies", False):
-        build.package = create_package()
-        build.missing_packages = [create_package()]
-        build.missing_recipes = [create_recipe()]
+        build.package = create_package(parameters)
     return build
 
 
-def create_recipe(parameters=dict()):
+def create_recipe(parameters):
     recipe = database.Recipe()
-    recipe.ecosystem = parameters.get("ecosystem", create_ecosystem(parameters))
+    if "ecosystem" in parameters.keys():
+        recipe.ecosystem = parameters["ecosystem"]
+    else:
+        recipe.ecosystem = create_ecosystem(parameters)
     recipe.name = parameters.get("recipe.name", "app")
     recipe.version = "1.2.3"
     recipe.user = None
     recipe.channel = None
-    recipe.revision = "2b44d2dde63878dd279ebe5d38c60dfaa97153fb"
     return recipe
 
 
-def create_package(parameters=dict()):
+def create_recipe_revision(parameters):
     recipe = create_recipe(parameters)
+    recipe_revision = database.RecipeRevision()
+    recipe_revision.recipe = recipe
+    recipe_revision.revision = "2b44d2dde63878dd279ebe5d38c60dfaa97153fb"
+    return recipe_revision
+
+
+def create_package(parameters):
+    recipe_revision = create_recipe_revision(parameters)
     package = database.Package()
     package.package_id = "227220812d7ea3aa060187bae41abbc9911dfdfd"
-    package.recipe = recipe
+    package.recipe_revision = recipe_revision
     return package

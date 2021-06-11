@@ -19,8 +19,10 @@ class BaseTestCase(TestCase):
         auth.master_password = 'paSSwOrd'
         auth.secret_key = 'MDAwMDAwMDAwMDAwMDAwMA=='
         auth.setup_login(app.app)
-        reset_database()
         return app.app
+
+    def setUp(self):
+        reset_database()
 
     def login(self):
         body = models.Credentials(user="user", password="paSSwOrd")

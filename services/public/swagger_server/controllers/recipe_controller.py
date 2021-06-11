@@ -11,8 +11,7 @@ def __create_recipe(record: database.Recipe):
             name=record.name,
             version=record.version,
             channel=record.channel,
-            user=record.user,
-            revision=record.revision
+            user=record.user
         ),
         relationships=models.RecipeRelationships(
             ecosystem=models.RepoRelationshipsEcosystem(
@@ -21,7 +20,30 @@ def __create_recipe(record: database.Recipe):
                     type="ecosystems"
                 )
             ),
-            packages=models.BuildRelationshipsMissingpackages(
+            revisions=models.RecipeRelationshipsRevisions(
+                models.RecipeRelationshipsRevisionsLinks(
+                    related="revision"
+                )
+            )
+        )
+    )
+
+
+def __create_recipe_revision(record: database.RecipeRevision):
+    return models.RecipeRevision(
+        id=record.id,
+        type="recipe-revision",
+        attributes=models.RecipeRevisionAttributes(
+            revision=record.revision
+        ),
+        relationships=models.RecipeRevisionRelationships(
+            recipe=models.RecipeRevisionRelationshipsRecipe(
+                data=models.RecipeRevisionRelationshipsRecipeData(
+                    id=record.recipe_id,
+                    type="recipes"
+                )
+            ),
+            packages=models.RecipeRevisionRelationshipsPackages(
                 data=[
                     models.BuildRelationshipsPackageData(
                         id=package.id,
@@ -46,3 +68,18 @@ def get_recipes(ecosystem_id):
         records = session.query(database.Recipe). \
             filter(database.Recipe.ecosystem_id == ecosystem_id)
         return models.EcosystemList(data=[__create_recipe(record) for record in records])
+
+
+def get_recipe_revision(recipe_revision_id):
+    with database.session_scope() as session:
+        record = session.query(database.RecipeRevision).filter_by(id=recipe_revision_id).first()
+        if not record:
+            abort(404)
+        return models.RecipeRevisionData(data=__create_recipe_revision(record))
+
+
+def get_recipe_revisions(recipe_id):
+    with database.session_scope() as session:
+        records = session.query(database.RecipeRevision). \
+            filter(database.RecipeRevision.recipe_id == recipe_id)
+        return models.RecipeRevisionList(data=[__create_recipe_revision(record) for record in records])

@@ -13,9 +13,10 @@ from swagger_server.test import BaseTestCase
 class TestChannelController(BaseTestCase):
 
     def setUp(self):
+        super().setUp()
         self.login()
         with database.session_scope() as session:
-            channel = util.create_channel()
+            channel = util.create_channel(dict())
             session.add(channel)
 
     def test_add_channel(self):

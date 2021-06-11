@@ -13,8 +13,9 @@ class TestGeneralController(BaseTestCase):
     """GeneralController integration test stubs"""
 
     def setUp(self):
+        super().setUp()
         with database.session_scope() as session:
-            ecosystem = util.create_ecosystem()
+            ecosystem = util.create_ecosystem(dict())
             session.add(ecosystem)
 
     def test_login(self):

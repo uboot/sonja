@@ -764,6 +764,31 @@ paths:
         "400":
           description: bad input parameter
       x-openapi-router-controller: swagger_server.controllers.recipe_controller
+  /recipe/{recipeId}/revision:
+    get:
+      tags:
+      - Recipe
+      summary: get all recipe revision
+      operationId: get_recipe_revisions
+      parameters:
+      - name: recipeId
+        in: path
+        description: ecosystem
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: list of recipe visions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecipeRevisionList'
+        "400":
+          description: bad input parameter
+      x-openapi-router-controller: swagger_server.controllers.recipe_controller
   /recipe/{recipeId}:
     get:
       tags:
@@ -786,6 +811,33 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecipeData'
+        "400":
+          description: invalid ID supplied
+        "404":
+          description: recipe not found
+      x-openapi-router-controller: swagger_server.controllers.recipe_controller
+  /recipe_revision/{recipeRevisionId}:
+    get:
+      tags:
+      - Recipe
+      summary: get a recipe revision
+      operationId: get_recipe_revision
+      parameters:
+      - name: recipeRevisionId
+        in: path
+        description: recipe revision ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: recipe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecipeRevisionData'
         "400":
           description: invalid ID supplied
         "404":
@@ -1359,12 +1411,6 @@ components:
             data:
               id: "1"
               type: ecosystems
-          missing-recipes:
-            data:
-            - id: "1"
-              type: recipes
-            - id: "1"
-              type: recipes
           log:
             data:
               id: "1"
@@ -1377,10 +1423,6 @@ components:
             data:
               id: "1"
               type: commits
-          missing-packages:
-            data:
-            - null
-            - null
         attributes:
           status: new
         id: "1"
@@ -1403,12 +1445,6 @@ components:
               data:
                 id: "1"
                 type: ecosystems
-            missing-recipes:
-              data:
-              - id: "1"
-                type: recipes
-              - id: "1"
-                type: recipes
             log:
               data:
                 id: "1"
@@ -1421,10 +1457,6 @@ components:
               data:
                 id: "1"
                 type: commits
-            missing-packages:
-              data:
-              - null
-              - null
           attributes:
             status: new
           id: "1"
@@ -1449,12 +1481,6 @@ components:
               data:
                 id: "1"
                 type: ecosystems
-            missing-recipes:
-              data:
-              - id: "1"
-                type: recipes
-              - id: "1"
-                type: recipes
             log:
               data:
                 id: "1"
@@ -1467,10 +1493,6 @@ components:
               data:
                 id: "1"
                 type: commits
-            missing-packages:
-              data:
-              - null
-              - null
           attributes:
             status: new
           id: "1"
@@ -1484,12 +1506,6 @@ components:
               data:
                 id: "1"
                 type: ecosystems
-            missing-recipes:
-              data:
-              - id: "1"
-                type: recipes
-              - id: "1"
-                type: recipes
             log:
               data:
                 id: "1"
@@ -1502,10 +1518,6 @@ components:
               data:
                 id: "1"
                 type: commits
-            missing-packages:
-              data:
-              - null
-              - null
           attributes:
             status: new
           id: "1"
@@ -1562,16 +1574,14 @@ components:
             data:
               id: "1"
               type: ecosystems
-          packages:
-            data:
-            - null
-            - null
+          revisions:
+            links:
+              related: revision
         attributes:
           name: hello
           channel: stable
           version: 1.2.3
           user: conanci
-          revision: 08979da6c039dd919292f7408785e2ad711b2fd5
         id: "1"
         type: recipe
     RecipeData:
@@ -1588,16 +1598,14 @@ components:
               data:
                 id: "1"
                 type: ecosystems
-            packages:
-              data:
-              - null
-              - null
+            revisions:
+              links:
+                related: revision
           attributes:
             name: hello
             channel: stable
             version: 1.2.3
             user: conanci
-            revision: 08979da6c039dd919292f7408785e2ad711b2fd5
           id: "1"
           type: recipe
     RecipeList:
@@ -1616,16 +1624,14 @@ components:
               data:
                 id: "1"
                 type: ecosystems
-            packages:
-              data:
-              - null
-              - null
+            revisions:
+              links:
+                related: revision
           attributes:
             name: hello
             channel: stable
             version: 1.2.3
             user: conanci
-            revision: 08979da6c039dd919292f7408785e2ad711b2fd5
           id: "1"
           type: recipe
         - relationships:
@@ -1633,18 +1639,112 @@ components:
               data:
                 id: "1"
                 type: ecosystems
-            packages:
-              data:
-              - null
-              - null
+            revisions:
+              links:
+                related: revision
           attributes:
             name: hello
             channel: stable
             version: 1.2.3
             user: conanci
-            revision: 08979da6c039dd919292f7408785e2ad711b2fd5
           id: "1"
           type: recipe
+    RecipeRevision:
+      required:
+      - type
+      type: object
+      properties:
+        id:
+          type: string
+          example: "1"
+        type:
+          type: string
+          example: recipe-revision
+        attributes:
+          $ref: '#/components/schemas/RecipeRevision_attributes'
+        relationships:
+          $ref: '#/components/schemas/RecipeRevision_relationships'
+      example:
+        relationships:
+          recipe:
+            data:
+              id: "1"
+              type: recipes
+          packages:
+            data:
+            - id: "1"
+              type: packages
+            - id: "1"
+              type: packages
+        attributes:
+          revision: 08979da6c039dd919292f7408785e2ad711b2fd5
+        id: "1"
+        type: recipe-revision
+    RecipeRevisionData:
+      required:
+      - data
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/RecipeRevision'
+      example:
+        data:
+          relationships:
+            recipe:
+              data:
+                id: "1"
+                type: recipes
+            packages:
+              data:
+              - id: "1"
+                type: packages
+              - id: "1"
+                type: packages
+          attributes:
+            revision: 08979da6c039dd919292f7408785e2ad711b2fd5
+          id: "1"
+          type: recipe-revision
+    RecipeRevisionList:
+      required:
+      - data
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/RecipeRevision'
+      example:
+        data:
+        - relationships:
+            recipe:
+              data:
+                id: "1"
+                type: recipes
+            packages:
+              data:
+              - id: "1"
+                type: packages
+              - id: "1"
+                type: packages
+          attributes:
+            revision: 08979da6c039dd919292f7408785e2ad711b2fd5
+          id: "1"
+          type: recipe-revision
+        - relationships:
+            recipe:
+              data:
+                id: "1"
+                type: recipes
+            packages:
+              data:
+              - id: "1"
+                type: packages
+              - id: "1"
+                type: packages
+          attributes:
+            revision: 08979da6c039dd919292f7408785e2ad711b2fd5
+          id: "1"
+          type: recipe-revision
     Package:
       required:
       - type
@@ -1663,14 +1763,16 @@ components:
       example:
         relationships:
           required-by: null
-          recipe:
+          recipe-revision:
             data:
               id: "1"
-              type: recipes
+              type: recipe-revisions
           requires:
             data:
-            - null
-            - null
+            - id: "1"
+              type: packages
+            - id: "1"
+              type: packages
         attributes:
           package-id: cda61897af86d277c61b93fa40c92da744abdf33
         id: "1"
@@ -1686,14 +1788,16 @@ components:
         data:
           relationships:
             required-by: null
-            recipe:
+            recipe-revision:
               data:
                 id: "1"
-                type: recipes
+                type: recipe-revisions
             requires:
               data:
-              - null
-              - null
+              - id: "1"
+                type: packages
+              - id: "1"
+                type: packages
           attributes:
             package-id: cda61897af86d277c61b93fa40c92da744abdf33
           id: "1"
@@ -2194,42 +2298,6 @@ components:
         data:
           id: "1"
           type: packages
-    Build_relationships_missingrecipes_data:
-      type: object
-      properties:
-        type:
-          type: string
-          example: recipes
-        id:
-          type: string
-          example: "1"
-      example:
-        id: "1"
-        type: recipes
-    Build_relationships_missingrecipes:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Build_relationships_missingrecipes_data'
-      example:
-        data:
-        - id: "1"
-          type: recipes
-        - id: "1"
-          type: recipes
-    Build_relationships_missingpackages:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Build_relationships_package_data'
-      example:
-        data:
-        - null
-        - null
     Build_relationships:
       type: object
       properties:
@@ -2243,10 +2311,6 @@ components:
           $ref: '#/components/schemas/Build_relationships_log'
         package:
           $ref: '#/components/schemas/Build_relationships_package'
-        missing-recipes:
-          $ref: '#/components/schemas/Build_relationships_missingrecipes'
-        missing-packages:
-          $ref: '#/components/schemas/Build_relationships_missingpackages'
       example:
         package:
           data:
@@ -2256,12 +2320,6 @@ components:
           data:
             id: "1"
             type: ecosystems
-        missing-recipes:
-          data:
-          - id: "1"
-            type: recipes
-          - id: "1"
-            type: recipes
         log:
           data:
             id: "1"
@@ -2274,10 +2332,6 @@ components:
           data:
             id: "1"
             type: commits
-        missing-packages:
-          data:
-          - null
-          - null
     Log_attributes:
       type: object
       properties:
@@ -2301,31 +2355,103 @@ components:
         channel:
           type: string
           example: stable
-        revision:
-          type: string
-          example: 08979da6c039dd919292f7408785e2ad711b2fd5
       example:
         name: hello
         channel: stable
         version: 1.2.3
         user: conanci
-        revision: 08979da6c039dd919292f7408785e2ad711b2fd5
+    Recipe_relationships_revisions_links:
+      type: object
+      properties:
+        related:
+          type: string
+          format: uri
+          example: revision
+      example:
+        related: revision
+    Recipe_relationships_revisions:
+      type: object
+      properties:
+        links:
+          $ref: '#/components/schemas/Recipe_relationships_revisions_links'
+      example:
+        links:
+          related: revision
     Recipe_relationships:
       type: object
       properties:
         ecosystem:
           $ref: '#/components/schemas/Repo_relationships_ecosystem'
-        packages:
-          $ref: '#/components/schemas/Build_relationships_missingpackages'
+        revisions:
+          $ref: '#/components/schemas/Recipe_relationships_revisions'
       example:
         ecosystem:
           data:
             id: "1"
             type: ecosystems
+        revisions:
+          links:
+            related: revision
+    RecipeRevision_attributes:
+      type: object
+      properties:
+        revision:
+          type: string
+          example: 08979da6c039dd919292f7408785e2ad711b2fd5
+      example:
+        revision: 08979da6c039dd919292f7408785e2ad711b2fd5
+    RecipeRevision_relationships_recipe_data:
+      type: object
+      properties:
+        type:
+          type: string
+          example: recipes
+        id:
+          type: string
+          example: "1"
+      example:
+        id: "1"
+        type: recipes
+    RecipeRevision_relationships_recipe:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/RecipeRevision_relationships_recipe_data'
+      example:
+        data:
+          id: "1"
+          type: recipes
+    RecipeRevision_relationships_packages:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Build_relationships_package_data'
+      example:
+        data:
+        - id: "1"
+          type: packages
+        - id: "1"
+          type: packages
+    RecipeRevision_relationships:
+      type: object
+      properties:
+        recipe:
+          $ref: '#/components/schemas/RecipeRevision_relationships_recipe'
+        packages:
+          $ref: '#/components/schemas/RecipeRevision_relationships_packages'
+      example:
+        recipe:
+          data:
+            id: "1"
+            type: recipes
         packages:
           data:
-          - null
-          - null
+          - id: "1"
+            type: packages
+          - id: "1"
+            type: packages
     Package_attributes:
       type: object
       properties:
@@ -2334,34 +2460,48 @@ components:
           example: cda61897af86d277c61b93fa40c92da744abdf33
       example:
         package-id: cda61897af86d277c61b93fa40c92da744abdf33
-    Package_relationships_recipe:
+    Package_relationships_reciperevision_data:
+      type: object
+      properties:
+        type:
+          type: string
+          example: recipe-revisions
+        id:
+          type: string
+          example: "1"
+      example:
+        id: "1"
+        type: recipe-revisions
+    Package_relationships_reciperevision:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/Build_relationships_missingrecipes_data'
+          $ref: '#/components/schemas/Package_relationships_reciperevision_data'
       example:
         data:
           id: "1"
-          type: recipes
+          type: recipe-revisions
     Package_relationships:
       type: object
       properties:
-        recipe:
-          $ref: '#/components/schemas/Package_relationships_recipe'
+        recipe-revision:
+          $ref: '#/components/schemas/Package_relationships_reciperevision'
         requires:
-          $ref: '#/components/schemas/Build_relationships_missingpackages'
+          $ref: '#/components/schemas/RecipeRevision_relationships_packages'
         required-by:
-          $ref: '#/components/schemas/Build_relationships_missingpackages'
+          $ref: '#/components/schemas/RecipeRevision_relationships_packages'
       example:
         required-by: null
-        recipe:
+        recipe-revision:
           data:
             id: "1"
-            type: recipes
+            type: recipe-revisions
         requires:
           data:
-          - null
-          - null
+          - id: "1"
+            type: packages
+          - id: "1"
+            type: packages
   securitySchemes:
     ApiKey:
       type: apiKey
