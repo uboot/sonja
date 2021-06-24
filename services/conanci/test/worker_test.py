@@ -98,15 +98,15 @@ class CrawlerTest(unittest.TestCase):
 
     def test_start_repo_but_no_channel(self):
         with database.session_scope() as session:
-            session.add(util.create_repo())
+            session.add(util.create_repo(dict()))
         self.crawler.start()
         called = self.crawler.query(lambda: self.scheduler.process_commits.called)
         self.assertFalse(called)
 
     def test_start_repo_and_channel(self):
         with database.session_scope() as session:
-            session.add(util.create_repo())
-            session.add(util.create_channel())
+            session.add(util.create_repo(dict()))
+            session.add(util.create_channel(dict()))
         self.crawler.start()
         time.sleep(5)
         called = self.crawler.query(lambda: self.scheduler.process_commits.called)
@@ -117,7 +117,7 @@ class CrawlerTest(unittest.TestCase):
 
     def test_start_repo_and_regex_channel(self):
         with database.session_scope() as session:
-            session.add(util.create_repo())
+            session.add(util.create_repo(dict()))
             session.add(util.create_channel({"channel.branch": "mas.*"}))
         self.crawler.start()
         time.sleep(5)
@@ -129,7 +129,7 @@ class CrawlerTest(unittest.TestCase):
 
     def test_start_repo_and_channel_no_match(self):
         with database.session_scope() as session:
-            session.add(util.create_repo())
+            session.add(util.create_repo(dict()))
             session.add(util.create_channel({"channel.branch": "maste"}))
         self.crawler.start()
         time.sleep(5)
@@ -156,7 +156,7 @@ class CrawlerTest(unittest.TestCase):
     def test_start_invalid_repo(self):
         with database.session_scope() as session:
             session.add(util.create_repo({"repo.invalid": True}))
-            session.add(util.create_channel())
+            session.add(util.create_channel(dict()))
         self.crawler.start()
         time.sleep(3)
         with database.session_scope() as session:
@@ -180,14 +180,25 @@ class SchedulerTest(unittest.TestCase):
 
     def test_start_commit_and_profile(self):
         with database.session_scope() as session:
-            session.add(util.create_commit({"commit.status": database.CommitStatus.new}))
-            session.add(util.create_profile({"os": "Linux"}))
+            session.add(util.create_commit(dict()))
+            session.add(util.create_profile(dict()))
         self.scheduler.start()
         time.sleep(1)
         self.scheduler.cancel()
         self.scheduler.join()
         self.assertTrue(self.linux_agent.process_builds.called)
         self.assertTrue(self.windows_agent.process_builds.called)
+
+    def test_start_exclude_repo(self):
+        with database.session_scope() as session:
+            session.add(util.create_commit(dict()))
+            session.add(util.create_profile({"profile.os": "Windows"}))
+        self.scheduler.start()
+        time.sleep(1)
+        self.scheduler.cancel()
+        self.scheduler.join()
+        self.assertFalse(self.linux_agent.process_builds.called)
+        self.assertFalse(self.windows_agent.process_builds.called)
 
     def test_start_new_builds(self):
         with database.session_scope() as session:

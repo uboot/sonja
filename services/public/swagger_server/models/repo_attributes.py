@@ -6,6 +6,7 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
+from swagger_server.models.repo_attributes_exclude import RepoAttributesExclude  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -14,7 +15,7 @@ class RepoAttributes(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, name: str=None, url: str=None, path: str=None):  # noqa: E501
+    def __init__(self, name: str=None, url: str=None, path: str=None, exclude: List[RepoAttributesExclude]=None):  # noqa: E501
         """RepoAttributes - a model defined in Swagger
 
         :param name: The name of this RepoAttributes.  # noqa: E501
@@ -23,21 +24,26 @@ class RepoAttributes(Model):
         :type url: str
         :param path: The path of this RepoAttributes.  # noqa: E501
         :type path: str
+        :param exclude: The exclude of this RepoAttributes.  # noqa: E501
+        :type exclude: List[RepoAttributesExclude]
         """
         self.swagger_types = {
             'name': str,
             'url': str,
-            'path': str
+            'path': str,
+            'exclude': List[RepoAttributesExclude]
         }
 
         self.attribute_map = {
             'name': 'name',
             'url': 'url',
-            'path': 'path'
+            'path': 'path',
+            'exclude': 'exclude'
         }
         self._name = name
         self._url = url
         self._path = path
+        self._exclude = exclude
 
     @classmethod
     def from_dict(cls, dikt) -> 'RepoAttributes':
@@ -112,3 +118,24 @@ class RepoAttributes(Model):
         """
 
         self._path = path
+
+    @property
+    def exclude(self) -> List[RepoAttributesExclude]:
+        """Gets the exclude of this RepoAttributes.
+
+
+        :return: The exclude of this RepoAttributes.
+        :rtype: List[RepoAttributesExclude]
+        """
+        return self._exclude
+
+    @exclude.setter
+    def exclude(self, exclude: List[RepoAttributesExclude]):
+        """Sets the exclude of this RepoAttributes.
+
+
+        :param exclude: The exclude of this RepoAttributes.
+        :type exclude: List[RepoAttributesExclude]
+        """
+
+        self._exclude = exclude

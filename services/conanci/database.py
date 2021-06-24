@@ -59,6 +59,21 @@ class Ecosystem(Base):
     settings = Column(Text())
 
 
+class Label(Base):
+    __tablename__ = 'label'
+
+    id = Column(Integer, primary_key=True)
+    value = Column(String(255), nullable=False)
+
+    def __init__(self, value):
+        self.value = value
+
+
+repo_label = Table('replo_label', Base.metadata,
+                   Column('repo_id', Integer, ForeignKey('repo.id')),
+                   Column('label_id', Integer, ForeignKey('label.id')))
+
+
 class Repo(Base):
     __tablename__ = 'repo'
 
@@ -68,6 +83,7 @@ class Repo(Base):
     name = Column(String(255))
     url = Column(String(255))
     path = Column(String(255))
+    exclude = relationship("Label", secondary=repo_label)
 
 
 class Channel(Base):
@@ -78,6 +94,11 @@ class Channel(Base):
     ecosystem = relationship("Ecosystem", backref="channels")
     name = Column(String(255), nullable=False)
     branch = Column(String(255))
+
+
+profile_label = Table('profile_label', Base.metadata,
+    Column('profile_id', Integer, ForeignKey('profile.id')),
+    Column('label_id', Integer, ForeignKey('label.id')))
 
 
 class Profile(Base):
@@ -92,10 +113,26 @@ class Profile(Base):
     docker_password = Column(String(255))
     settings = relationship('Setting', backref='profile', lazy=True,
                             cascade="all, delete, delete-orphan")
+    options = relationship('Option', backref='profile', lazy=True,
+                            cascade="all, delete, delete-orphan")
+    labels = relationship("Label", secondary=profile_label)
 
 
 class Setting(Base):
     __tablename__ = 'setting'
+
+    id = Column(Integer, primary_key=True)
+    key = Column(String(255), nullable=False)
+    value = Column(String(255), nullable=False)
+    profile_id = Column(Integer, ForeignKey('profile.id'), nullable=False)
+
+    def __init__(self, key, value):
+        self.key = key
+        self.value = value
+
+
+class Option(Base):
+    __tablename__ = 'option'
 
     id = Column(Integer, primary_key=True)
     key = Column(String(255), nullable=False)
@@ -184,8 +221,7 @@ class RecipeRevision(Base):
 
 package_requirement = Table('package_requirement', Base.metadata,
     Column('package_id', Integer, ForeignKey('package.id'), primary_key=True),
-    Column('requirement_id', Integer, ForeignKey('package.id'), primary_key=True)
-)
+    Column('requirement_id', Integer, ForeignKey('package.id'), primary_key=True))
 
 
 class Package(Base):
@@ -223,6 +259,9 @@ def populate_database():
         hello.ecosystem = ecosystem
         hello.url = "git@github.com:uboot/conan-ci.git"
         hello.path = "packages/hello"
+        hello.exclude = [
+            Label("debug")
+        ]
         session.add(hello)
 
         base = Repo()
@@ -230,6 +269,9 @@ def populate_database():
         base.ecosystem = ecosystem
         base.url = "git@github.com:uboot/conan-ci.git"
         base.path = "packages/base"
+        base.exclude = [
+            Label("debug")
+        ]
         session.add(hello)
 
         app = Repo()
@@ -237,6 +279,9 @@ def populate_database():
         app.ecosystem = ecosystem
         app.url = "git@github.com:uboot/conan-ci.git"
         app.path = "packages/app"
+        app.exclude = [
+            Label("debug")
+        ]
         session.add(hello)
 
         linux_release = Profile()
@@ -246,6 +291,9 @@ def populate_database():
         linux_release.settings = [
             Setting("os", "Linux"),
             Setting("build_type", "Release")
+        ]
+        linux_release.options = [
+            Option("hello:shared", "False")
         ]
         session.add(linux_release)
 
@@ -257,6 +305,12 @@ def populate_database():
             Setting("os", "Linux"),
             Setting("build_type", "Debug")
         ]
+        linux_debug.options = [
+            Option("hello:shared", "False")
+        ]
+        linux_debug.labels = [
+            Label("debug")
+        ]
         session.add(linux_debug)
 
         windows_release = Profile()
@@ -267,6 +321,9 @@ def populate_database():
             Setting("os", "Windows"),
             Setting("build_type", "Release")
         ]
+        windows_release.options = [
+            Option("hello:shared", "False")
+        ]
         session.add(windows_release)
 
         windows_debug = Profile()
@@ -276,6 +333,12 @@ def populate_database():
         windows_debug.settings = [
             Setting("os", "Windows"),
             Setting("build_type", "Debug")
+        ]
+        windows_debug.options = [
+            Option("hello:shared", "False")
+        ]
+        windows_debug.labels = [
+            Label("debug")
         ]
         session.add(windows_debug)
 
@@ -308,8 +371,12 @@ def clear_ecosystems():
     drop_table(Commit.__table__)
     drop_table(Channel.__table__)
     drop_table(Setting.__table__)
+    drop_table(Option.__table__)
+    drop_table(profile_label)
     drop_table(Profile.__table__)
+    drop_table(repo_label)
     drop_table(Repo.__table__)
+    drop_table(Label.__table__)
 
     try:
         Base.metadata.create_all(engine)

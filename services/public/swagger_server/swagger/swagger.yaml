@@ -1093,6 +1093,9 @@ components:
         attributes:
           path: packages/hello
           name: Conan CI
+          exclude:
+          - label: embedded
+          - label: embedded
           url: https://github.com/uboot/conan-ci.git
         id: "1"
         type: repos
@@ -1116,6 +1119,9 @@ components:
           attributes:
             path: packages/hello
             name: Conan CI
+            exclude:
+            - label: embedded
+            - label: embedded
             url: https://github.com/uboot/conan-ci.git
           id: "1"
           type: repos
@@ -1141,6 +1147,9 @@ components:
           attributes:
             path: packages/hello
             name: Conan CI
+            exclude:
+            - label: embedded
+            - label: embedded
             url: https://github.com/uboot/conan-ci.git
           id: "1"
           type: repos
@@ -1155,6 +1164,9 @@ components:
           attributes:
             path: packages/hello
             name: Conan CI
+            exclude:
+            - label: embedded
+            - label: embedded
             url: https://github.com/uboot/conan-ci.git
           id: "1"
           type: repos
@@ -1188,7 +1200,15 @@ components:
             key: build_type
           docker-password: paSSw0rd
           name: GCC 9
+          options:
+          - value: "true"
+            key: hello:shared
+          - value: "true"
+            key: hello:shared
           docker-user: user
+          labels:
+          - label: embedded
+          - label: embedded
         id: "1"
         type: profiles
     ProfileData:
@@ -1214,7 +1234,15 @@ components:
               key: build_type
             docker-password: paSSw0rd
             name: GCC 9
+            options:
+            - value: "true"
+              key: hello:shared
+            - value: "true"
+              key: hello:shared
             docker-user: user
+            labels:
+            - label: embedded
+            - label: embedded
           id: "1"
           type: profiles
     Channel:
@@ -1977,6 +2005,16 @@ components:
             type: profiles
           - id: "1"
             type: profiles
+    Repo_attributes_exclude:
+      required:
+      - label
+      type: object
+      properties:
+        label:
+          type: string
+          example: embedded
+      example:
+        label: embedded
     Repo_attributes:
       type: object
       properties:
@@ -1989,9 +2027,16 @@ components:
         path:
           type: string
           example: packages/hello
+        exclude:
+          type: array
+          items:
+            $ref: '#/components/schemas/Repo_attributes_exclude'
       example:
         path: packages/hello
         name: Conan CI
+        exclude:
+        - label: embedded
+        - label: embedded
         url: https://github.com/uboot/conan-ci.git
     Repo_relationships_ecosystem_data:
       type: object
@@ -2061,6 +2106,21 @@ components:
       example:
         value: Release
         key: build_type
+    Profile_attributes_options:
+      required:
+      - key
+      - value
+      type: object
+      properties:
+        key:
+          type: string
+          example: hello:shared
+        value:
+          type: string
+          example: "true"
+      example:
+        value: "true"
+        key: hello:shared
     Profile_attributes:
       type: object
       properties:
@@ -2080,6 +2140,14 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Profile_attributes_settings'
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/Profile_attributes_options'
+        labels:
+          type: array
+          items:
+            $ref: '#/components/schemas/Repo_attributes_exclude'
       example:
         container: uboot/gcc9:latest
         settings:
@@ -2089,7 +2157,15 @@ components:
           key: build_type
         docker-password: paSSw0rd
         name: GCC 9
+        options:
+        - value: "true"
+          key: hello:shared
+        - value: "true"
+          key: hello:shared
         docker-user: user
+        labels:
+        - label: embedded
+        - label: embedded
     Profile_relationships:
       type: object
       properties:

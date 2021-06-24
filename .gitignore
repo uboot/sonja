@@ -1,6 +1,7 @@
 __pycache__ 
 .idea
 .venv
+venv
 /temp/
 /deployment/iso/*
 /deployment/k3s.yaml

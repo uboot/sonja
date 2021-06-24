@@ -38,6 +38,7 @@ def create_repo(parameters):
         repo.path = "packages/deadlock"
     else:
         repo.path = "packages/hello"
+    repo.exclude = [database.Label("desktop")]
     return repo
 
 
@@ -76,6 +77,11 @@ def create_profile(parameters):
             database.Setting("build_type", "Debug"),
             database.Setting("compiler.libcxx", "libstdc++11")
         ]
+        profile.options = [
+            database.Option("hello:shared", "True"),
+            database.Option("base:with_tests", "False")
+        ]
+        profile.labels = [database.Label("embedded")]
     else:
         profile.name = "MSVC 15"
         profile.container = "msvc15:local"
@@ -83,6 +89,11 @@ def create_profile(parameters):
             database.Setting("os", "Windows"),
             database.Setting("build_type", "Release")
         ]
+        profile.options = [
+            database.Option("hello:shared", "True"),
+            database.Option("base:with_tests", "False")
+        ]
+        profile.labels = [database.Label("desktop")]
     return profile
 
 

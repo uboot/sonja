@@ -76,7 +76,9 @@ class TestProfileController(BaseTestCase):
                 attributes=models.ProfileAttributes(
                     name=name,
                     container=container,
-                    settings=[models.ProfileAttributesSettings("os", "Linux")]
+                    settings=[models.ProfileAttributesSettings("os", "Linux")],
+                    options=[models.ProfileAttributesOptions("base:shared", "True")],
+                    labels=[models.RepoAttributesExclude("embedded")]
                 ),
                 relationships=models.ProfileRelationships(
                     ecosystem=models.RepoRelationshipsEcosystem(

@@ -30,7 +30,13 @@ class Scheduler(Worker):
             profiles = session.query(database.Profile).all()
             for commit in commits:
                 logger.info("Process commit '%s' of repo '%s'", commit.sha[:7], commit.repo.url)
+                exclude_labels = {label.value for label in commit.repo.exclude}
                 for profile in profiles:
+                    labels = {label.value for label in profile.labels}
+                    if not labels.isdisjoint(exclude_labels):
+                        logger.info("Exclude build for '%s' with profile '%s'", commit.sha[:7], profile.name)
+                        continue
+
                     new_commits = True
                     logger.info("Schedule build for '%s' with profile '%s'", commit.sha[:7], profile.name)
                     build = database.Build()

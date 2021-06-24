@@ -6,7 +6,9 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
+from swagger_server.models.profile_attributes_options import ProfileAttributesOptions  # noqa: F401,E501
 from swagger_server.models.profile_attributes_settings import ProfileAttributesSettings  # noqa: F401,E501
+from swagger_server.models.repo_attributes_exclude import RepoAttributesExclude  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -15,7 +17,7 @@ class ProfileAttributes(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, name: str=None, container: str=None, docker_user: str=None, docker_password: str=None, settings: List[ProfileAttributesSettings]=None):  # noqa: E501
+    def __init__(self, name: str=None, container: str=None, docker_user: str=None, docker_password: str=None, settings: List[ProfileAttributesSettings]=None, options: List[ProfileAttributesOptions]=None, labels: List[RepoAttributesExclude]=None):  # noqa: E501
         """ProfileAttributes - a model defined in Swagger
 
         :param name: The name of this ProfileAttributes.  # noqa: E501
@@ -28,13 +30,19 @@ class ProfileAttributes(Model):
         :type docker_password: str
         :param settings: The settings of this ProfileAttributes.  # noqa: E501
         :type settings: List[ProfileAttributesSettings]
+        :param options: The options of this ProfileAttributes.  # noqa: E501
+        :type options: List[ProfileAttributesOptions]
+        :param labels: The labels of this ProfileAttributes.  # noqa: E501
+        :type labels: List[RepoAttributesExclude]
         """
         self.swagger_types = {
             'name': str,
             'container': str,
             'docker_user': str,
             'docker_password': str,
-            'settings': List[ProfileAttributesSettings]
+            'settings': List[ProfileAttributesSettings],
+            'options': List[ProfileAttributesOptions],
+            'labels': List[RepoAttributesExclude]
         }
 
         self.attribute_map = {
@@ -42,13 +50,17 @@ class ProfileAttributes(Model):
             'container': 'container',
             'docker_user': 'docker-user',
             'docker_password': 'docker-password',
-            'settings': 'settings'
+            'settings': 'settings',
+            'options': 'options',
+            'labels': 'labels'
         }
         self._name = name
         self._container = container
         self._docker_user = docker_user
         self._docker_password = docker_password
         self._settings = settings
+        self._options = options
+        self._labels = labels
 
     @classmethod
     def from_dict(cls, dikt) -> 'ProfileAttributes':
@@ -165,3 +177,45 @@ class ProfileAttributes(Model):
         """
 
         self._settings = settings
+
+    @property
+    def options(self) -> List[ProfileAttributesOptions]:
+        """Gets the options of this ProfileAttributes.
+
+
+        :return: The options of this ProfileAttributes.
+        :rtype: List[ProfileAttributesOptions]
+        """
+        return self._options
+
+    @options.setter
+    def options(self, options: List[ProfileAttributesOptions]):
+        """Sets the options of this ProfileAttributes.
+
+
+        :param options: The options of this ProfileAttributes.
+        :type options: List[ProfileAttributesOptions]
+        """
+
+        self._options = options
+
+    @property
+    def labels(self) -> List[RepoAttributesExclude]:
+        """Gets the labels of this ProfileAttributes.
+
+
+        :return: The labels of this ProfileAttributes.
+        :rtype: List[RepoAttributesExclude]
+        """
+        return self._labels
+
+    @labels.setter
+    def labels(self, labels: List[RepoAttributesExclude]):
+        """Sets the labels of this ProfileAttributes.
+
+
+        :param labels: The labels of this ProfileAttributes.
+        :type labels: List[RepoAttributesExclude]
+        """
+
+        self._labels = labels

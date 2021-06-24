@@ -41,6 +41,11 @@ def create_build_tar(script_template_name: str, parameters: dict):
         add_content(tar, "settings.yml", decode(parameters["conan_settings"]))
     tar.close()
     f.seek(0)
+
+    # with open("build.tar", "wb") as dump:
+    #     dump.write(f.read())
+    # f.seek(0)
+
     return f
 
 
@@ -141,10 +146,6 @@ class Builder(object):
 
     def setup(self, parameters):
         logger.info("Setup docker container")
-
-        # with open("build.tar", "wb") as f:
-        #     f.write(build_tar.read())
-        # build_tar.seek(0)
 
         self.__container = self.__client.containers.create(image=self.__image,
                                                            command=self.build_command)

@@ -50,6 +50,7 @@ from swagger_server.models.log_data import LogData
 from swagger_server.models.profile import Profile
 from swagger_server.models.profile_attributes import ProfileAttributes
 from swagger_server.models.profile_attributes_settings import ProfileAttributesSettings
+from swagger_server.models.profile_attributes_options import ProfileAttributesOptions
 from swagger_server.models.profile_data import ProfileData
 from swagger_server.models.profile_relationships import ProfileRelationships
 from swagger_server.models.recipe import Recipe
@@ -75,6 +76,7 @@ from swagger_server.models.package_relationships_reciperevision import PackageRe
 from swagger_server.models.package_relationships_reciperevision_data import PackageRelationshipsReciperevisionData
 from swagger_server.models.repo import Repo
 from swagger_server.models.repo_attributes import RepoAttributes
+from swagger_server.models.repo_attributes_exclude import RepoAttributesExclude
 from swagger_server.models.repo_data import RepoData
 from swagger_server.models.repo_list import RepoList
 from swagger_server.models.repo_relationships import RepoRelationships

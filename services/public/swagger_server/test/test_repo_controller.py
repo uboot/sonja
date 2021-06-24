@@ -87,7 +87,8 @@ class TestRepoController(BaseTestCase):
                 attributes=models.RepoAttributes(
                     name=name,
                     url=url,
-                    path=path
+                    path=path,
+                    exclude=[models.RepoAttributesExclude("embedded")]
                 ),
                 relationships=models.RepoRelationships(
                     ecosystem=models.RepoRelationshipsEcosystem(

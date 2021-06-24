@@ -10,8 +10,8 @@ class BaseConan(ConanFile):
     description = "<Description of Hello here>"
     topics = ("<Put some tag here>", "<here>", "<and here>")
     settings = "os", "compiler", "build_type", "arch"
-    options = {"shared": [True, False]}
-    default_options = {"shared": False}
+    options = {"with_tests": [True, False]}
+    default_options = {"with_tests": False}
     generators = "cmake"
     revision_mode = "scm"
 

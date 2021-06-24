@@ -39,9 +39,9 @@ class Agent(Worker):
             build = session\
                 .query(database.Build)\
                 .join(database.Build.profile).join(database.Profile.settings)\
-                .filter(database.Setting.key=='os',\
-                    database.Setting.value==conanci_os,\
-                    database.Build.status==database.BuildStatus.new)\
+                .filter(database.Setting.key == 'os',\
+                        database.Setting.value == conanci_os,\
+                        database.Build.status == database.BuildStatus.new)\
                 .populate_existing()\
                 .with_for_update(skip_locked=True, of=database.Build)\
                 .first()
@@ -57,6 +57,10 @@ class Agent(Worker):
             build.log.logs = ''
 
             container = build.profile.container
+            conan_settings = " ".join(["-s {0}={1}".format(setting.key, setting.value)
+                                       for setting in build.profile.settings])
+            conan_options = " ".join(["-o {0}={1}".format(option.key, option.value)
+                                      for option in build.profile.options])
             parameters = {
                 "conan_remote": build.profile.ecosystem.conan_remote,
                 "conan_verify_ssl": build.profile.ecosystem.conan_verify_ssl,
@@ -66,8 +70,7 @@ class Agent(Worker):
                 "git_url": build.commit.repo.url,
                 "git_sha": build.commit.sha,
                 "conanci_user": build.profile.ecosystem.user,
-                "conan_args": " ".join(["-s {0}={1}".format(setting.key, setting.value)
-                                        for setting in build.profile.settings]),
+                "conan_args": " ".join([conan_settings, conan_options]),
                 "channel": build.commit.channel.name,
                 "path": os.path.join(build.commit.repo.path, "conanfile.py")
                         if build.commit.repo.path != "" else "conanfile.py",

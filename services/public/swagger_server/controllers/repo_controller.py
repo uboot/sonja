@@ -12,7 +12,8 @@ def __create_repo(record: database.Repo):
         attributes=models.RepoAttributes(
             name=record.name,
             url=record.url,
-            path=record.path
+            path=record.path,
+            exclude=[models.RepoAttributesExclude(label=r.value) for r in record.exclude]
         ),
         relationships=models.RepoRelationships(
             commits=models.RepoRelationshipsCommits(
@@ -44,6 +45,7 @@ def add_repo(body=None):
         record.name = body.data.attributes.name
         record.path = body.data.attributes.path
         record.url = body.data.attributes.url
+        record.exclude = [database.Label(l.label) for l in body.data.attributes.exclude]
         record.ecosystem = ecosystem
         session.add(record)
         session.commit()
@@ -86,5 +88,6 @@ def update_repo(repo_id, body=None):
         record.name = body.data.attributes.name
         record.path = body.data.attributes.path
         record.url = body.data.attributes.url
+        record.exclude = [database.Label(l.label) for l in body.data.attributes.exclude]
         return models.RepoData(data=__create_repo(record))
 
