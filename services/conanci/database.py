@@ -186,7 +186,7 @@ class Build(Base):
     package = relationship("Package", backref="builds")
     profile_id = Column(Integer, ForeignKey('profile.id'), nullable=False)
     profile = relationship("Profile")
-    log_id = Column(Integer, ForeignKey('log.id'))
+    log_id = Column(Integer, ForeignKey('log.id'), nullable=False)
     log = relationship("Log")
 
 

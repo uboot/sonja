@@ -115,6 +115,21 @@ class CrawlerTest(unittest.TestCase):
             commit = session.query(database.Commit).first()
             self.assertEqual(database.CommitStatus.new, commit.status)
 
+    def test_post_repo(self):
+        self.crawler.start()
+        time.sleep(1)
+        with database.session_scope() as session:
+            session.add(util.create_repo(dict()))
+            session.add(util.create_channel(dict()))
+        self.crawler.post_repo("1")
+        self.crawler.trigger()
+        time.sleep(5)
+        called = self.crawler.query(lambda: self.scheduler.process_commits.called)
+        self.assertTrue(called)
+        with database.session_scope() as session:
+            commit = session.query(database.Commit).first()
+            self.assertEqual(database.CommitStatus.new, commit.status)
+
     def test_start_repo_and_regex_channel(self):
         with database.session_scope() as session:
             session.add(util.create_repo(dict()))

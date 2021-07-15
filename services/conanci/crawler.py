@@ -2,14 +2,18 @@ from conanci import database
 from conanci.config import connect_to_database, logger
 from conanci.ssh import decode
 from conanci.worker import Worker
+from queue import Empty, SimpleQueue
 import asyncio
+import datetime
 import git
 import os.path
 import re
 import shutil
 import stat
 
+
 data_dir = os.environ.get("VCS_DATA_DIR", "/data")
+CRAWLER_PERIOD_SECONDS = 300
 
 
 class RepoController(object):
@@ -93,19 +97,22 @@ class RepoController(object):
         return email[:255] if len(email) > 255 else email
 
 
-
 class Crawler(Worker):
     def __init__(self, scheduler):
         super().__init__()
         connect_to_database()
         self.__scheduler = scheduler
+        self.__repos = SimpleQueue()
+        self.__next_crawl = datetime.datetime.now()
+
+    def post_repo(self, repo_id):
+        self.__repos.put(repo_id)
 
     async def work(self):
         try:
             await self.__process_repos()
         except Exception as e:
             logger.error("Processing repos failed: %s", e)
-        self.reschedule_internally(60)
 
     async def __process_repos(self):
         logger.info("Start crawling")
@@ -117,7 +124,15 @@ class Crawler(Worker):
 
         new_commits = False
         with database.session_scope() as session:
-            repos = session.query(database.Repo).all()
+            if datetime.datetime.now() >= self.__next_crawl:
+                logger.info("Crawl all repos")
+                repos = session.query(database.Repo).all()
+                self.__next_crawl = datetime.datetime.now() + datetime.timedelta(seconds=CRAWLER_PERIOD_SECONDS)
+                self.reschedule_internally(CRAWLER_PERIOD_SECONDS)
+            else:
+                logger.info("Crawl manually triggered repos")
+                repo_ids = [repo for repo in self.__get_repos()]
+                repos = session.query(database.Repo).filter(database.Repo.id.in_(repo_ids)).all()
             channels = session.query(database.Channel).all()
             for repo in repos:
                 try:
@@ -181,3 +196,10 @@ class Crawler(Worker):
             self.__scheduler.process_commits()
         else:
             logger.info("Finish crawling with *no* new commits")
+
+    def __get_repos(self):
+        try:
+            while True:
+                yield self.__repos.get_nowait()
+        except Empty:
+            pass

@@ -76,15 +76,28 @@ paths:
         "200":
           description: success
       x-openapi-router-controller: swagger_server.controllers.general_controller
-  /process-repos:
+  /process-repo/{repoId}:
     get:
       tags:
       - General
       summary: scan repos for new commits
-      operationId: process_repos
+      operationId: process_repo
+      parameters:
+      - name: repoId
+        in: path
+        description: repo ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
       responses:
         "200":
           description: success
+        "400":
+          description: invalid ID supplied
+        "404":
+          description: repo not found
       x-openapi-router-controller: swagger_server.controllers.general_controller
   /populate-database:
     get:

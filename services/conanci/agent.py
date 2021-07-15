@@ -53,7 +53,6 @@ class Agent(Worker):
             logger.info("Set status of build '%d' to 'active'", build.id)
             self.__build_id = build.id
             build.status = database.BuildStatus.active
-            build.log = database.Log()
             build.log.logs = ''
 
             container = build.profile.container

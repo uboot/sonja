@@ -114,16 +114,19 @@ def populate_database():  # noqa: E501
     return 'success'
 
 
-def process_repos():  # noqa: E501
+def process_repo(repo_id):  # noqa: E501
     """scan repos for new commits
 
      # noqa: E501
 
+    :param repo_id: repo ID
+    :type repo_id: str
 
     :rtype: None
     """
     try:
-        crawler.process_repos()
+        crawler.process_repo(repo_id)
     except MaxRetryError as e:
         pass
     return 'success'
+

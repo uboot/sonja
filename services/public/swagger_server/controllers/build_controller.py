@@ -101,9 +101,8 @@ def update_build(build_id, body=None):
         try:
             record.status = build_status_table[body.data.attributes.status]
             if record.status == database.BuildStatus.new:
-                log = record.log
-                record.log = None
-                session.delete(log)
+                record.log.logs = ''
+                session.commit()
 
                 logger.info('Trigger linux agent: process builds')
                 try:

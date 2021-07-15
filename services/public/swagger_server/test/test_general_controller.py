@@ -147,14 +147,13 @@ class TestGeneralController(BaseTestCase):
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
-    def test_process_repos(self):
-        """Test case for process_repos
+    def test_process_repo(self):
+        """Test case for process_repo
 
         scan repos for new commits
         """
-        self.login()
         response = self.client.open(
-            '/api/v1/process-repos',
+            '/process-repo/{repoId}'.format(repo_id='1'),
             method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))

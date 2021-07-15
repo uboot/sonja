@@ -5,6 +5,9 @@ from conanci.worker import Worker
 from urllib3.exceptions import MaxRetryError
 
 
+SCHEDULER_PERIOD_SECONDS = 60
+
+
 class Scheduler(Worker):
     def __init__(self, linux_agent, windows_agent):
         super().__init__()
@@ -19,7 +22,7 @@ class Scheduler(Worker):
                 new_commits = await self.__process_commits()
             except Exception as e:
                 logger.error("Processing commits failed: %s", e)
-        self.reschedule_internally(60)
+        #self.reschedule_internally(SCHEDULER_PERIOD_SECONDS)
         
     async def __process_commits(self):
         logger.info("Start processing commits")
@@ -43,6 +46,7 @@ class Scheduler(Worker):
                     build.profile = profile
                     build.commit = commit
                     build.status = database.BuildStatus.new
+                    build.log = database.Log()
                     session.add(build)
                 logger.info("Set commit '%s' to 'building'", commit.sha[:7])
                 commit.status = database.CommitStatus.building

@@ -17,8 +17,8 @@ class Worker(threading.Thread):
     def trigger(self):
         self.__loop.call_soon_threadsafe(self.__trigger)
 
-    def reschedule_internally(self, delay):
-        self.__loop.call_later(delay, self.__trigger)
+    def reschedule_internally(self, delay_in_seconds):
+        self.__loop.call_later(delay_in_seconds, self.__trigger)
 
     def cancel(self):
         self.__loop.call_soon_threadsafe(self.__cancel)

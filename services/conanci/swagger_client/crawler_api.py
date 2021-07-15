@@ -109,41 +109,43 @@ class CrawlerApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def process_repos(self, **kwargs):  # noqa: E501
+    def process_repo(self, repo_id, **kwargs):  # noqa: E501
         """scan repos for new commits  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.process_repos(async_req=True)
+        >>> thread = api.process_repo(repo_id, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
+        :param str repo_id: repo ID (required)
         :return: None
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.process_repos_with_http_info(**kwargs)  # noqa: E501
+            return self.process_repo_with_http_info(repo_id, **kwargs)  # noqa: E501
         else:
-            (data) = self.process_repos_with_http_info(**kwargs)  # noqa: E501
+            (data) = self.process_repo_with_http_info(repo_id, **kwargs)  # noqa: E501
             return data
 
-    def process_repos_with_http_info(self, **kwargs):  # noqa: E501
+    def process_repo_with_http_info(self, repo_id, **kwargs):  # noqa: E501
         """scan repos for new commits  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.process_repos_with_http_info(async_req=True)
+        >>> thread = api.process_repo_with_http_info(repo_id, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
+        :param str repo_id: repo ID (required)
         :return: None
                  If the method is called asynchronously,
                  returns the request thread.
         """
 
-        all_params = []  # noqa: E501
+        all_params = ['repo_id']  # noqa: E501
         all_params.append('async_req')
         all_params.append('_return_http_data_only')
         all_params.append('_preload_content')
@@ -154,14 +156,20 @@ class CrawlerApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method process_repos" % key
+                    " to method process_repo" % key
                 )
             params[key] = val
         del params['kwargs']
+        # verify the required parameter 'repo_id' is set
+        if ('repo_id' not in params or
+                params['repo_id'] is None):
+            raise ValueError("Missing the required parameter `repo_id` when calling `process_repo`")  # noqa: E501
 
         collection_formats = {}
 
         path_params = {}
+        if 'repo_id' in params:
+            path_params['repoId'] = params['repo_id']  # noqa: E501
 
         query_params = []
 
@@ -175,7 +183,7 @@ class CrawlerApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/process-repos', 'GET',
+            '/process-repo/{repoId}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -189,3 +197,4 @@ class CrawlerApi(object):
             _preload_content=params.get('_preload_content', True),
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
+
