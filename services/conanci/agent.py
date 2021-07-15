@@ -149,7 +149,7 @@ class Agent(Worker):
                 .values(logs=func.concat(database.Log.logs, log_tail))
             session.execute(statement)
 
-    def __cancel_stopping_build(self, builder):
+    def __cancel_stopping_build(self, builder) -> bool:
         with database.session_scope() as session:
             build = session.query(database.Build) \
                 .filter_by(id=self.__build_id, status=database.BuildStatus.stopping) \

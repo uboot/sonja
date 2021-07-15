@@ -174,7 +174,6 @@ class Builder(object):
             self.__container_logs = self.__container.logs(stream=True, follow=True)
         for byte_data in self.__container_logs:
             line = byte_data.decode("utf-8").strip('\n\r')
-            logger.info(line)
             self.__logs.put(line)
         with self.__cancel_lock:
             self.__container_logs = None

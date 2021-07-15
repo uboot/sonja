@@ -1,9 +1,22 @@
 import connexion
+import os
 
 from conanci import database
+from conanci.config import logger
+from conanci.swagger_client import ApiClient, Configuration, AgentApi
 from flask import abort
 from swagger_server import models
+from urllib3.exceptions import MaxRetryError
 
+linux_agent_url = os.environ.get('CONANCI_LINUXAGENT_URL', '127.0.0.1')
+linux_agent_configuration = Configuration()
+linux_agent_configuration.host = "http://{0}:8080".format(linux_agent_url)
+linux_agent = AgentApi(ApiClient(linux_agent_configuration))
+
+windows_agent_url = os.environ.get('CONANCI_WINDOWSAGENT_URL', '127.0.0.1')
+windows_agent_configuration = Configuration()
+windows_agent_configuration.host = "http://{0}:8080".format(windows_agent_url)
+windows_agent = AgentApi(ApiClient(windows_agent_configuration))
 
 build_status_table = {
     "new": database.BuildStatus.new,
@@ -87,6 +100,22 @@ def update_build(build_id, body=None):
             abort(404)
         try:
             record.status = build_status_table[body.data.attributes.status]
+            if record.status == database.BuildStatus.new:
+                log = record.log
+                record.log = None
+                session.delete(log)
+
+                logger.info('Trigger linux agent: process builds')
+                try:
+                    linux_agent.process_builds()
+                except MaxRetryError:
+                    logger.error("Failed to trigger Linux agent")
+
+                logger.info('Trigger windows agent: process builds')
+                try:
+                    windows_agent.process_builds()
+                except MaxRetryError:
+                    logger.error("Failed to trigger Windows agent")
         except KeyError:
             abort(400)
 
