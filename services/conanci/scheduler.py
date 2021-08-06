@@ -47,6 +47,7 @@ class Scheduler(Worker):
                     build.commit = commit
                     build.status = database.BuildStatus.new
                     build.log = database.Log()
+                    build.log.logs = ''
                     session.add(build)
                 logger.info("Set commit '%s' to 'building'", commit.sha[:7])
                 commit.status = database.CommitStatus.building
