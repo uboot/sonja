@@ -6,7 +6,7 @@ RUN npm install -g ember-cli@3.23.0
 
 RUN git clone https://github.com/uboot/conan-ci-frontend.git \
   && cd conan-ci-frontend \
-  && git checkout 600575f5b2ce01d072959edbeb63218a3bb24af2 \
+  && git checkout 1fad89bc320ff70750d345f67e34acb00ab87e47 \
   && npm install \
   && ember build --environment production
 
