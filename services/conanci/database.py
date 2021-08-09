@@ -52,11 +52,12 @@ class Ecosystem(Base):
     public_ssh_key = Column(Text())
     ssh_key = Column(Text())
     known_hosts = Column(Text())
+    conan_config_url = Column(String(255))
+    conan_config_path = Column(String(255))
+    conan_config_branch = Column(String(255))
     conan_remote = Column(String(255))
-    conan_verify_ssl = Column(Boolean())
     conan_user = Column(String(255))
     conan_password = Column(String(255))
-    settings = Column(Text())
 
 
 class Label(Base):
@@ -69,7 +70,7 @@ class Label(Base):
         self.value = value
 
 
-repo_label = Table('replo_label', Base.metadata,
+repo_label = Table('repo_label', Base.metadata,
                    Column('repo_id', Integer, ForeignKey('repo.id')),
                    Column('label_id', Integer, ForeignKey('label.id')))
 
@@ -96,6 +97,11 @@ class Channel(Base):
     branch = Column(String(255))
 
 
+class Platform(enum.Enum):
+    linux = 1
+    windows = 2
+
+
 profile_label = Table('profile_label', Base.metadata,
     Column('profile_id', Integer, ForeignKey('profile.id')),
     Column('label_id', Integer, ForeignKey('label.id')))
@@ -108,40 +114,12 @@ class Profile(Base):
     ecosystem_id = Column(Integer, ForeignKey('ecosystem.id'))
     ecosystem = relationship("Ecosystem", backref="profiles")
     name = Column(String(255), nullable=False)
+    platform = Column(Enum(Platform))
+    conan_profile = Column(String(255))
     container = Column(String(255))
     docker_user = Column(String(255))
     docker_password = Column(String(255))
-    settings = relationship('Setting', backref='profile', lazy=True,
-                            cascade="all, delete, delete-orphan")
-    options = relationship('Option', backref='profile', lazy=True,
-                            cascade="all, delete, delete-orphan")
     labels = relationship("Label", secondary=profile_label)
-
-
-class Setting(Base):
-    __tablename__ = 'setting'
-
-    id = Column(Integer, primary_key=True)
-    key = Column(String(255), nullable=False)
-    value = Column(String(255), nullable=False)
-    profile_id = Column(Integer, ForeignKey('profile.id'), nullable=False)
-
-    def __init__(self, key, value):
-        self.key = key
-        self.value = value
-
-
-class Option(Base):
-    __tablename__ = 'option'
-
-    id = Column(Integer, primary_key=True)
-    key = Column(String(255), nullable=False)
-    value = Column(String(255), nullable=False)
-    profile_id = Column(Integer, ForeignKey('profile.id'), nullable=False)
-
-    def __init__(self, key, value):
-        self.key = key
-        self.value = value
 
 
 class CommitStatus(enum.Enum):
@@ -288,26 +266,14 @@ def populate_database():
         linux_release.ecosystem = ecosystem
         linux_release.name = "GCC 9 Release"
         linux_release.container = "uboot/gcc9:latest"
-        linux_release.settings = [
-            Setting("os", "Linux"),
-            Setting("build_type", "Release")
-        ]
-        linux_release.options = [
-            Option("hello:shared", "False")
-        ]
+        linux_release.conan_profile = "linux-release"
         session.add(linux_release)
 
         linux_debug = Profile()
         linux_debug.ecosystem = ecosystem
         linux_debug.name = "GCC 9 Debug"
         linux_debug.container = "uboot/gcc9:latest"
-        linux_debug.settings = [
-            Setting("os", "Linux"),
-            Setting("build_type", "Debug")
-        ]
-        linux_debug.options = [
-            Option("hello:shared", "False")
-        ]
+        linux_debug.conan_profile = "linux-debug"
         linux_debug.labels = [
             Label("debug")
         ]
@@ -317,26 +283,14 @@ def populate_database():
         windows_release.ecosystem = ecosystem
         windows_release.name = "MSVC 15 Release"
         windows_release.container = "uboot/msvc15:latest"
-        windows_release.settings = [
-            Setting("os", "Windows"),
-            Setting("build_type", "Release")
-        ]
-        windows_release.options = [
-            Option("hello:shared", "False")
-        ]
+        windows_release.conan_profile = "windows-release"
         session.add(windows_release)
 
         windows_debug = Profile()
         windows_debug.ecosystem = ecosystem
         windows_debug.name = "MSVC 15 Debug"
         windows_debug.container = "uboot/msvc15:latest"
-        windows_debug.settings = [
-            Setting("os", "Windows"),
-            Setting("build_type", "Debug")
-        ]
-        windows_debug.options = [
-            Option("hello:shared", "False")
-        ]
+        windows_debug.conan_profile = "windows-debug"
         windows_debug.labels = [
             Label("debug")
         ]
@@ -370,8 +324,6 @@ def clear_ecosystems():
     drop_table(Recipe.__table__)
     drop_table(Commit.__table__)
     drop_table(Channel.__table__)
-    drop_table(Setting.__table__)
-    drop_table(Option.__table__)
     drop_table(profile_label)
     drop_table(Profile.__table__)
     drop_table(repo_label)
