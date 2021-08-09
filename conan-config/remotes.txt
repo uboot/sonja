@@ -1,0 +1,1 @@
+uboot https://ubootsartifactory.jfrog.io/artifactory/api/conan/default-conan-local true
