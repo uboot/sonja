@@ -16,20 +16,10 @@ Copy-Item "$build_package_dir\id_rsa" -Destination "$$env:userprofile\.ssh"; Thr
 Copy-Item "$build_package_dir\known_hosts" -Destination "$$env:userprofile\.ssh"; ThrowOnNonZero
 
 echo '### Setup Conan ###'
-mkdir -p "$$env:userprofile\.conan"; ThrowOnNonZero
-if (Test-Path -Path "$build_package_dir\settings.yml" -PathType Leaf) {
-    echo '# Copy Conan settings'
-    Copy-Item "$build_package_dir\settings.yml" -Destination "$$env:userprofile\.conan"; ThrowOnNonZero
-}
-
-echo '# Clean remotes'
-conan remote clean; ThrowOnNonZero
-
-echo '# Add Conan server'
-conan remote add server $conan_remote $conan_verify_ssl; ThrowOnNonZero
+conan config install $conan_config_args; ThrowOnNonZero
 
 echo '# Setup Conan user'
-conan user -r server -p $conan_password $conan_user; ThrowOnNonZero
+conan user -r $conan_remote -p $conan_password $conan_user; ThrowOnNonZero
 
 echo '# Enable Conan revisions'
 conan config set general.revisions_enabled=1; ThrowOnNonZero
@@ -46,10 +36,10 @@ echo '### Build package ###'
 mkdir -p "$build_output_dir"; ThrowOnNonZero
 $$package_name=[string](conan inspect --raw name $path); ThrowOnNonZero
 $$package_version=[string](conan inspect --raw version $path); ThrowOnNonZero
+conan create -pr $conan_profile --json $build_output_dir/create.json $path @$conanci_user/$channel; ThrowOnNonZero
 
 echo '### Collect package data ###'
-conan create $conan_args --json $build_output_dir\create.json $path @$conanci_user/$channel; ThrowOnNonZero
-conan info $conan_args --json $build_output_dir\info.json $path; ThrowOnNonZero
+conan info -pr $conan_profile --json $build_output_dir/info.json $path; ThrowOnNonZero
 
 echo '### Upload package ###'
-conan upload $$package_name/$$package_version@$conanci_user/$channel --all --confirm -r server; ThrowOnNonZero
+conan upload $$package_name/$$package_version@$conanci_user/$channel --all --confirm -r $conan_remote; ThrowOnNonZero

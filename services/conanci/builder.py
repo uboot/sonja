@@ -37,8 +37,6 @@ def create_build_tar(script_template_name: str, parameters: dict):
     add_content(tar, script_name, script)
     add_content(tar, "id_rsa", decode(parameters["ssh_key"]))
     add_content(tar, "known_hosts", decode(parameters["known_hosts"]))
-    if "conan_settings" in parameters.keys() and parameters["conan_settings"]:
-        add_content(tar, "settings.yml", decode(parameters["conan_settings"]))
     tar.close()
     f.seek(0)
 
@@ -151,8 +149,17 @@ class Builder(object):
                                                            command=self.build_command)
         logger.info("Created docker container '%s'", self.__container.short_id)
 
+        config_url = "{0} --type=git".format(parameters["conan_config_url"])
+        config_branch = "--args \"-b {0}\"".format(parameters["conan_config_branch"])\
+            if parameters["conan_config_branch"] else ""
+        config_path = "-sf {0}".format(parameters["conan_config_path"])\
+            if parameters["conan_config_path"] else ""
+
+        "$conan_config_url --type=git --args \"-b $conan_config_branch\" -sf $conan_config_path"
+
         patched_parameters = {
             **parameters,
+            "conan_config_args": " ".join([config_url, config_branch, config_path]),
             "build_package_dir": self.build_package_dir,
             "build_output_dir": self.build_output_dir
         }

@@ -8,23 +8,10 @@ chmod 600 ~/.ssh/id_rsa
 cp $build_package_dir/known_hosts ~/.ssh
 
 echo '### Setup Conan ###'
-mkdir -p ~/.conan
-if [ -f '$build_package_dir/settings.yml' ]; then
-    echo '# Copy Conan settings'
-    cp $build_package_dir/settings.yml ~/.conan
-fi
-
-echo '# Clean remotes'
-conan remote clean
-
-echo '# Add Conan server'
-conan remote add server $conan_remote $conan_verify_ssl
+conan config install $conan_config_args
 
 echo '# Setup Conan user'
-conan user -r server -p $conan_password $conan_user
-
-echo '# Enable Conan revisions'
-conan config set general.revisions_enabled=1
+conan user -r $conan_remote -p $conan_password $conan_user
 
 echo '### Clone repository ###'
 mkdir conanci
@@ -38,10 +25,10 @@ echo '### Build package ###'
 mkdir -p $build_output_dir
 package_name=$$(conan inspect --raw name $path)
 package_version=$$(conan inspect --raw version $path)
+conan create -pr $conan_profile --json $build_output_dir/create.json $path @$conanci_user/$channel
 
 echo '### Collect package data ###'
-conan create $conan_args --json $build_output_dir/create.json $path @$conanci_user/$channel
-conan info $conan_args --json $build_output_dir/info.json $path
+conan info -pr $conan_profile --json $build_output_dir/info.json $path
 
 echo '### Upload package ###'
-conan upload $$package_name/$$package_version@$conanci_user/$channel --all --confirm -r server
+conan upload $$package_name/$$package_version@$conanci_user/$channel --all --confirm -r $conan_remote
