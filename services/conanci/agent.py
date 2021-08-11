@@ -35,12 +35,12 @@ class Agent(Worker):
         # database.populate_database()
         # return
         logger.info("Start processing builds")
+        platform = database.Platform.linux if conanci_os == "Linux" else database.Platform.windows
         with database.session_scope() as session:
             build = session\
                 .query(database.Build)\
-                .join(database.Build.profile).join(database.Profile.settings)\
-                .filter(database.Setting.key == 'os',\
-                        database.Setting.value == conanci_os,\
+                .join(database.Build.profile)\
+                .filter(database.Profile.platform == platform,\
                         database.Build.status == database.BuildStatus.new)\
                 .populate_existing()\
                 .with_for_update(skip_locked=True, of=database.Build)\
@@ -56,22 +56,19 @@ class Agent(Worker):
             build.log.logs = ''
 
             container = build.profile.container
-            conan_settings = " ".join(["-s {0}={1}".format(setting.key, setting.value)
-                                       for setting in build.profile.settings])
-            conan_options = " ".join(["-o {0}={1}".format(option.key, option.value)
-                                      for option in build.profile.options])
             parameters = {
+                "conan_config_url": build.profile.ecosystem.conan_config_url,
+                "conan_config_path": build.profile.ecosystem.conan_config_path,
+                "conan_config_branch": build.profile.ecosystem.conan_config_branch,
                 "conan_remote": build.profile.ecosystem.conan_remote,
-                "conan_verify_ssl": build.profile.ecosystem.conan_verify_ssl,
                 "conan_user": build.profile.ecosystem.conan_user,
                 "conan_password": build.profile.ecosystem.conan_password,
-                "conan_settings": build.profile.ecosystem.settings,
+                "conan_profile": build.profile.conan_profile,
                 "git_url": build.commit.repo.url,
                 "git_sha": build.commit.sha,
                 "conanci_user": build.profile.ecosystem.user,
-                "conan_args": " ".join([conan_settings, conan_options]),
                 "channel": build.commit.channel.name,
-                "path": os.path.join(build.commit.repo.path, "conanfile.py")
+                "path": "{0}/{1}".format(build.commit.repo.path, "conanfile.py")
                         if build.commit.repo.path != "" else "conanfile.py",
                 "ssh_key": build.profile.ecosystem.ssh_key,
                 "known_hosts": build.profile.ecosystem.known_hosts,
