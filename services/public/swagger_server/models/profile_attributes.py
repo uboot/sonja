@@ -6,8 +6,6 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
-from swagger_server.models.profile_attributes_options import ProfileAttributesOptions  # noqa: F401,E501
-from swagger_server.models.profile_attributes_settings import ProfileAttributesSettings  # noqa: F401,E501
 from swagger_server.models.repo_attributes_exclude import RepoAttributesExclude  # noqa: F401,E501
 from swagger_server import util
 
@@ -17,7 +15,7 @@ class ProfileAttributes(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, name: str=None, container: str=None, docker_user: str=None, docker_password: str=None, settings: List[ProfileAttributesSettings]=None, options: List[ProfileAttributesOptions]=None, labels: List[RepoAttributesExclude]=None):  # noqa: E501
+    def __init__(self, name: str=None, container: str=None, docker_user: str=None, docker_password: str=None, platform: str=None, conan_profile: str=None, labels: List[RepoAttributesExclude]=None):  # noqa: E501
         """ProfileAttributes - a model defined in Swagger
 
         :param name: The name of this ProfileAttributes.  # noqa: E501
@@ -28,10 +26,10 @@ class ProfileAttributes(Model):
         :type docker_user: str
         :param docker_password: The docker_password of this ProfileAttributes.  # noqa: E501
         :type docker_password: str
-        :param settings: The settings of this ProfileAttributes.  # noqa: E501
-        :type settings: List[ProfileAttributesSettings]
-        :param options: The options of this ProfileAttributes.  # noqa: E501
-        :type options: List[ProfileAttributesOptions]
+        :param platform: The platform of this ProfileAttributes.  # noqa: E501
+        :type platform: str
+        :param conan_profile: The conan_profile of this ProfileAttributes.  # noqa: E501
+        :type conan_profile: str
         :param labels: The labels of this ProfileAttributes.  # noqa: E501
         :type labels: List[RepoAttributesExclude]
         """
@@ -40,8 +38,8 @@ class ProfileAttributes(Model):
             'container': str,
             'docker_user': str,
             'docker_password': str,
-            'settings': List[ProfileAttributesSettings],
-            'options': List[ProfileAttributesOptions],
+            'platform': str,
+            'conan_profile': str,
             'labels': List[RepoAttributesExclude]
         }
 
@@ -50,16 +48,16 @@ class ProfileAttributes(Model):
             'container': 'container',
             'docker_user': 'docker-user',
             'docker_password': 'docker-password',
-            'settings': 'settings',
-            'options': 'options',
+            'platform': 'platform',
+            'conan_profile': 'conan-profile',
             'labels': 'labels'
         }
         self._name = name
         self._container = container
         self._docker_user = docker_user
         self._docker_password = docker_password
-        self._settings = settings
-        self._options = options
+        self._platform = platform
+        self._conan_profile = conan_profile
         self._labels = labels
 
     @classmethod
@@ -158,46 +156,52 @@ class ProfileAttributes(Model):
         self._docker_password = docker_password
 
     @property
-    def settings(self) -> List[ProfileAttributesSettings]:
-        """Gets the settings of this ProfileAttributes.
+    def platform(self) -> str:
+        """Gets the platform of this ProfileAttributes.
 
 
-        :return: The settings of this ProfileAttributes.
-        :rtype: List[ProfileAttributesSettings]
+        :return: The platform of this ProfileAttributes.
+        :rtype: str
         """
-        return self._settings
+        return self._platform
 
-    @settings.setter
-    def settings(self, settings: List[ProfileAttributesSettings]):
-        """Sets the settings of this ProfileAttributes.
+    @platform.setter
+    def platform(self, platform: str):
+        """Sets the platform of this ProfileAttributes.
 
 
-        :param settings: The settings of this ProfileAttributes.
-        :type settings: List[ProfileAttributesSettings]
+        :param platform: The platform of this ProfileAttributes.
+        :type platform: str
         """
+        allowed_values = ["linux", "windows"]  # noqa: E501
+        if platform not in allowed_values:
+            raise ValueError(
+                "Invalid value for `platform` ({0}), must be one of {1}"
+                .format(platform, allowed_values)
+            )
 
-        self._settings = settings
+        self._platform = platform
 
     @property
-    def options(self) -> List[ProfileAttributesOptions]:
-        """Gets the options of this ProfileAttributes.
+    def conan_profile(self) -> str:
+        """Gets the conan_profile of this ProfileAttributes.
 
 
-        :return: The options of this ProfileAttributes.
-        :rtype: List[ProfileAttributesOptions]
+        :return: The conan_profile of this ProfileAttributes.
+        :rtype: str
         """
-        return self._options
+        return self._conan_profile
 
-    @options.setter
-    def options(self, options: List[ProfileAttributesOptions]):
-        """Sets the options of this ProfileAttributes.
+    @conan_profile.setter
+    def conan_profile(self, conan_profile: str):
+        """Sets the conan_profile of this ProfileAttributes.
 
 
-        :param options: The options of this ProfileAttributes.
-        :type options: List[ProfileAttributesOptions]
+        :param conan_profile: The conan_profile of this ProfileAttributes.
+        :type conan_profile: str
         """
 
-        self._options = options
+        self._conan_profile = conan_profile
 
     @property
     def labels(self) -> List[RepoAttributesExclude]:

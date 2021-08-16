@@ -76,8 +76,8 @@ class TestProfileController(BaseTestCase):
                 attributes=models.ProfileAttributes(
                     name=name,
                     container=container,
-                    settings=[models.ProfileAttributesSettings("os", "Linux")],
-                    options=[models.ProfileAttributesOptions("base:shared", "True")],
+                    platform="linux",
+                    conan_profile="linux-release",
                     labels=[models.RepoAttributesExclude("embedded")]
                 ),
                 relationships=models.ProfileRelationships(

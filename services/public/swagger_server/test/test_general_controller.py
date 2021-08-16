@@ -152,8 +152,9 @@ class TestGeneralController(BaseTestCase):
 
         scan repos for new commits
         """
+        self.login()
         response = self.client.open(
-            '/process-repo/{repoId}'.format(repo_id='1'),
+            '/api/v1/process-repo/{repo_id}'.format(repo_id='1'),
             method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))

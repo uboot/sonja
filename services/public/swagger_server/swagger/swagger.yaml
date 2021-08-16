@@ -946,12 +946,13 @@ components:
             - id: "1"
               type: profiles
         attributes:
-          settings: ""
+          conan-config-path: ""
           known-hosts: Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN2hSR21kbm05dFVEYk85SURTd0JLNlRiUWErUFhZUENQeTZyYlRyVHR3N1BIa2NjS3JwcDB5VmhwNUhkRUljS3I2cExsVkRCZk9MWDlRVXN5Q09WMHd6ZmpJSk5sR0VZc2RsTEppekhoYm4ybVVqdlNBSFFxWkVUWVA4MWVGekxRTm5QSHQ0RVZWVWg3VmZERVNVODRLZXptRDVRbFdwWExtdlUzMS95TWYrU2U4eGhIVHZLU0NaSUZJbVd3b0c2bWJVb1dmOW56cElvYVNqQit3ZXFxVVVtcGFhYXNYVmFsNzJKK1VYMkIrMlJQVzNSY1QwZU96UWdxbEpMM1JLclRKdmRzakUzSkVBdkdxM2xHSFNaWHkyOEczc2t1YTJTbVZpL3c0eUNFNmdiT0RxblRXbGc3K3dDNjA0eWRHWEE4VkppUzVhcDQzSlhpVUZGQWFRPT0K
-          conan-verify-ssl: true
+          conan-config-url: git@github.com:uboot/conan-ci.git
           name: My Company
+          conan-config-branch: master
           conan-password: demo
-          conan-remote: http://test-conan-server:9300
+          conan-remote: uboot
           user: mycompany
           public-ssh-key: ""
           conan-user: agent
@@ -989,12 +990,13 @@ components:
               - id: "1"
                 type: profiles
           attributes:
-            settings: ""
+            conan-config-path: ""
             known-hosts: Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN2hSR21kbm05dFVEYk85SURTd0JLNlRiUWErUFhZUENQeTZyYlRyVHR3N1BIa2NjS3JwcDB5VmhwNUhkRUljS3I2cExsVkRCZk9MWDlRVXN5Q09WMHd6ZmpJSk5sR0VZc2RsTEppekhoYm4ybVVqdlNBSFFxWkVUWVA4MWVGekxRTm5QSHQ0RVZWVWg3VmZERVNVODRLZXptRDVRbFdwWExtdlUzMS95TWYrU2U4eGhIVHZLU0NaSUZJbVd3b0c2bWJVb1dmOW56cElvYVNqQit3ZXFxVVVtcGFhYXNYVmFsNzJKK1VYMkIrMlJQVzNSY1QwZU96UWdxbEpMM1JLclRKdmRzakUzSkVBdkdxM2xHSFNaWHkyOEczc2t1YTJTbVZpL3c0eUNFNmdiT0RxblRXbGc3K3dDNjA0eWRHWEE4VkppUzVhcDQzSlhpVUZGQWFRPT0K
-            conan-verify-ssl: true
+            conan-config-url: git@github.com:uboot/conan-ci.git
             name: My Company
+            conan-config-branch: master
             conan-password: demo
-            conan-remote: http://test-conan-server:9300
+            conan-remote: uboot
             user: mycompany
             public-ssh-key: ""
             conan-user: agent
@@ -1034,12 +1036,13 @@ components:
               - id: "1"
                 type: profiles
           attributes:
-            settings: ""
+            conan-config-path: ""
             known-hosts: Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN2hSR21kbm05dFVEYk85SURTd0JLNlRiUWErUFhZUENQeTZyYlRyVHR3N1BIa2NjS3JwcDB5VmhwNUhkRUljS3I2cExsVkRCZk9MWDlRVXN5Q09WMHd6ZmpJSk5sR0VZc2RsTEppekhoYm4ybVVqdlNBSFFxWkVUWVA4MWVGekxRTm5QSHQ0RVZWVWg3VmZERVNVODRLZXptRDVRbFdwWExtdlUzMS95TWYrU2U4eGhIVHZLU0NaSUZJbVd3b0c2bWJVb1dmOW56cElvYVNqQit3ZXFxVVVtcGFhYXNYVmFsNzJKK1VYMkIrMlJQVzNSY1QwZU96UWdxbEpMM1JLclRKdmRzakUzSkVBdkdxM2xHSFNaWHkyOEczc2t1YTJTbVZpL3c0eUNFNmdiT0RxblRXbGc3K3dDNjA0eWRHWEE4VkppUzVhcDQzSlhpVUZGQWFRPT0K
-            conan-verify-ssl: true
+            conan-config-url: git@github.com:uboot/conan-ci.git
             name: My Company
+            conan-config-branch: master
             conan-password: demo
-            conan-remote: http://test-conan-server:9300
+            conan-remote: uboot
             user: mycompany
             public-ssh-key: ""
             conan-user: agent
@@ -1068,12 +1071,13 @@ components:
               - id: "1"
                 type: profiles
           attributes:
-            settings: ""
+            conan-config-path: ""
             known-hosts: Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN2hSR21kbm05dFVEYk85SURTd0JLNlRiUWErUFhZUENQeTZyYlRyVHR3N1BIa2NjS3JwcDB5VmhwNUhkRUljS3I2cExsVkRCZk9MWDlRVXN5Q09WMHd6ZmpJSk5sR0VZc2RsTEppekhoYm4ybVVqdlNBSFFxWkVUWVA4MWVGekxRTm5QSHQ0RVZWVWg3VmZERVNVODRLZXptRDVRbFdwWExtdlUzMS95TWYrU2U4eGhIVHZLU0NaSUZJbVd3b0c2bWJVb1dmOW56cElvYVNqQit3ZXFxVVVtcGFhYXNYVmFsNzJKK1VYMkIrMlJQVzNSY1QwZU96UWdxbEpMM1JLclRKdmRzakUzSkVBdkdxM2xHSFNaWHkyOEczc2t1YTJTbVZpL3c0eUNFNmdiT0RxblRXbGc3K3dDNjA0eWRHWEE4VkppUzVhcDQzSlhpVUZGQWFRPT0K
-            conan-verify-ssl: true
+            conan-config-url: git@github.com:uboot/conan-ci.git
             name: My Company
+            conan-config-branch: master
             conan-password: demo
-            conan-remote: http://test-conan-server:9300
+            conan-remote: uboot
             user: mycompany
             public-ssh-key: ""
             conan-user: agent
@@ -1206,19 +1210,11 @@ components:
               type: ecosystems
         attributes:
           container: uboot/gcc9:latest
-          settings:
-          - value: Release
-            key: build_type
-          - value: Release
-            key: build_type
           docker-password: paSSw0rd
           name: GCC 9
-          options:
-          - value: "true"
-            key: hello:shared
-          - value: "true"
-            key: hello:shared
           docker-user: user
+          conan-profile: linux-debug
+          platform: linux
           labels:
           - label: embedded
           - label: embedded
@@ -1240,19 +1236,11 @@ components:
                 type: ecosystems
           attributes:
             container: uboot/gcc9:latest
-            settings:
-            - value: Release
-              key: build_type
-            - value: Release
-              key: build_type
             docker-password: paSSw0rd
             name: GCC 9
-            options:
-            - value: "true"
-              key: hello:shared
-            - value: "true"
-              key: hello:shared
             docker-user: user
+            conan-profile: linux-debug
+            platform: linux
             labels:
             - label: embedded
             - label: embedded
@@ -1852,15 +1840,18 @@ components:
         user:
           type: string
           example: mycompany
-        settings:
-          type: string
-          example: ""
         conan-remote:
           type: string
-          example: http://test-conan-server:9300
-        conan-verify-ssl:
-          type: boolean
-          example: true
+          example: uboot
+        conan-config-url:
+          type: string
+          example: git@github.com:uboot/conan-ci.git
+        conan-config-path:
+          type: string
+          example: ""
+        conan-config-branch:
+          type: string
+          example: master
         conan-user:
           type: string
           example: agent
@@ -1874,12 +1865,13 @@ components:
           type: string
           example: Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN2hSR21kbm05dFVEYk85SURTd0JLNlRiUWErUFhZUENQeTZyYlRyVHR3N1BIa2NjS3JwcDB5VmhwNUhkRUljS3I2cExsVkRCZk9MWDlRVXN5Q09WMHd6ZmpJSk5sR0VZc2RsTEppekhoYm4ybVVqdlNBSFFxWkVUWVA4MWVGekxRTm5QSHQ0RVZWVWg3VmZERVNVODRLZXptRDVRbFdwWExtdlUzMS95TWYrU2U4eGhIVHZLU0NaSUZJbVd3b0c2bWJVb1dmOW56cElvYVNqQit3ZXFxVVVtcGFhYXNYVmFsNzJKK1VYMkIrMlJQVzNSY1QwZU96UWdxbEpMM1JLclRKdmRzakUzSkVBdkdxM2xHSFNaWHkyOEczc2t1YTJTbVZpL3c0eUNFNmdiT0RxblRXbGc3K3dDNjA0eWRHWEE4VkppUzVhcDQzSlhpVUZGQWFRPT0K
       example:
-        settings: ""
+        conan-config-path: ""
         known-hosts: Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN2hSR21kbm05dFVEYk85SURTd0JLNlRiUWErUFhZUENQeTZyYlRyVHR3N1BIa2NjS3JwcDB5VmhwNUhkRUljS3I2cExsVkRCZk9MWDlRVXN5Q09WMHd6ZmpJSk5sR0VZc2RsTEppekhoYm4ybVVqdlNBSFFxWkVUWVA4MWVGekxRTm5QSHQ0RVZWVWg3VmZERVNVODRLZXptRDVRbFdwWExtdlUzMS95TWYrU2U4eGhIVHZLU0NaSUZJbVd3b0c2bWJVb1dmOW56cElvYVNqQit3ZXFxVVVtcGFhYXNYVmFsNzJKK1VYMkIrMlJQVzNSY1QwZU96UWdxbEpMM1JLclRKdmRzakUzSkVBdkdxM2xHSFNaWHkyOEczc2t1YTJTbVZpL3c0eUNFNmdiT0RxblRXbGc3K3dDNjA0eWRHWEE4VkppUzVhcDQzSlhpVUZGQWFRPT0K
-        conan-verify-ssl: true
+        conan-config-url: git@github.com:uboot/conan-ci.git
         name: My Company
+        conan-config-branch: master
         conan-password: demo
-        conan-remote: http://test-conan-server:9300
+        conan-remote: uboot
         user: mycompany
         public-ssh-key: ""
         conan-user: agent
@@ -2104,36 +2096,6 @@ components:
         commits:
           links:
             related: commit
-    Profile_attributes_settings:
-      required:
-      - key
-      - value
-      type: object
-      properties:
-        key:
-          type: string
-          example: build_type
-        value:
-          type: string
-          example: Release
-      example:
-        value: Release
-        key: build_type
-    Profile_attributes_options:
-      required:
-      - key
-      - value
-      type: object
-      properties:
-        key:
-          type: string
-          example: hello:shared
-        value:
-          type: string
-          example: "true"
-      example:
-        value: "true"
-        key: hello:shared
     Profile_attributes:
       type: object
       properties:
@@ -2149,33 +2111,26 @@ components:
         docker-password:
           type: string
           example: paSSw0rd
-        settings:
-          type: array
-          items:
-            $ref: '#/components/schemas/Profile_attributes_settings'
-        options:
-          type: array
-          items:
-            $ref: '#/components/schemas/Profile_attributes_options'
+        platform:
+          type: string
+          example: linux
+          enum:
+          - linux
+          - windows
+        conan-profile:
+          type: string
+          example: linux-debug
         labels:
           type: array
           items:
             $ref: '#/components/schemas/Repo_attributes_exclude'
       example:
         container: uboot/gcc9:latest
-        settings:
-        - value: Release
-          key: build_type
-        - value: Release
-          key: build_type
         docker-password: paSSw0rd
         name: GCC 9
-        options:
-        - value: "true"
-          key: hello:shared
-        - value: "true"
-          key: hello:shared
         docker-user: user
+        conan-profile: linux-debug
+        platform: linux
         labels:
         - label: embedded
         - label: embedded

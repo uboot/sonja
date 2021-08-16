@@ -5,6 +5,12 @@ from flask import abort
 from swagger_server import models
 
 
+platform_table = {
+    "linux": database.Platform.linux,
+    "windows": database.Platform.windows
+}
+
+
 def __create_profile(record: database.Profile):
     return models.Profile(
         id=record.id,
@@ -12,10 +18,10 @@ def __create_profile(record: database.Profile):
         attributes=models.ProfileAttributes(
             name=record.name,
             container=record.container,
+            platform=record.platform.name,
+            conan_profile=record.conan_profile,
             docker_user=record.docker_user,
             docker_password=record.docker_password,
-            settings=[models.ProfileAttributesSettings(key=r.key, value=r.value) for r in record.settings],
-            options=[models.ProfileAttributesOptions(key=r.key, value=r.value) for r in record.options],
             labels=[models.RepoAttributesExclude(label=r.value) for r in record.labels]
         ),
         relationships=models.ProfileRelationships(
@@ -41,12 +47,12 @@ def add_profile(body=None):
             abort(400)
         record = database.Profile()
         record.name = body.data.attributes.name
+        record.platform = platform_table[body.data.attributes.platform]
         record.ecosystem = ecosystem
         record.container = body.data.attributes.container
+        record.conan_profile = body.data.attributes.conan_profile
         record.docker_user = body.data.attributes.docker_user
         record.docker_password = body.data.attributes.docker_password
-        record.settings = [database.Setting(s.key, s.value) for s in body.data.attributes.settings]
-        record.options = [database.Option(o.key, o.value) for o in body.data.attributes.options]
         record.labels = [database.Label(l.label) for l in body.data.attributes.labels]
         session.add(record)
         session.commit()
@@ -80,10 +86,10 @@ def update_profile(profile_id, body=None):
             abort(404)
 
         record.name = body.data.attributes.name
+        record.platform = platform_table[body.data.attributes.platform]
+        record.conan_profile = body.data.attributes.conan_profile
         record.container = body.data.attributes.container
         record.docker_user = body.data.attributes.docker_user
         record.docker_password = body.data.attributes.docker_password
-        record.settings = [database.Setting(s.key, s.value) for s in body.data.attributes.settings]
-        record.options = [database.Option(o.key, o.value) for o in body.data.attributes.options]
         record.labels = [database.Label(l.label) for l in body.data.attributes.labels]
         return models.ProfileData(data=__create_profile(record))

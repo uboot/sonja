@@ -14,19 +14,21 @@ class EcosystemAttributes(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, name: str=None, user: str=None, settings: str=None, conan_remote: str=None, conan_verify_ssl: bool=None, conan_user: str=None, conan_password: str=None, public_ssh_key: str=None, known_hosts: str=None):  # noqa: E501
+    def __init__(self, name: str=None, user: str=None, conan_remote: str=None, conan_config_url: str=None, conan_config_path: str=None, conan_config_branch: str=None, conan_user: str=None, conan_password: str=None, public_ssh_key: str=None, known_hosts: str=None):  # noqa: E501
         """EcosystemAttributes - a model defined in Swagger
 
         :param name: The name of this EcosystemAttributes.  # noqa: E501
         :type name: str
         :param user: The user of this EcosystemAttributes.  # noqa: E501
         :type user: str
-        :param settings: The settings of this EcosystemAttributes.  # noqa: E501
-        :type settings: str
         :param conan_remote: The conan_remote of this EcosystemAttributes.  # noqa: E501
         :type conan_remote: str
-        :param conan_verify_ssl: The conan_verify_ssl of this EcosystemAttributes.  # noqa: E501
-        :type conan_verify_ssl: bool
+        :param conan_config_url: The conan_config_url of this EcosystemAttributes.  # noqa: E501
+        :type conan_config_url: str
+        :param conan_config_path: The conan_config_path of this EcosystemAttributes.  # noqa: E501
+        :type conan_config_path: str
+        :param conan_config_branch: The conan_config_branch of this EcosystemAttributes.  # noqa: E501
+        :type conan_config_branch: str
         :param conan_user: The conan_user of this EcosystemAttributes.  # noqa: E501
         :type conan_user: str
         :param conan_password: The conan_password of this EcosystemAttributes.  # noqa: E501
@@ -39,9 +41,10 @@ class EcosystemAttributes(Model):
         self.swagger_types = {
             'name': str,
             'user': str,
-            'settings': str,
             'conan_remote': str,
-            'conan_verify_ssl': bool,
+            'conan_config_url': str,
+            'conan_config_path': str,
+            'conan_config_branch': str,
             'conan_user': str,
             'conan_password': str,
             'public_ssh_key': str,
@@ -51,9 +54,10 @@ class EcosystemAttributes(Model):
         self.attribute_map = {
             'name': 'name',
             'user': 'user',
-            'settings': 'settings',
             'conan_remote': 'conan-remote',
-            'conan_verify_ssl': 'conan-verify-ssl',
+            'conan_config_url': 'conan-config-url',
+            'conan_config_path': 'conan-config-path',
+            'conan_config_branch': 'conan-config-branch',
             'conan_user': 'conan-user',
             'conan_password': 'conan-password',
             'public_ssh_key': 'public-ssh-key',
@@ -61,9 +65,10 @@ class EcosystemAttributes(Model):
         }
         self._name = name
         self._user = user
-        self._settings = settings
         self._conan_remote = conan_remote
-        self._conan_verify_ssl = conan_verify_ssl
+        self._conan_config_url = conan_config_url
+        self._conan_config_path = conan_config_path
+        self._conan_config_branch = conan_config_branch
         self._conan_user = conan_user
         self._conan_password = conan_password
         self._public_ssh_key = public_ssh_key
@@ -123,27 +128,6 @@ class EcosystemAttributes(Model):
         self._user = user
 
     @property
-    def settings(self) -> str:
-        """Gets the settings of this EcosystemAttributes.
-
-
-        :return: The settings of this EcosystemAttributes.
-        :rtype: str
-        """
-        return self._settings
-
-    @settings.setter
-    def settings(self, settings: str):
-        """Sets the settings of this EcosystemAttributes.
-
-
-        :param settings: The settings of this EcosystemAttributes.
-        :type settings: str
-        """
-
-        self._settings = settings
-
-    @property
     def conan_remote(self) -> str:
         """Gets the conan_remote of this EcosystemAttributes.
 
@@ -165,25 +149,67 @@ class EcosystemAttributes(Model):
         self._conan_remote = conan_remote
 
     @property
-    def conan_verify_ssl(self) -> bool:
-        """Gets the conan_verify_ssl of this EcosystemAttributes.
+    def conan_config_url(self) -> str:
+        """Gets the conan_config_url of this EcosystemAttributes.
 
 
-        :return: The conan_verify_ssl of this EcosystemAttributes.
-        :rtype: bool
+        :return: The conan_config_url of this EcosystemAttributes.
+        :rtype: str
         """
-        return self._conan_verify_ssl
+        return self._conan_config_url
 
-    @conan_verify_ssl.setter
-    def conan_verify_ssl(self, conan_verify_ssl: bool):
-        """Sets the conan_verify_ssl of this EcosystemAttributes.
+    @conan_config_url.setter
+    def conan_config_url(self, conan_config_url: str):
+        """Sets the conan_config_url of this EcosystemAttributes.
 
 
-        :param conan_verify_ssl: The conan_verify_ssl of this EcosystemAttributes.
-        :type conan_verify_ssl: bool
+        :param conan_config_url: The conan_config_url of this EcosystemAttributes.
+        :type conan_config_url: str
         """
 
-        self._conan_verify_ssl = conan_verify_ssl
+        self._conan_config_url = conan_config_url
+
+    @property
+    def conan_config_path(self) -> str:
+        """Gets the conan_config_path of this EcosystemAttributes.
+
+
+        :return: The conan_config_path of this EcosystemAttributes.
+        :rtype: str
+        """
+        return self._conan_config_path
+
+    @conan_config_path.setter
+    def conan_config_path(self, conan_config_path: str):
+        """Sets the conan_config_path of this EcosystemAttributes.
+
+
+        :param conan_config_path: The conan_config_path of this EcosystemAttributes.
+        :type conan_config_path: str
+        """
+
+        self._conan_config_path = conan_config_path
+
+    @property
+    def conan_config_branch(self) -> str:
+        """Gets the conan_config_branch of this EcosystemAttributes.
+
+
+        :return: The conan_config_branch of this EcosystemAttributes.
+        :rtype: str
+        """
+        return self._conan_config_branch
+
+    @conan_config_branch.setter
+    def conan_config_branch(self, conan_config_branch: str):
+        """Sets the conan_config_branch of this EcosystemAttributes.
+
+
+        :param conan_config_branch: The conan_config_branch of this EcosystemAttributes.
+        :type conan_config_branch: str
+        """
+
+        self._conan_config_branch = conan_config_branch
 
     @property
     def conan_user(self) -> str:
