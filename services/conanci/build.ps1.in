@@ -5,9 +5,10 @@ function ThrowOnNonZero {
 }
 
 echo '### Setup MTU ###'
+echo 'Set mtu=$mtu'
 $$adapters = $$(Get-NetAdapter | Where { $$_.Name -Match 'Ethernet' }).Name
 $$adapters | ForEach-Object({
-    netsh interface ipv4 set subinterface "$$_" mtu=1450 store=persistent
+    netsh interface ipv4 set subinterface "$$_" mtu=$mtu store=persistent
 })
 
 echo '### Setup SSH ###'
@@ -20,9 +21,6 @@ conan config install $conan_config_args; ThrowOnNonZero
 
 echo '# Setup Conan user'
 conan user -r $conan_remote -p $conan_password $conan_user; ThrowOnNonZero
-
-echo '# Enable Conan revisions'
-conan config set general.revisions_enabled=1; ThrowOnNonZero
 
 echo '### Clone repository ###'
 mkdir conanci; ThrowOnNonZero

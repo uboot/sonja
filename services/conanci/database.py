@@ -264,6 +264,7 @@ def populate_database():
 
         linux_release = Profile()
         linux_release.ecosystem = ecosystem
+        linux_release.platform = Platform.linux
         linux_release.name = "GCC 9 Release"
         linux_release.container = "uboot/gcc9:latest"
         linux_release.conan_profile = "linux-release"
@@ -271,6 +272,7 @@ def populate_database():
 
         linux_debug = Profile()
         linux_debug.ecosystem = ecosystem
+        linux_debug.platform = Platform.linux
         linux_debug.name = "GCC 9 Debug"
         linux_debug.container = "uboot/gcc9:latest"
         linux_debug.conan_profile = "linux-debug"
@@ -281,6 +283,7 @@ def populate_database():
 
         windows_release = Profile()
         windows_release.ecosystem = ecosystem
+        windows_release.platform = Platform.windows
         windows_release.name = "MSVC 15 Release"
         windows_release.container = "uboot/msvc15:latest"
         windows_release.conan_profile = "windows-release"
@@ -288,6 +291,7 @@ def populate_database():
 
         windows_debug = Profile()
         windows_debug.ecosystem = ecosystem
+        windows_debug.platform = Platform.windows
         windows_debug.name = "MSVC 15 Debug"
         windows_debug.container = "uboot/msvc15:latest"
         windows_debug.conan_profile = "windows-debug"

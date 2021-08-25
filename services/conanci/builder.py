@@ -155,8 +155,6 @@ class Builder(object):
         config_path = "-sf {0}".format(parameters["conan_config_path"])\
             if parameters["conan_config_path"] else ""
 
-        "$conan_config_url --type=git --args \"-b $conan_config_branch\" -sf $conan_config_path"
-
         patched_parameters = {
             **parameters,
             "conan_config_args": " ".join([config_url, config_branch, config_path]),

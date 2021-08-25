@@ -34,6 +34,8 @@ spec:
           value: {{ $.Values.mysql.mysqlRootPassword }}
         - name: CONANCI_AGENT_OS
           value: Linux
+        - name: CONANCI_MTU
+          value: "{{ $.Values.mtu | default 1500 }}"
         - name: CONANCI_CRAWLER_URL
           value: {{ template "conan-ci.fullname" $ }}-crawler
         - name: CONANCI_SCHEDULER_URL
@@ -110,6 +112,8 @@ spec:
           value: {{ $.Values.mysql.mysqlRootPassword }}
         - name: CONANCI_AGENT_OS
           value: Windows
+        - name: CONANCI_MTU
+          value: "{{ $.Values.mtu | default 1500 }}"
         - name: CONANCI_CRAWLER_URL
           value: {{ template "conan-ci.fullname" $ }}-crawler
         - name: CONANCI_SCHEDULER_URL
@@ -118,12 +122,6 @@ spec:
           value: {{ template "conan-ci.fullname" $ }}-linux-agent
         - name: CONANCI_WINDOWSAGENT_URL
           value: {{ template "conan-ci.fullname" $ }}-windows-agent
-        - name: CONAN_SERVER_URL
-          value: {{ template "conan-ci.conan-server-url" $ }}
-        - name: CONAN_SERVER_USER
-          value: {{ index $.Values "conan-server" "user" }}
-        - name: CONAN_SERVER_PASSWORD
-          value: {{ index $.Values "conan-server" "password" }}
         - name: DOCKER_HOST
           value: {{ template "conan-ci.fullname" $ }}-windows-docker-{{ .name }}:2375
 ---

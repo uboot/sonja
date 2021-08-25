@@ -73,7 +73,8 @@ class Agent(Worker):
                 "ssh_key": build.profile.ecosystem.ssh_key,
                 "known_hosts": build.profile.ecosystem.known_hosts,
                 "docker_user": build.profile.docker_user,
-                "docker_password": build.profile.docker_password
+                "docker_password": build.profile.docker_password,
+                "mtu": os.environ.get("CONANCI_MTU", "1500")
             }
 
         try:

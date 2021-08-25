@@ -57,7 +57,7 @@ def get_build_parameters(profile):
     return {
         "conan_config_url": "git@github.com:uboot/conan-ci.git",
         "conan_config_path": "conan-config",
-        "conan_config_branch": "config",
+        "conan_config_branch": "",
         "conan_remote": "uboot",
         "conan_user": "user",
         "conan_password": os.environ.get("CONAN_PASSWORD", ""),
@@ -70,7 +70,8 @@ def get_build_parameters(profile):
         "ssh_key": os.environ.get("SSH_KEY", ""),
         "known_hosts": known_hosts,
         "docker_user": "",
-        "docker_password": ""
+        "docker_password": "",
+        "mtu": "1450"
     }
 
 

@@ -18,7 +18,7 @@ def __create_profile(record: database.Profile):
         attributes=models.ProfileAttributes(
             name=record.name,
             container=record.container,
-            platform=record.platform.name,
+            platform=record.platform.name if record.platform else "",
             conan_profile=record.conan_profile,
             docker_user=record.docker_user,
             docker_password=record.docker_password,

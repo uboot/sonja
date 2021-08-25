@@ -49,9 +49,9 @@ class RepoController(object):
         with open(known_hosts_path, "w") as f:
             f.write(decode(known_hosts))
         repo = git.Repo(self.repo_dir)
-        config = repo.config_writer()
-        config.set_value("core", "sshCommand", "ssh -i {0} -o UserKnownHostsFile={1}".format(ssh_key_path,
-                                                                                             known_hosts_path))
+        with repo.config_writer() as config:
+            config.set_value("core", "sshCommand", "ssh -i {0} -o UserKnownHostsFile={1}".format(ssh_key_path,
+                                                                                                 known_hosts_path))
 
     def fetch(self):
         repo = git.Repo(self.repo_dir)

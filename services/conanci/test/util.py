@@ -18,7 +18,7 @@ def create_ecosystem(parameters):
     ecosystem.public_ssh_key = os.environ.get("PUBLIC_SSH_KEY", "")
     ecosystem.conan_config_url = "git@github.com:uboot/conan-ci.git"
     ecosystem.conan_config_path = "conan-config"
-    ecosystem.conan_config_branch = "config"
+    ecosystem.conan_config_branch = ""
     ecosystem.conan_remote = "uboot"
     ecosystem.conan_user = "user"
     ecosystem.conan_password = os.environ.get("CONAN_PASSWORD", "")
@@ -73,12 +73,14 @@ def create_profile(parameters):
         profile.ecosystem = create_ecosystem(parameters)
     if parameters.get("profile.os", "Linux") == "Linux":
         profile.name = "GCC 9"
+        profile.platform = database.Platform.linux
         profile.container = "uboot/gcc9:latest"
         profile.conan_profile = "linux-debug"
         profile.labels = [database.Label("embedded")]
         profile.platform = database.Platform.linux
     else:
         profile.name = "MSVC 15"
+        profile.platform = database.Platform.windows
         profile.container = "msvc15:local"
         profile.conan_profile = "windows-release"
         profile.labels = [database.Label("desktop")]
