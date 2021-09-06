@@ -7,7 +7,8 @@ RUN apk add --no-cache \
 		py3-pip \
 		py3-wheel \
 		py3-cryptography \
-		py3-mysqlclient
+		py3-mysqlclient \
+		py3-gevent
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
@@ -21,6 +22,6 @@ COPY public /usr/src/app
 
 EXPOSE 8080
 
-ENTRYPOINT ["python3"]
+ENTRYPOINT ["gunicorn"]
 
-CMD ["-m", "swagger_server"]
+CMD ["-w", "4", "-b", "0.0.0.0:8080", "-k", "gevent", "swagger_server:create_app()"]
