@@ -31,7 +31,7 @@ spec:
         - name: MYSQL_URL
           value: {{ $.Release.Name }}-mysql
         - name: MYSQL_ROOT_PASSWORD
-          value: {{ $.Values.mysql.mysqlRootPassword }}
+          value: {{ $.Values.mysql.auth.rootPassword }}
         - name: CONANCI_AGENT_OS
           value: Linux
         - name: CONANCI_MTU
@@ -109,7 +109,7 @@ spec:
         - name: MYSQL_URL
           value: {{ $.Release.Name }}-mysql
         - name: MYSQL_ROOT_PASSWORD
-          value: {{ $.Values.mysql.mysqlRootPassword }}
+          value: {{ $.Values.mysql.auth.rootPassword }}
         - name: CONANCI_AGENT_OS
           value: Windows
         - name: CONANCI_MTU

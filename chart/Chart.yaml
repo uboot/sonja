@@ -24,8 +24,8 @@ appVersion: 1.16.0
 
 dependencies:
 - name: mysql
-  version: "1.6.9"
-  repository: "https://helm.wso2.com"
+  version: "8.8.6"
+  repository: "https://charts.bitnami.com/bitnami"
 - name: phpmyadmin
   version: "6.5.3"
   repository: "https://charts.bitnami.com/bitnami"

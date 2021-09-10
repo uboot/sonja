@@ -5,11 +5,12 @@
 hostName: conan-ci
 
 mysql:
-  imageTag: 8.0.21
-  mysqlRootPassword: secret
-  mysqlDatabase: conan-ci
-  # persistence:
-  #   existingClaim: mysql
+  auth:
+    rootPassword: secret
+    database: conan-ci
+  # primary:
+  #   persistence:
+  #     existingClaim: mysql
 
 phpmyadmin:
   db:
