@@ -20,3 +20,10 @@ class SshTest(unittest.TestCase):
 
     def test_decode_none(self):
         self.assertEqual("", ssh.decode(None))
+
+    def test_hash_password(self):
+        self.assertEqual("$2b$12$", ssh.hash_password("password")[:7])
+
+    def test_test_password(self):
+        hashed = ssh.hash_password("password")
+        self.assertTrue(ssh.test_password("password", hashed))

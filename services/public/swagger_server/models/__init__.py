@@ -85,3 +85,8 @@ from swagger_server.models.repo_relationships_commits_links import RepoRelations
 from swagger_server.models.repo_relationships_ecosystem import RepoRelationshipsEcosystem
 from swagger_server.models.repo_relationships_ecosystem_data import RepoRelationshipsEcosystemData
 from swagger_server.models.user import User
+from swagger_server.models.user_data import UserData
+from swagger_server.models.user_list import UserList
+from swagger_server.models.user_attributes import UserAttributes
+from swagger_server.models.user_token import UserToken
+

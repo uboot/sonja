@@ -1,10 +1,11 @@
-from sqlalchemy import Boolean, create_engine, Column, Enum, ForeignKey, Integer, String, Table, Text
+from sqlalchemy import and_, create_engine, Column, Enum, exists, ForeignKey, Integer, literal, select, String,\
+    Table, Text
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.exc import OperationalError
+from sqlalchemy.sql.expression import func
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import backref, relationship, sessionmaker
-
-import sqlalchemy
+from sqlalchemy.orm import relationship, sessionmaker
+from conanci.ssh import hash_password
 
 from contextlib import contextmanager
 import enum
@@ -29,6 +30,14 @@ engine = create_engine(connection_string, echo=False)
 Session = sessionmaker(engine)
 
 
+class NotFound(Exception):
+    pass
+
+
+class OperationFailed(Exception):
+    pass
+
+
 @contextmanager
 def session_scope():
     """Provide a transactional scope around a series of operations."""
@@ -41,6 +50,32 @@ def session_scope():
         raise
     finally:
         session.close()
+
+
+class User(Base):
+    __tablename__ = 'user'
+
+    id = Column(Integer, primary_key=True)
+    user_name = Column(String(255), nullable=False, unique=True)
+    first_name = Column(String(255))
+    last_name = Column(String(255))
+    password = Column(String(255))
+    email = Column(String(255))
+
+
+class PermissionLabel(enum.Enum):
+    read = 1
+    write = 2
+    admin = 3
+
+
+class Permission(Base):
+    __tablename__ = 'permission'
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship("User", backref="permissions")
+    label = Column(Enum(PermissionLabel), nullable=False)
 
 
 class Ecosystem(Base):
@@ -216,6 +251,39 @@ class Package(Base):
                             backref='required_by')
 
 
+def insert_first_user(name: str, password: str):
+    if not name or not password:
+        logger.warning("No initial user/password provided")
+        return
+
+    with session_scope() as session:
+        password_hash = hash_password(password)
+        statement = \
+            User.__table__.insert(). \
+            from_select([User.user_name, User.password],
+                        select([literal(name), literal(password_hash)]).
+                        where(~exists().where(User.__table__)))
+        result = session.execute(statement)
+
+        if result.lastrowid:
+            user = session.query(User).filter_by(id=result.lastrowid).first()
+            permission = Permission()
+            permission.label = PermissionLabel.admin
+            user.permissions.append(permission)
+            logger.info("Created initial user with ID %d", user.id)
+
+
+def remove_but_last_user(user_id: str):
+    with session_scope() as session:
+        record = session.query(User).filter_by(id=user_id).first()
+        if not record:
+            raise NotFound
+        session.delete(record)
+        if session.query(User).count() == 0:
+            session.rollback()
+            raise OperationFailed
+
+
 def reset_database():
         try:
             Base.metadata.drop_all(engine)
@@ -333,6 +401,8 @@ def clear_ecosystems():
     drop_table(repo_label)
     drop_table(Repo.__table__)
     drop_table(Label.__table__)
+    drop_table(Permission.__table__)
+    drop_table(User.__table__)
 
     try:
         Base.metadata.create_all(engine)

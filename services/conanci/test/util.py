@@ -1,6 +1,19 @@
 from conanci import database
+from conanci.ssh import hash_password
 
 import os
+
+
+def create_user(parameters):
+    user = database.User()
+    user.user_name = parameters.get("user.user_name", "user")
+    user.first_name = "Joe"
+    user.last_name = "Doe"
+    user.password = hash_password("password")
+    permission = database.Permission()
+    permission.label = database.PermissionLabel.write
+    user.permissions.append(permission)
+    return user
 
 
 def create_ecosystem(parameters):
@@ -24,6 +37,24 @@ def create_ecosystem(parameters):
     ecosystem.conan_password = os.environ.get("CONAN_PASSWORD", "")
     parameters["ecosystem"] = ecosystem
     return ecosystem
+
+
+def create_repo(parameters):
+    repo = database.Repo()
+    if "ecosystem" in parameters.keys():
+        repo.ecosystem = parameters["ecosystem"]
+    else:
+        repo.ecosystem = create_ecosystem(parameters)
+    if parameters.get("repo.invalid", False):
+        repo.url = "https://github.com/uboot/nonsense.git"
+    else:
+        repo.url = "https://github.com/uboot/conan-ci.git"
+    if parameters.get("repo.deadlock", False):
+        repo.path = "packages/deadlock"
+    else:
+        repo.path = "packages/hello"
+    repo.exclude = [database.Label("desktop")]
+    return repo
 
 
 def create_repo(parameters):

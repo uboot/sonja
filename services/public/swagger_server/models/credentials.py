@@ -14,24 +14,24 @@ class Credentials(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, user: str=None, password: str=None):  # noqa: E501
+    def __init__(self, user_name: str=None, password: str=None):  # noqa: E501
         """Credentials - a model defined in Swagger
 
-        :param user: The user of this Credentials.  # noqa: E501
-        :type user: str
+        :param user_name: The user_name of this Credentials.  # noqa: E501
+        :type user_name: str
         :param password: The password of this Credentials.  # noqa: E501
         :type password: str
         """
         self.swagger_types = {
-            'user': str,
+            'user_name': str,
             'password': str
         }
 
         self.attribute_map = {
-            'user': 'user',
+            'user_name': 'user-name',
             'password': 'password'
         }
-        self._user = user
+        self._user_name = user_name
         self._password = password
 
     @classmethod
@@ -46,27 +46,25 @@ class Credentials(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def user(self) -> str:
-        """Gets the user of this Credentials.
+    def user_name(self) -> str:
+        """Gets the user_name of this Credentials.
 
 
-        :return: The user of this Credentials.
+        :return: The user_name of this Credentials.
         :rtype: str
         """
-        return self._user
+        return self._user_name
 
-    @user.setter
-    def user(self, user: str):
-        """Sets the user of this Credentials.
+    @user_name.setter
+    def user_name(self, user_name: str):
+        """Sets the user_name of this Credentials.
 
 
-        :param user: The user of this Credentials.
-        :type user: str
+        :param user_name: The user_name of this Credentials.
+        :type user_name: str
         """
-        if user is None:
-            raise ValueError("Invalid value for `user`, must not be `None`")  # noqa: E501
 
-        self._user = user
+        self._user_name = user_name
 
     @property
     def password(self) -> str:

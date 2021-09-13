@@ -44,10 +44,12 @@ spec:
           value: {{ template "conan-ci.fullname" $ }}-linux-agent
         - name: CONANCI_WINDOWSAGENT_URL
           value: {{ template "conan-ci.fullname" $ }}-windows-agent
-{{- if .secretKey }}
-        - name: SECRET_KEY
-          value: {{ .secretKey }}
-{{- end }}
+        - name: CONANCI_INITIAL_USER
+          value: {{ $.Values.auth.user }}
+        - name: CONANCI_INITIAL_PASSWORD
+          value: {{ $.Values.auth.password }}
+        - name: CONANCI_SECRET_KEY
+          value: {{ $.Values.auth.secretKey }}
 {{- if .password }}
         - name: PASSWORD
           value: {{ .password }}

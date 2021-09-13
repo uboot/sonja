@@ -23,13 +23,35 @@ class TestGeneralController(BaseTestCase):
 
         log in
         """
-        body = models.Credentials(user="user", password="paSSwOrd")
+        with database.session_scope() as session:
+            user = util.create_user(dict())
+            session.add(user)
+
+        body = models.Credentials(user_name="user", password="password")
         response = self.client.open(
             '/api/v1/login',
             method='POST',
             data=json.dumps(body),
             content_type='application/json')
         self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
+    def test_login_wrong_password(self):
+        """Test case for login
+
+        log in
+        """
+        with database.session_scope() as session:
+            user = util.create_user(dict())
+            session.add(user)
+
+        body = models.Credentials(user_name="user", password="wrong")
+        response = self.client.open(
+            '/api/v1/login',
+            method='POST',
+            data=json.dumps(body),
+            content_type='application/json')
+        self.assert401(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
     def test_logout(self):
@@ -49,7 +71,7 @@ class TestGeneralController(BaseTestCase):
 
         log out
         """
-        body = models.User(user="user")
+        body = models.UserToken(user_id="1")
         self.login()
         response = self.client.open(
             '/api/v1/restore',
@@ -64,7 +86,7 @@ class TestGeneralController(BaseTestCase):
 
         log out
         """
-        body = models.User(user="user")
+        body = models.User(attributes=models.UserAttributes(user_name="user"))
         response = self.client.open(
             '/api/v1/restore',
             method='POST',
@@ -78,7 +100,7 @@ class TestGeneralController(BaseTestCase):
 
         log out
         """
-        body = models.User(user="wrong_user")
+        body = models.User(attributes=models.UserAttributes(user_name="wrong_user"))
         response = self.client.open(
             '/api/v1/restore',
             method='POST',

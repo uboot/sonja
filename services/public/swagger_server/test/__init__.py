@@ -2,7 +2,8 @@ import connexion
 import logging
 import os
 
-from conanci.database import reset_database
+from conanci.database import reset_database, session_scope
+from conanci.test import util
 from flask import json
 from flask_testing import TestCase
 from swagger_server import auth, encoder, models
@@ -16,8 +17,6 @@ class BaseTestCase(TestCase):
         app = connexion.App(__name__, specification_dir='../swagger/')
         app.app.json_encoder = encoder.JSONEncoder
         app.add_api(swagger_api, arguments={'title': 'Conan CI Linux Agent'}, pythonic_params=True)
-        auth.master_password = 'paSSwOrd'
-        auth.secret_key = 'MDAwMDAwMDAwMDAwMDAwMA=='
         auth.setup_login(app.app)
         return app.app
 
@@ -25,7 +24,11 @@ class BaseTestCase(TestCase):
         reset_database()
 
     def login(self):
-        body = models.Credentials(user="user", password="paSSwOrd")
+        with session_scope() as session:
+            user = util.create_user(dict())
+            session.add(user)
+
+        body = models.Credentials(user_name="user", password="password")
         self.client.open(
             '/api/v1/login',
             method='POST',

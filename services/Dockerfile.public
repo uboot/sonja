@@ -8,7 +8,8 @@ RUN apk add --no-cache \
 		py3-wheel \
 		py3-cryptography \
 		py3-mysqlclient \
-		py3-gevent
+		py3-gevent \
+		py3-bcrypt
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app

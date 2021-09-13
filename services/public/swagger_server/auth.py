@@ -4,8 +4,7 @@ import os
 from flask_login import current_user, LoginManager, UserMixin
 
 
-master_password = os.environ.get('PASSWORD', '')
-secret_key = os.environ.get('SECRET_KEY', 'MDAwMDAwMDAwMDAwMDAwMA==')
+secret_key = os.environ.get('CONANCI_SECRET_KEY', 'MDAwMDAwMDAwMDAwMDAwMA==')
 
 
 class User(UserMixin):
@@ -23,15 +22,11 @@ def setup_login(app):
         return User(user_id)
 
 
-def authorize(user, password):
-    return password == master_password
-
-
 def restore(user):
     return current_user.id == user and current_user.is_authenticated
 
 
-def get_user():
+def get_user() -> str:
     if current_user:
         return current_user.id
 

@@ -39,7 +39,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/UserToken'
         "401":
           description: wrong credentials
       security: []
@@ -55,14 +55,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/UserToken'
       responses:
         "200":
           description: success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/UserToken'
         "401":
           description: not logged in
       x-openapi-router-controller: swagger_server.controllers.general_controller
@@ -129,6 +129,126 @@ paths:
         "200":
           description: success
       x-openapi-router-controller: swagger_server.controllers.general_controller
+  /user:
+    get:
+      tags:
+      - User
+      summary: get all users
+      operationId: get_users
+      responses:
+        "200":
+          description: list of users
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserList'
+        "400":
+          description: bad input parameter
+      x-openapi-router-controller: swagger_server.controllers.user_controller
+    post:
+      tags:
+      - User
+      summary: add a new user
+      operationId: add_user
+      requestBody:
+        description: user to add
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserData'
+      responses:
+        "201":
+          description: user created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserData'
+        "400":
+          description: "invalid input, object invalid"
+        "409":
+          description: an existing item already exists
+      x-openapi-router-controller: swagger_server.controllers.user_controller
+  /user/{userId}:
+    get:
+      tags:
+      - User
+      summary: get an user
+      operationId: get_user
+      parameters:
+      - name: userId
+        in: path
+        description: user ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserData'
+        "400":
+          description: invalid ID supplied
+        "404":
+          description: user not found
+      x-openapi-router-controller: swagger_server.controllers.user_controller
+    delete:
+      tags:
+      - User
+      summary: delete an user
+      operationId: delete_user
+      parameters:
+      - name: userId
+        in: path
+        description: user id to delete
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "204":
+          description: user deleted
+        "400":
+          description: invalid ID supplied
+        "404":
+          description: user not found
+      x-openapi-router-controller: swagger_server.controllers.user_controller
+    patch:
+      tags:
+      - User
+      summary: update an user
+      operationId: update_user
+      parameters:
+      - name: userId
+        in: path
+        description: id of the user to update
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: user updates
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserData'
+      responses:
+        "200":
+          description: updated user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserData'
+        "400":
+          description: "invalid input, object invalid"
+        "404":
+          description: user not found
+      x-openapi-router-controller: swagger_server.controllers.user_controller
   /ecosystem:
     get:
       tags:
@@ -888,25 +1008,107 @@ components:
     Credentials:
       required:
       - password
-      - user
+      - user-name
       type: object
       properties:
-        user:
+        user-name:
           type: string
           example: user
         password:
           type: string
           example: paSSwOrd
-    User:
+    UserToken:
       required:
-      - user
+      - user-id
       type: object
       properties:
-        user:
+        user-id:
           type: string
-          example: user
+          example: "1"
       example:
-        user: user
+        user-id: "1"
+    User:
+      required:
+      - type
+      type: object
+      properties:
+        id:
+          type: string
+          example: "1"
+        type:
+          type: string
+          example: users
+        attributes:
+          $ref: '#/components/schemas/User_attributes'
+      example:
+        attributes:
+          password: passw0rd
+          old-password: passxyz
+          user-name: user
+          permissions:
+          - read
+          - write
+          first-name: Joe
+          email: joe.doe@acme.com
+          last-name: Doe
+        id: "1"
+        type: users
+    UserData:
+      required:
+      - data
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/User'
+      example:
+        data:
+          attributes:
+            password: passw0rd
+            old-password: passxyz
+            user-name: user
+            permissions:
+            - read
+            - write
+            first-name: Joe
+            email: joe.doe@acme.com
+            last-name: Doe
+          id: "1"
+          type: users
+    UserList:
+      required:
+      - data
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+      example:
+        data:
+        - attributes:
+            password: passw0rd
+            old-password: passxyz
+            user-name: user
+            permissions:
+            - read
+            - write
+            first-name: Joe
+            email: joe.doe@acme.com
+            last-name: Doe
+          id: "1"
+          type: users
+        - attributes:
+            password: passw0rd
+            old-password: passxyz
+            user-name: user
+            permissions:
+            - read
+            - write
+            first-name: Joe
+            email: joe.doe@acme.com
+            last-name: Doe
+          id: "1"
+          type: users
     Ecosystem:
       required:
       - type
@@ -1831,6 +2033,48 @@ components:
             package-id: cda61897af86d277c61b93fa40c92da744abdf33
           id: "1"
           type: recipe
+    User_attributes:
+      type: object
+      properties:
+        user-name:
+          type: string
+          example: user
+        first-name:
+          type: string
+          example: Joe
+        last-name:
+          type: string
+          example: Doe
+        email:
+          type: string
+          example: joe.doe@acme.com
+        password:
+          type: string
+          example: passw0rd
+        old-password:
+          type: string
+          example: passxyz
+        permissions:
+          type: array
+          example:
+          - read
+          - write
+          items:
+            type: string
+            enum:
+            - read
+            - write
+            - admin
+      example:
+        password: passw0rd
+        old-password: passxyz
+        user-name: user
+        permissions:
+        - read
+        - write
+        first-name: Joe
+        email: joe.doe@acme.com
+        last-name: Doe
     Ecosystem_attributes:
       type: object
       properties:

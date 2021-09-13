@@ -3,6 +3,7 @@ import os
 
 from conanci import database
 from conanci.swagger_client import ApiClient, Configuration, CrawlerApi
+from conanci.ssh import test_password
 from flask import abort
 from flask_login import login_user, logout_user
 from urllib3.exceptions import MaxRetryError
@@ -52,14 +53,18 @@ def login(body=None):  # noqa: E501
     if connexion.request.is_json:
         body = models.Credentials.from_dict(connexion.request.get_json())  # noqa: E501
 
-    user = auth.User(body.user)
+    with database.session_scope() as session:
+        record = session.query(database.User).filter_by(user_name=body.user_name).first()
+        if not record:
+            abort(401, 'Wrong credentials')
+        if not test_password(body.password, record.password):
+            abort(401, 'Wrong credentials')
 
-    if not auth.authorize(user, body.password):
-        abort(401, 'Wrong credentials')
+        user = auth.User(record.id)
 
     login_user(user)
 
-    return models.User(user=auth.get_user()), 200
+    return models.UserToken(user_id=auth.get_user()), 200
 
 
 def logout():  # noqa: E501
@@ -85,10 +90,13 @@ def restore(body=None):  # noqa: E501
 
     :rtype: None
     """
-    if not auth.restore(body['user']):
-        abort(401, 'Wrong user')
+    if connexion.request.is_json:
+        body = models.UserToken.from_dict(connexion.request.get_json())  # noqa: E501
 
-    return models.User(user=auth.get_user()), 200
+    if body.user_id != auth.get_user():
+        abort(401, 'Token does not match current user')
+
+    return models.UserToken(user_id=auth.get_user()), 200
 
 
 def ping():  # noqa: E501

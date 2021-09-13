@@ -19,12 +19,16 @@ phpmyadmin:
 mtu: 1450
 insecureRegistries: []
 
+auth:
+  # python -c 'import base64, os; print(base64.b64encode(os.urandom(16)))'
+  secretKey: MDAwMDAwMDAwMDAwMDAwMA==
+  user: user
+  password: paSSw0rd
+
+
 services:
   - name: public
     pingUrl: /api/v1/ping
-    # python -c 'import base64, os; print(base64.b64encode(os.urandom(16)))'
-    secretKey: MDAwMDAwMDAwMDAwMDAwMA==
-    password: paSSw0rd
   - name: scheduler
   - name: crawler
   - name: frontend

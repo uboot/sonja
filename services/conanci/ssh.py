@@ -1,4 +1,5 @@
 import base64
+import bcrypt
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import rsa
@@ -34,3 +35,11 @@ def decode(encoded):
         return ""
 
     return str(base64.b64decode(encoded), "utf-8")
+
+
+def hash_password(password):
+    return str(bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()), "utf-8")
+
+
+def test_password(password, hashed):
+    return bcrypt.checkpw(password.encode("utf-8"), hashed.encode("utf-8"))

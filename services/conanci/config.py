@@ -1,4 +1,4 @@
-from conanci.database import Base, engine, logger, session_scope
+from conanci.database import Base, engine, insert_first_user, logger, session_scope
 import connexion
 import logging
 import logging.config
@@ -13,6 +13,8 @@ from alembic.runtime import migration
 
 
 app = connexion.App(__name__, specification_dir='./swagger/')
+initial_user = os.environ.get('CONANCI_INITIAL_USER', 'user')
+initial_password = os.environ.get('CONANCI_INITIAL_PASSWORD', 'paSSwOrd')
 
 
 class PingFilter(logging.Filter):
@@ -48,6 +50,8 @@ def connect_to_database():
                     command.stamp(alembic_cfg, "head")
                 new_revision = context.get_current_revision()
                 logger.info("Database is at revision %s", new_revision)
+
+                insert_first_user(initial_user, initial_password)
             logger.info("Connected")
             return
         except sqlalchemy.exc.OperationalError:

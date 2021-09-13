@@ -6,6 +6,7 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
+from swagger_server.models.user_attributes import UserAttributes  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -14,20 +15,30 @@ class User(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, user: str=None):  # noqa: E501
+    def __init__(self, id: str=None, type: str=None, attributes: UserAttributes=None):  # noqa: E501
         """User - a model defined in Swagger
 
-        :param user: The user of this User.  # noqa: E501
-        :type user: str
+        :param id: The id of this User.  # noqa: E501
+        :type id: str
+        :param type: The type of this User.  # noqa: E501
+        :type type: str
+        :param attributes: The attributes of this User.  # noqa: E501
+        :type attributes: UserAttributes
         """
         self.swagger_types = {
-            'user': str
+            'id': str,
+            'type': str,
+            'attributes': UserAttributes
         }
 
         self.attribute_map = {
-            'user': 'user'
+            'id': 'id',
+            'type': 'type',
+            'attributes': 'attributes'
         }
-        self._user = user
+        self._id = id
+        self._type = type
+        self._attributes = attributes
 
     @classmethod
     def from_dict(cls, dikt) -> 'User':
@@ -41,24 +52,66 @@ class User(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def user(self) -> str:
-        """Gets the user of this User.
+    def id(self) -> str:
+        """Gets the id of this User.
 
 
-        :return: The user of this User.
+        :return: The id of this User.
         :rtype: str
         """
-        return self._user
+        return self._id
 
-    @user.setter
-    def user(self, user: str):
-        """Sets the user of this User.
+    @id.setter
+    def id(self, id: str):
+        """Sets the id of this User.
 
 
-        :param user: The user of this User.
-        :type user: str
+        :param id: The id of this User.
+        :type id: str
         """
-        if user is None:
-            raise ValueError("Invalid value for `user`, must not be `None`")  # noqa: E501
 
-        self._user = user
+        self._id = id
+
+    @property
+    def type(self) -> str:
+        """Gets the type of this User.
+
+
+        :return: The type of this User.
+        :rtype: str
+        """
+        return self._type
+
+    @type.setter
+    def type(self, type: str):
+        """Sets the type of this User.
+
+
+        :param type: The type of this User.
+        :type type: str
+        """
+        if type is None:
+            raise ValueError("Invalid value for `type`, must not be `None`")  # noqa: E501
+
+        self._type = type
+
+    @property
+    def attributes(self) -> UserAttributes:
+        """Gets the attributes of this User.
+
+
+        :return: The attributes of this User.
+        :rtype: UserAttributes
+        """
+        return self._attributes
+
+    @attributes.setter
+    def attributes(self, attributes: UserAttributes):
+        """Sets the attributes of this User.
+
+
+        :param attributes: The attributes of this User.
+        :type attributes: UserAttributes
+        """
+
+        self._attributes = attributes
