@@ -1,4 +1,4 @@
-from conanci.database import Base, engine, insert_first_user, logger, session_scope
+from sonja.database import Base, engine, insert_first_user, logger, session_scope
 import connexion
 import logging
 import logging.config
@@ -13,8 +13,8 @@ from alembic.runtime import migration
 
 
 app = connexion.App(__name__, specification_dir='./swagger/')
-initial_user = os.environ.get('CONANCI_INITIAL_USER', 'user')
-initial_password = os.environ.get('CONANCI_INITIAL_PASSWORD', 'paSSwOrd')
+initial_user = os.environ.get('SONJA_INITIAL_USER', 'user')
+initial_password = os.environ.get('SONJA_INITIAL_PASSWORD', 'paSSwOrd')
 
 
 class PingFilter(logging.Filter):

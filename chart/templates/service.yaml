@@ -2,10 +2,10 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: {{ template "conan-ci.fullname" $ }}-{{ .name }}
+  name: {{ template "sonja.fullname" $ }}-{{ .name }}
 spec:
   selector:
-    app: {{ template "conan-ci.fullname" $ }}-{{ .name }}
+    app: {{ template "sonja.fullname" $ }}-{{ .name }}
   ports:
     - port: 8080
 ---
@@ -13,10 +13,10 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: {{ template "conan-ci.fullname" $ }}-windows-agent
+  name: {{ template "sonja.fullname" $ }}-windows-agent
 spec:
   selector:
-    app: {{ template "conan-ci.fullname" $ }}-windows-agent
+    app: {{ template "sonja.fullname" $ }}-windows-agent
   ports:
     - port: 8080
 ---
@@ -24,10 +24,10 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: {{ template "conan-ci.fullname" $ }}-windows-docker-{{ .name }}
+  name: {{ template "sonja.fullname" $ }}-windows-docker-{{ .name }}
 spec:
   selector:
-    app: {{ template "conan-ci.fullname" $ }}-windows-docker-{{ .name }}
+    app: {{ template "sonja.fullname" $ }}-windows-docker-{{ .name }}
   ports:
     - port: 2375
 ---

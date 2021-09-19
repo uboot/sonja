@@ -1,8 +1,8 @@
 import connexion
 import six
 
-from conanci.agent import Agent
-from conanci.config import app
+from sonja.agent import Agent
+from sonja.config import app
 
 agent = Agent()
 logger = app.app.logger

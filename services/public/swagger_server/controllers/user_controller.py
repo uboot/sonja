@@ -1,8 +1,8 @@
 import connexion
 import sqlalchemy.exc
 
-from conanci import database
-from conanci.ssh import hash_password, test_password
+from sonja import database
+from sonja.ssh import hash_password, test_password
 from flask import abort
 from swagger_server import models
 

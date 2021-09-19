@@ -1,13 +1,13 @@
-from conanci import database, manager
+from sonja import database, manager
 
-import conanci.test.util as util
+import sonja.test.util as util
 import os
 import unittest
 
 # Requires:
 #
 # 1. MySQL database
-# docker run --rm -d --name mysql -p 3306:3306 -e MYSQL_DATABASE=conan-ci -e MYSQL_ROOT_PASSWORD=secret mysql:8.0.21
+# docker run --rm -d --name mysql -p 3306:3306 -e MYSQL_DATABASE=sonja -e MYSQL_ROOT_PASSWORD=secret mysql:8.0.21
 
 def _setup_build_output():
     build_output = dict()

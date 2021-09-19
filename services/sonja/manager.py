@@ -1,7 +1,7 @@
 import json
 import re
 
-from conanci import database
+from sonja import database
 
 
 def _process_recipe(session: database.Session, recipe_data: dict, build: database.Build) -> database.Recipe:

@@ -2,7 +2,7 @@ import os
 import shutil
 import unittest
 
-from conanci.crawler import RepoController
+from sonja.crawler import RepoController
 
 
 known_hosts = ("Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN"
@@ -20,7 +20,7 @@ class RepoControllerTest(unittest.TestCase):
 
     def test_checkout_master(self):
         controller = RepoController(self.work_dir)
-        controller.create_new_repo("git@github.com:uboot/conan-ci.git")
+        controller.create_new_repo("git@github.com:uboot/sonja.git")
         controller.setup_ssh(os.environ.get("SSH_KEY", ""), known_hosts)
         controller.fetch()
         controller.checkout("master")
@@ -28,7 +28,7 @@ class RepoControllerTest(unittest.TestCase):
 
     def test_setup_ssh(self):
         controller = RepoController(self.work_dir)
-        controller.create_new_repo("git@github.com:uboot/conan-ci.git")
+        controller.create_new_repo("git@github.com:uboot/sonja.git")
         controller.setup_ssh(os.environ.get("SSH_KEY", ""), known_hosts)
         self.assertTrue(os.path.exists(os.path.join(self.work_dir, "id_rsa")))
         self.assertTrue(os.path.exists(os.path.join(self.work_dir, "known_hosts")))

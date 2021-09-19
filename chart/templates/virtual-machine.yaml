@@ -2,21 +2,21 @@
 apiVersion: kubevirt.io/v1alpha3
 kind: VirtualMachineInstanceReplicaSet
 metadata:
-  name: {{ template "conan-ci.fullname" $ }}-windows-docker-{{ .name }}
+  name: {{ template "sonja.fullname" $ }}-windows-docker-{{ .name }}
   labels:
-    app: {{ template "conan-ci.fullname" $ }}-windows-docker-{{ .name }}
+    app: {{ template "sonja.fullname" $ }}-windows-docker-{{ .name }}
     kubevirt.io/os: win2k19
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{ template "conan-ci.fullname" $ }}-windows-docker-{{ .name }}
+      app: {{ template "sonja.fullname" $ }}-windows-docker-{{ .name }}
   template:
     metadata:
       generation: 1
       labels:
         kubevirt.io/os: windows
-        app: {{ template "conan-ci.fullname" $ }}-windows-docker-{{ .name }}
+        app: {{ template "sonja.fullname" $ }}-windows-docker-{{ .name }}
     spec:
       terminationGracePeriodSeconds: 30
       domain:
@@ -55,7 +55,7 @@ spec:
             #cloud-config
             write_files:
             - encoding: b64
-              content: {{ template "conan-ci.daemonJsonB64" $ }}
+              content: {{ template "sonja.daemonJsonB64" $ }}
               path: C:\ProgramData\Docker\config\daemon.json
               permissions: '0644'
             runcmd:

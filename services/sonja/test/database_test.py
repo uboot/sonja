@@ -1,6 +1,6 @@
 import unittest
 
-from conanci import database
+from sonja import database
 
 
 class DatabaseTest(unittest.TestCase):

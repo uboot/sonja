@@ -19,9 +19,9 @@ handlers:
     stream: ext://sys.stdout
 filters:
   ping:
-    (): conanci.config.PingFilter
+    (): sonja.config.PingFilter
 loggers:
-  conanci:
+  sonja:
     level: INFO
     handlers: [console]
     propagate: no

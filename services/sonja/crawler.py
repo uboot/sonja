@@ -1,7 +1,7 @@
-from conanci import database
-from conanci.config import connect_to_database, logger
-from conanci.ssh import decode
-from conanci.worker import Worker
+from sonja import database
+from sonja.config import connect_to_database, logger
+from sonja.ssh import decode
+from sonja.worker import Worker
 from queue import Empty, SimpleQueue
 import asyncio
 import datetime

@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ template "conan-ci.fullname" $ }}-ingress-frontend
+  name: {{ template "sonja.fullname" $ }}-ingress-frontend
   annotations:
     ingress.kubernetes.io/ssl-redirect: "true"
 spec:
@@ -17,21 +17,21 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: {{ template "conan-ci.fullname" $ }}-frontend
+            name: {{ template "sonja.fullname" $ }}-frontend
             port: 
               number: 8080
       - path: /api/v1
         pathType: Prefix
         backend:
           service:
-            name: {{ template "conan-ci.fullname" $ }}-public
+            name: {{ template "sonja.fullname" $ }}-public
             port: 
               number: 8080
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ template "conan-ci.fullname" $ }}-ingress-phpmyadmin
+  name: {{ template "sonja.fullname" $ }}-ingress-phpmyadmin
   annotations:
     traefik.ingress.kubernetes.io/request-modifier: "ReplacePathRegex: ^/phpmyadmin/(.*) /$1"
     ingress.kubernetes.io/ssl-redirect: "true"

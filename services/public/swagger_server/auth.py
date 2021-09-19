@@ -4,7 +4,7 @@ import os
 from flask_login import current_user, LoginManager, UserMixin
 
 
-secret_key = os.environ.get('CONANCI_SECRET_KEY', 'MDAwMDAwMDAwMDAwMDAwMA==')
+secret_key = os.environ.get('SONJA_SECRET_KEY', 'MDAwMDAwMDAwMDAwMDAwMA==')
 
 
 class User(UserMixin):

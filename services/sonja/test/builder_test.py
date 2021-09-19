@@ -1,4 +1,4 @@
-from conanci.builder import Builder
+from sonja.builder import Builder
 
 import base64
 import os
@@ -55,16 +55,16 @@ def cancel_build(builder, seconds):
 
 def get_build_parameters(profile):
     return {
-        "conan_config_url": "git@github.com:uboot/conan-ci.git",
+        "conan_config_url": "git@github.com:uboot/sonja.git",
         "conan_config_path": "conan-config",
         "conan_config_branch": "",
         "conan_remote": "uboot",
         "conan_user": "user",
         "conan_password": os.environ.get("CONAN_PASSWORD", ""),
         "conan_profile": profile,
-        "git_url": "git@github.com:uboot/conan-ci.git",
+        "git_url": "git@github.com:uboot/sonja.git",
         "git_sha": "08979da6c039dd919292f7408785e2ad711b2fd5",
-        "conanci_user": "conanci",
+        "sonja_user": "sonja",
         "channel": "latest",
         "path": "packages/hello/conanfile.py",
         "ssh_key": os.environ.get("SSH_KEY", ""),

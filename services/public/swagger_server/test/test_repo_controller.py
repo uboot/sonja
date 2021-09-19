@@ -2,8 +2,8 @@
 
 from __future__ import absolute_import
 
-from conanci import database
-from conanci.test import util
+from sonja import database
+from sonja.test import util
 from flask import json
 from swagger_server import models
 from swagger_server.test import BaseTestCase
@@ -24,7 +24,7 @@ class TestRepoController(BaseTestCase):
 
         add a new repo
         """
-        body = self.__create_repo("hello", "git@github.com:uboot/conan-ci.git", "packages/hello")
+        body = self.__create_repo("hello", "git@github.com:uboot/sonja.git", "packages/hello")
         response = self.client.open(
             '/api/v1/repo',
             method='POST',
@@ -71,7 +71,7 @@ class TestRepoController(BaseTestCase):
 
         update a repo
         """
-        body = self.__create_repo("hello", "git@github.com:uboot/conan-ci.git", "packages/hello")
+        body = self.__create_repo("hello", "git@github.com:uboot/sonja.git", "packages/hello")
         response = self.client.open(
             '/api/v1/repo/{repo_id}'.format(repo_id=1),
             method='PATCH',

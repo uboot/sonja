@@ -20,8 +20,8 @@ if windows:
 
     source_template = string.Template(
         """sh -c \" \
-        mkdir conanci \
-        && cd conanci \
+        mkdir sonja \
+        && cd sonja \
         && git init \
         && git remote add origin $git_url \
         && git fetch origin $git_sha \
@@ -50,8 +50,8 @@ else:
 
     source_template = string.Template(
         """sh -c \" \
-        mkdir conanci \
-        && cd conanci \
+        mkdir sonja \
+        && cd sonja \
         && git init \
         && git remote add origin $git_url \
         && git fetch origin $git_sha \
@@ -83,9 +83,9 @@ conan_url = "conan-server"
 conan_password = "demo"
 docker_image_pattern = ("([a-z0-9\\.-]+(:[0-9]+)?/)?"
                         "[a-z0-9\\.-/]+([:@][a-z0-9\\.-]+)$")
-git_url = "https://github.com/uboot/conan-ci.git"
+git_url = "https://github.com/uboot/sonja.git"
 git_sha = "ce8ad84282be5583989bdbdf0c42e95a53527657"
-package_path = "./conanci/packages/hello/"
+package_path = "./sonja/packages/hello/"
 package = "hello"
 channel = "@user/latest"
 

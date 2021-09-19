@@ -18,7 +18,7 @@ COPY requirements.txt /usr/src/app/
 
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-COPY conanci /usr/src/app/conanci
+COPY sonja /usr/src/app/sonja
 COPY public /usr/src/app
 
 EXPOSE 8080

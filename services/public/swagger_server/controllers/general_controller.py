@@ -1,16 +1,16 @@
 import connexion
 import os
 
-from conanci import database
-from conanci.swagger_client import ApiClient, Configuration, CrawlerApi
-from conanci.ssh import test_password
+from sonja import database
+from sonja.swagger_client import ApiClient, Configuration, CrawlerApi
+from sonja.ssh import test_password
 from flask import abort
 from flask_login import login_user, logout_user
 from urllib3.exceptions import MaxRetryError
 from swagger_server import auth, models
 
 
-crawler_url = os.environ.get('CONANCI_CRAWLER_URL', '127.0.0.1')
+crawler_url = os.environ.get('SONJA_CRAWLER_URL', '127.0.0.1')
 crawler_configuration = Configuration()
 crawler_configuration.host = "http://{0}:8080".format(crawler_url)
 crawler = CrawlerApi(ApiClient(crawler_configuration))

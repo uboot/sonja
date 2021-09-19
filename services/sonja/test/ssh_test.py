@@ -1,6 +1,6 @@
 import unittest
 
-from conanci import ssh
+from sonja import ssh
 
 
 class SshTest(unittest.TestCase):

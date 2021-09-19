@@ -1,13 +1,13 @@
-# Default values for conan-ci.
+# Default values for sonja.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-hostName: conan-ci
+hostName: sonja
 
 mysql:
   auth:
     rootPassword: secret
-    database: conan-ci
+    database: sonja
   # primary:
   #   persistence:
   #     existingClaim: mysql

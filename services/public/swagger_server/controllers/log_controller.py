@@ -1,6 +1,6 @@
 import connexion
 
-from conanci import database
+from sonja import database
 from flask import abort
 from swagger_server import models
 

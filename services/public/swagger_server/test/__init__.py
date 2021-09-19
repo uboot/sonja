@@ -2,8 +2,8 @@ import connexion
 import logging
 import os
 
-from conanci.database import reset_database, session_scope
-from conanci.test import util
+from sonja.database import reset_database, session_scope
+from sonja.test import util
 from flask import json
 from flask_testing import TestCase
 from swagger_server import auth, encoder, models
@@ -16,7 +16,7 @@ class BaseTestCase(TestCase):
         logging.getLogger('connexion.operation').setLevel('ERROR')
         app = connexion.App(__name__, specification_dir='../swagger/')
         app.app.json_encoder = encoder.JSONEncoder
-        app.add_api(swagger_api, arguments={'title': 'Conan CI Linux Agent'}, pythonic_params=True)
+        app.add_api(swagger_api, arguments={'title': 'Linux Agent'}, pythonic_params=True)
         auth.setup_login(app.app)
         return app.app
 

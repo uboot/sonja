@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from conanci.config import app, setup_logging
+from sonja.config import app, setup_logging
 from swagger_server import agent
 from swagger_server import encoder
 import os.path
@@ -21,7 +21,7 @@ def handler(signum, frame):
 
 def main():
     signal.signal(signal.SIGTERM, handler)
-    app.add_api(swagger_api, arguments={'title': 'Conan CI Linux Agent'}, pythonic_params=True)
+    app.add_api(swagger_api, arguments={'title': 'Linux Agent'}, pythonic_params=True)
     app.app.json_encoder = encoder.JSONEncoder
     setup_logging()
     agent.start()

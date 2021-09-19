@@ -1,7 +1,7 @@
 import asyncio
-from conanci import database
-from conanci.config import connect_to_database, logger
-from conanci.worker import Worker
+from sonja import database
+from sonja.config import connect_to_database, logger
+from sonja.worker import Worker
 from urllib3.exceptions import MaxRetryError
 
 

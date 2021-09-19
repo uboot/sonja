@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  title: Conan-CI Public
+  title: Public
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -1150,7 +1150,7 @@ components:
         attributes:
           conan-config-path: ""
           known-hosts: Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN2hSR21kbm05dFVEYk85SURTd0JLNlRiUWErUFhZUENQeTZyYlRyVHR3N1BIa2NjS3JwcDB5VmhwNUhkRUljS3I2cExsVkRCZk9MWDlRVXN5Q09WMHd6ZmpJSk5sR0VZc2RsTEppekhoYm4ybVVqdlNBSFFxWkVUWVA4MWVGekxRTm5QSHQ0RVZWVWg3VmZERVNVODRLZXptRDVRbFdwWExtdlUzMS95TWYrU2U4eGhIVHZLU0NaSUZJbVd3b0c2bWJVb1dmOW56cElvYVNqQit3ZXFxVVVtcGFhYXNYVmFsNzJKK1VYMkIrMlJQVzNSY1QwZU96UWdxbEpMM1JLclRKdmRzakUzSkVBdkdxM2xHSFNaWHkyOEczc2t1YTJTbVZpL3c0eUNFNmdiT0RxblRXbGc3K3dDNjA0eWRHWEE4VkppUzVhcDQzSlhpVUZGQWFRPT0K
-          conan-config-url: git@github.com:uboot/conan-ci.git
+          conan-config-url: git@github.com:uboot/sonja.git
           name: My Company
           conan-config-branch: master
           conan-password: demo
@@ -1194,7 +1194,7 @@ components:
           attributes:
             conan-config-path: ""
             known-hosts: Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN2hSR21kbm05dFVEYk85SURTd0JLNlRiUWErUFhZUENQeTZyYlRyVHR3N1BIa2NjS3JwcDB5VmhwNUhkRUljS3I2cExsVkRCZk9MWDlRVXN5Q09WMHd6ZmpJSk5sR0VZc2RsTEppekhoYm4ybVVqdlNBSFFxWkVUWVA4MWVGekxRTm5QSHQ0RVZWVWg3VmZERVNVODRLZXptRDVRbFdwWExtdlUzMS95TWYrU2U4eGhIVHZLU0NaSUZJbVd3b0c2bWJVb1dmOW56cElvYVNqQit3ZXFxVVVtcGFhYXNYVmFsNzJKK1VYMkIrMlJQVzNSY1QwZU96UWdxbEpMM1JLclRKdmRzakUzSkVBdkdxM2xHSFNaWHkyOEczc2t1YTJTbVZpL3c0eUNFNmdiT0RxblRXbGc3K3dDNjA0eWRHWEE4VkppUzVhcDQzSlhpVUZGQWFRPT0K
-            conan-config-url: git@github.com:uboot/conan-ci.git
+            conan-config-url: git@github.com:uboot/sonja.git
             name: My Company
             conan-config-branch: master
             conan-password: demo
@@ -1240,7 +1240,7 @@ components:
           attributes:
             conan-config-path: ""
             known-hosts: Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN2hSR21kbm05dFVEYk85SURTd0JLNlRiUWErUFhZUENQeTZyYlRyVHR3N1BIa2NjS3JwcDB5VmhwNUhkRUljS3I2cExsVkRCZk9MWDlRVXN5Q09WMHd6ZmpJSk5sR0VZc2RsTEppekhoYm4ybVVqdlNBSFFxWkVUWVA4MWVGekxRTm5QSHQ0RVZWVWg3VmZERVNVODRLZXptRDVRbFdwWExtdlUzMS95TWYrU2U4eGhIVHZLU0NaSUZJbVd3b0c2bWJVb1dmOW56cElvYVNqQit3ZXFxVVVtcGFhYXNYVmFsNzJKK1VYMkIrMlJQVzNSY1QwZU96UWdxbEpMM1JLclRKdmRzakUzSkVBdkdxM2xHSFNaWHkyOEczc2t1YTJTbVZpL3c0eUNFNmdiT0RxblRXbGc3K3dDNjA0eWRHWEE4VkppUzVhcDQzSlhpVUZGQWFRPT0K
-            conan-config-url: git@github.com:uboot/conan-ci.git
+            conan-config-url: git@github.com:uboot/sonja.git
             name: My Company
             conan-config-branch: master
             conan-password: demo
@@ -1275,7 +1275,7 @@ components:
           attributes:
             conan-config-path: ""
             known-hosts: Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN2hSR21kbm05dFVEYk85SURTd0JLNlRiUWErUFhZUENQeTZyYlRyVHR3N1BIa2NjS3JwcDB5VmhwNUhkRUljS3I2cExsVkRCZk9MWDlRVXN5Q09WMHd6ZmpJSk5sR0VZc2RsTEppekhoYm4ybVVqdlNBSFFxWkVUWVA4MWVGekxRTm5QSHQ0RVZWVWg3VmZERVNVODRLZXptRDVRbFdwWExtdlUzMS95TWYrU2U4eGhIVHZLU0NaSUZJbVd3b0c2bWJVb1dmOW56cElvYVNqQit3ZXFxVVVtcGFhYXNYVmFsNzJKK1VYMkIrMlJQVzNSY1QwZU96UWdxbEpMM1JLclRKdmRzakUzSkVBdkdxM2xHSFNaWHkyOEczc2t1YTJTbVZpL3c0eUNFNmdiT0RxblRXbGc3K3dDNjA0eWRHWEE4VkppUzVhcDQzSlhpVUZGQWFRPT0K
-            conan-config-url: git@github.com:uboot/conan-ci.git
+            conan-config-url: git@github.com:uboot/sonja.git
             name: My Company
             conan-config-branch: master
             conan-password: demo
@@ -1311,11 +1311,11 @@ components:
               related: commit
         attributes:
           path: packages/hello
-          name: Conan CI
+          name: Sonja
           exclude:
           - label: embedded
           - label: embedded
-          url: https://github.com/uboot/conan-ci.git
+          url: https://github.com/uboot/sonja.git
         id: "1"
         type: repos
     RepoData:
@@ -1337,11 +1337,11 @@ components:
                 related: commit
           attributes:
             path: packages/hello
-            name: Conan CI
+            name: Sonja
             exclude:
             - label: embedded
             - label: embedded
-            url: https://github.com/uboot/conan-ci.git
+            url: https://github.com/uboot/sonja.git
           id: "1"
           type: repos
     RepoList:
@@ -1365,11 +1365,11 @@ components:
                 related: commit
           attributes:
             path: packages/hello
-            name: Conan CI
+            name: Sonja
             exclude:
             - label: embedded
             - label: embedded
-            url: https://github.com/uboot/conan-ci.git
+            url: https://github.com/uboot/sonja.git
           id: "1"
           type: repos
         - relationships:
@@ -1382,11 +1382,11 @@ components:
                 related: commit
           attributes:
             path: packages/hello
-            name: Conan CI
+            name: Sonja
             exclude:
             - label: embedded
             - label: embedded
-            url: https://github.com/uboot/conan-ci.git
+            url: https://github.com/uboot/sonja.git
           id: "1"
           type: repos
     Profile:
@@ -1812,7 +1812,7 @@ components:
           name: hello
           channel: stable
           version: 1.2.3
-          user: conanci
+          user: sonja
         id: "1"
         type: recipe
     RecipeData:
@@ -1836,7 +1836,7 @@ components:
             name: hello
             channel: stable
             version: 1.2.3
-            user: conanci
+            user: sonja
           id: "1"
           type: recipe
     RecipeList:
@@ -1862,7 +1862,7 @@ components:
             name: hello
             channel: stable
             version: 1.2.3
-            user: conanci
+            user: sonja
           id: "1"
           type: recipe
         - relationships:
@@ -1877,7 +1877,7 @@ components:
             name: hello
             channel: stable
             version: 1.2.3
-            user: conanci
+            user: sonja
           id: "1"
           type: recipe
     RecipeRevision:
@@ -2089,7 +2089,7 @@ components:
           example: uboot
         conan-config-url:
           type: string
-          example: git@github.com:uboot/conan-ci.git
+          example: git@github.com:uboot/sonja.git
         conan-config-path:
           type: string
           example: ""
@@ -2111,7 +2111,7 @@ components:
       example:
         conan-config-path: ""
         known-hosts: Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN2hSR21kbm05dFVEYk85SURTd0JLNlRiUWErUFhZUENQeTZyYlRyVHR3N1BIa2NjS3JwcDB5VmhwNUhkRUljS3I2cExsVkRCZk9MWDlRVXN5Q09WMHd6ZmpJSk5sR0VZc2RsTEppekhoYm4ybVVqdlNBSFFxWkVUWVA4MWVGekxRTm5QSHQ0RVZWVWg3VmZERVNVODRLZXptRDVRbFdwWExtdlUzMS95TWYrU2U4eGhIVHZLU0NaSUZJbVd3b0c2bWJVb1dmOW56cElvYVNqQit3ZXFxVVVtcGFhYXNYVmFsNzJKK1VYMkIrMlJQVzNSY1QwZU96UWdxbEpMM1JLclRKdmRzakUzSkVBdkdxM2xHSFNaWHkyOEczc2t1YTJTbVZpL3c0eUNFNmdiT0RxblRXbGc3K3dDNjA0eWRHWEE4VkppUzVhcDQzSlhpVUZGQWFRPT0K
-        conan-config-url: git@github.com:uboot/conan-ci.git
+        conan-config-url: git@github.com:uboot/sonja.git
         name: My Company
         conan-config-branch: master
         conan-password: demo
@@ -2269,10 +2269,10 @@ components:
       properties:
         name:
           type: string
-          example: Conan CI
+          example: Sonja
         url:
           type: string
-          example: https://github.com/uboot/conan-ci.git
+          example: https://github.com/uboot/sonja.git
         path:
           type: string
           example: packages/hello
@@ -2282,11 +2282,11 @@ components:
             $ref: '#/components/schemas/Repo_attributes_exclude'
       example:
         path: packages/hello
-        name: Conan CI
+        name: Sonja
         exclude:
         - label: embedded
         - label: embedded
-        url: https://github.com/uboot/conan-ci.git
+        url: https://github.com/uboot/sonja.git
     Repo_relationships_ecosystem_data:
       type: object
       properties:
@@ -2639,7 +2639,7 @@ components:
           example: 1.2.3
         user:
           type: string
-          example: conanci
+          example: sonja
         channel:
           type: string
           example: stable
@@ -2647,7 +2647,7 @@ components:
         name: hello
         channel: stable
         version: 1.2.3
-        user: conanci
+        user: sonja
     Recipe_relationships_revisions_links:
       type: object
       properties:

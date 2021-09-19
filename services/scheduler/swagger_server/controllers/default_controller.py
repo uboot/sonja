@@ -2,19 +2,19 @@ import connexion
 import os
 import six
 
-from conanci.scheduler import Scheduler
-from conanci.config import app
-from conanci.swagger_client import AgentApi, ApiClient, Configuration
+from sonja.scheduler import Scheduler
+from sonja.config import app
+from sonja.swagger_client import AgentApi, ApiClient, Configuration
 from swagger_server import util
 
 logger = app.app.logger
 
-linux_agent_url = os.environ.get('CONANCI_LINUXAGENT_URL', '127.0.0.1')
+linux_agent_url = os.environ.get('SONJA_LINUXAGENT_URL', '127.0.0.1')
 linux_agent_configuration = Configuration()
 linux_agent_configuration.host = "http://{0}:8080".format(linux_agent_url)
 linux_agent = AgentApi(ApiClient(linux_agent_configuration))
 
-windows_agent_url = os.environ.get('CONANCI_WINDOWSAGENT_URL', '127.0.0.1')
+windows_agent_url = os.environ.get('SONJA_WINDOWSAGENT_URL', '127.0.0.1')
 windows_agent_configuration = Configuration()
 windows_agent_configuration.host = "http://{0}:8080".format(windows_agent_url)
 windows_agent = AgentApi(ApiClient(windows_agent_configuration))

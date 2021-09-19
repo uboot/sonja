@@ -1,4 +1,4 @@
-from conanci.worker import Worker
+from sonja.worker import Worker
 import asyncio
 import time
 

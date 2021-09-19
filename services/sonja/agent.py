@@ -1,13 +1,13 @@
-from conanci import database, manager
-from conanci.builder import Builder
-from conanci.config import connect_to_database, logger
-from conanci.worker import Worker
+from sonja import database, manager
+from sonja.builder import Builder
+from sonja.config import connect_to_database, logger
+from sonja.worker import Worker
 from sqlalchemy import func, update
 import asyncio
 import os
 
 
-conanci_os = os.environ.get("CONANCI_AGENT_OS", "Linux")
+sonja_os = os.environ.get("SONJA_AGENT_OS", "Linux")
 
 
 async def _run_build(builder, parameters):
@@ -35,7 +35,7 @@ class Agent(Worker):
         # database.populate_database()
         # return
         logger.info("Start processing builds")
-        platform = database.Platform.linux if conanci_os == "Linux" else database.Platform.windows
+        platform = database.Platform.linux if sonja_os == "Linux" else database.Platform.windows
         with database.session_scope() as session:
             build = session\
                 .query(database.Build)\
@@ -66,7 +66,7 @@ class Agent(Worker):
                 "conan_profile": build.profile.conan_profile,
                 "git_url": build.commit.repo.url,
                 "git_sha": build.commit.sha,
-                "conanci_user": build.profile.ecosystem.user,
+                "sonja_user": build.profile.ecosystem.user,
                 "channel": build.commit.channel.name,
                 "path": "{0}/{1}".format(build.commit.repo.path, "conanfile.py")
                         if build.commit.repo.path != "" else "conanfile.py",
@@ -74,11 +74,11 @@ class Agent(Worker):
                 "known_hosts": build.profile.ecosystem.known_hosts,
                 "docker_user": build.profile.docker_user,
                 "docker_password": build.profile.docker_password,
-                "mtu": os.environ.get("CONANCI_MTU", "1500")
+                "mtu": os.environ.get("SONJA_MTU", "1500")
             }
 
         try:
-            with Builder(conanci_os, container) as builder:
+            with Builder(sonja_os, container) as builder:
                 builder_task = asyncio.create_task(_run_build(builder, parameters))
                 while True:
                     # wait 10 seconds

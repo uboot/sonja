@@ -2,8 +2,8 @@
 
 from __future__ import absolute_import
 
-from conanci import database
-from conanci.test import util
+from sonja import database
+from sonja.test import util
 from flask import json
 
 from swagger_server import models

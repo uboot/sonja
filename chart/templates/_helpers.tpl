@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "conan-ci.name" -}}
+{{- define "sonja.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "conan-ci.fullname" -}}
+{{- define "sonja.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "conan-ci.chart" -}}
+{{- define "sonja.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "conan-ci.labels" -}}
-helm.sh/chart: {{ include "conan-ci.chart" . }}
-{{ include "conan-ci.selectorLabels" . }}
+{{- define "sonja.labels" -}}
+helm.sh/chart: {{ include "sonja.chart" . }}
+{{ include "sonja.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,17 +45,17 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "conan-ci.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "conan-ci.name" . }}
+{{- define "sonja.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "sonja.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "conan-ci.serviceAccountName" -}}
+{{- define "sonja.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "conan-ci.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "sonja.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
@@ -64,7 +64,7 @@ Create the name of the service account to use
 {{/*
 Create a daemon.json for Docker for Windows
 */}}
-{{- define "conan-ci.daemonJson" -}}
+{{- define "sonja.daemonJson" -}}
 {
     "hosts": ["tcp://0.0.0.0:2375", "npipe://"],
     "insecure-registries": {{ $.Values.insecureRegistries | toJson }},
@@ -75,6 +75,6 @@ Create a daemon.json for Docker for Windows
 {{/*
 Create a Base64 encoded daemon.json for Docker for Windows
 */}}
-{{- define "conan-ci.daemonJsonB64" -}}
-{{ include "conan-ci.daemonJson" . | b64enc }}
+{{- define "sonja.daemonJsonB64" -}}
+{{ include "sonja.daemonJson" . | b64enc }}
 {{- end }}

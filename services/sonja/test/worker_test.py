@@ -1,17 +1,17 @@
-from conanci import database
-from conanci.agent import Agent
-from conanci.crawler import Crawler
-from conanci.scheduler import Scheduler
+from sonja import database
+from sonja.agent import Agent
+from sonja.crawler import Crawler
+from sonja.scheduler import Scheduler
 from unittest.mock import Mock
 
-import conanci.test.util as util
+import sonja.test.util as util
 import time
 import unittest
 
 # Requires:
 #
 # 1. MySQL database
-# docker run --rm -d --name mysql -p 3306:3306 -e MYSQL_DATABASE=conan-ci -e MYSQL_ROOT_PASSWORD=secret mysql:8.0.21
+# docker run --rm -d --name mysql -p 3306:3306 -e MYSQL_DATABASE=sonja -e MYSQL_ROOT_PASSWORD=secret mysql:8.0.21
 #
 # 2. Conan server
 # cf. builder_test.py

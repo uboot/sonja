@@ -5,8 +5,8 @@ import string
 import tarfile
 import threading
 
-from conanci.config import logger
-from conanci.ssh import decode
+from sonja.config import logger
+from sonja.ssh import decode
 from io import BytesIO, FileIO
 from queue import Empty, SimpleQueue
 

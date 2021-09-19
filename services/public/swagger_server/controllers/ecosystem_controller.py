@@ -1,7 +1,7 @@
 import connexion
 
-from conanci import database
-from conanci.ssh import encode, generate_rsa_key
+from sonja import database
+from sonja.ssh import encode, generate_rsa_key
 from flask import abort
 from swagger_server import models
 

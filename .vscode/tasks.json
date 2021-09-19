@@ -4,7 +4,7 @@
 		{
 			"label": "bridge-to-kubernetes.service",
 			"type": "bridge-to-kubernetes.service",
-			"service": "test-conan-ci-scheduler",
+			"service": "test-sonja-scheduler",
 			"ports": [
 				8080
 			]

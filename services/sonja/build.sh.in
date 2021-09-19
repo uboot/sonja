@@ -14,8 +14,8 @@ echo '# Setup Conan user'
 conan user -r $conan_remote -p $conan_password $conan_user
 
 echo '### Clone repository ###'
-mkdir conanci
-cd conanci
+mkdir sonja
+cd sonja
 git init
 git remote add origin $git_url
 git fetch origin $git_sha
@@ -25,10 +25,10 @@ echo '### Build package ###'
 mkdir -p $build_output_dir
 package_name=$$(conan inspect --raw name $path)
 package_version=$$(conan inspect --raw version $path)
-conan create -pr $conan_profile --json $build_output_dir/create.json $path @$conanci_user/$channel
+conan create -pr $conan_profile --json $build_output_dir/create.json $path @$sonja_user/$channel
 
 echo '### Collect package data ###'
 conan info -pr $conan_profile --json $build_output_dir/info.json $path
 
 echo '### Upload package ###'
-conan upload $$package_name/$$package_version@$conanci_user/$channel --all --confirm -r $conan_remote
+conan upload $$package_name/$$package_version@$sonja_user/$channel --all --confirm -r $conan_remote

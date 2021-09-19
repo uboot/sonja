@@ -5,7 +5,7 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.sql.expression import func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
-from conanci.ssh import hash_password
+from sonja.ssh import hash_password
 
 from contextlib import contextmanager
 import enum
@@ -14,14 +14,14 @@ import os
 
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("conanci")
+logger = logging.getLogger("sonja")
 
 
 # start MySQL:
-# docker run --rm -d --name mysql -p 3306:3306 -e MYSQL_DATABASE=conan-ci -e MYSQL_ROOT_PASSWORD=secret mysql:8.0.21
+# docker run --rm -d --name mysql -p 3306:3306 -e MYSQL_DATABASE=sonja -e MYSQL_ROOT_PASSWORD=secret mysql:8.0.21
 # docker run --rm -d --name phpmyadmin --link mysql:db -p 8081:80 phpmyadmin:5.0.4
 
-connection_string = 'mysql+mysqldb://root:{0}@{1}/conan-ci'.format(
+connection_string = 'mysql+mysqldb://root:{0}@{1}/sonja'.format(
     os.environ.get('MYSQL_ROOT_PASSWORD', 'secret'),
     os.environ.get('MYSQL_URL', '127.0.0.1')
 )
@@ -303,7 +303,7 @@ def populate_database():
         hello = Repo()
         hello.name = "Hello"
         hello.ecosystem = ecosystem
-        hello.url = "git@github.com:uboot/conan-ci.git"
+        hello.url = "git@github.com:uboot/sonja.git"
         hello.path = "packages/hello"
         hello.exclude = [
             Label("debug")
@@ -313,7 +313,7 @@ def populate_database():
         base = Repo()
         base.name = "Base"
         base.ecosystem = ecosystem
-        base.url = "git@github.com:uboot/conan-ci.git"
+        base.url = "git@github.com:uboot/sonja.git"
         base.path = "packages/base"
         base.exclude = [
             Label("debug")
@@ -323,7 +323,7 @@ def populate_database():
         app = Repo()
         app.name = "App"
         app.ecosystem = ecosystem
-        app.url = "git@github.com:uboot/conan-ci.git"
+        app.url = "git@github.com:uboot/sonja.git"
         app.path = "packages/app"
         app.exclude = [
             Label("debug")

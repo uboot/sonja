@@ -1,5 +1,5 @@
-from conanci import database
-from conanci.ssh import hash_password
+from sonja import database
+from sonja.ssh import hash_password
 
 import os
 
@@ -18,8 +18,8 @@ def create_user(parameters):
 
 def create_ecosystem(parameters):
     ecosystem = database.Ecosystem()
-    ecosystem.name = "Conan CI"
-    ecosystem.user = "conanci"
+    ecosystem.name = "My Ecosystem"
+    ecosystem.user = "sonja"
     ecosystem.known_hosts = ("Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN"
                              "2hSR21kbm05dFVEYk85SURTd0JLNlRiUWErUFhZUENQeTZyYlRyVHR3N1BIa2NjS3JwcDB5VmhwNUhkRUljS3"
                              "I2cExsVkRCZk9MWDlRVXN5Q09WMHd6ZmpJSk5sR0VZc2RsTEppekhoYm4ybVVqdlNBSFFxWkVUWVA4MWVGekx"
@@ -29,7 +29,7 @@ def create_ecosystem(parameters):
                              "E4VkppUzVhcDQzSlhpVUZGQWFRPT0K")
     ecosystem.ssh_key = os.environ.get("SSH_KEY", "")
     ecosystem.public_ssh_key = os.environ.get("PUBLIC_SSH_KEY", "")
-    ecosystem.conan_config_url = "git@github.com:uboot/conan-ci.git"
+    ecosystem.conan_config_url = "git@github.com:uboot/sonja.git"
     ecosystem.conan_config_path = "conan-config"
     ecosystem.conan_config_branch = ""
     ecosystem.conan_remote = "uboot"
@@ -48,7 +48,7 @@ def create_repo(parameters):
     if parameters.get("repo.invalid", False):
         repo.url = "https://github.com/uboot/nonsense.git"
     else:
-        repo.url = "https://github.com/uboot/conan-ci.git"
+        repo.url = "https://github.com/uboot/sonja.git"
     if parameters.get("repo.deadlock", False):
         repo.path = "packages/deadlock"
     else:
@@ -66,7 +66,7 @@ def create_repo(parameters):
     if parameters.get("repo.invalid", False):
         repo.url = "https://github.com/uboot/nonsense.git"
     else:
-        repo.url = "https://github.com/uboot/conan-ci.git"
+        repo.url = "https://github.com/uboot/sonja.git"
     if parameters.get("repo.deadlock", False):
         repo.path = "packages/deadlock"
     else:
