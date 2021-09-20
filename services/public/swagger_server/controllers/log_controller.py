@@ -7,7 +7,7 @@ from swagger_server import models
 
 def __create_log(record: database.Log):
     return models.Log(
-        id=record.id,
+        id=str(record.id),
         type="logs",
         attributes=models.LogAttributes(
             logs=record.logs

@@ -8,7 +8,7 @@ secret_key = os.environ.get('SONJA_SECRET_KEY', 'MDAwMDAwMDAwMDAwMDAwMA==')
 
 
 class User(UserMixin):
-    def __init__(self, user_id):
+    def __init__(self, user_id: str):
         self.id = user_id
 
 

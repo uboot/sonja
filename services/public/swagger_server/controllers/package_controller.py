@@ -5,7 +5,7 @@ from swagger_server import models
 
 def __create_package(record: database.Package):
     return models.Package(
-        id=record.id,
+        id=str(record.id),
         type="packages",
         attributes=models.PackageAttributes(
             package_id=record.package_id

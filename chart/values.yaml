@@ -8,9 +8,6 @@ mysql:
   auth:
     rootPassword: secret
     database: sonja
-  # primary:
-  #   persistence:
-  #     existingClaim: mysql
 
 phpmyadmin:
   db:

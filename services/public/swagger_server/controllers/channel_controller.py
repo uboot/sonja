@@ -7,7 +7,7 @@ from swagger_server import models
 
 def __createChannel(record: database.Channel):
     return models.Channel(
-        id=record.id,
+        id=str(record.id),
         type="channels",
         attributes=models.ChannelAttributes(
             name=record.name,

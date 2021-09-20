@@ -8,7 +8,7 @@ from swagger_server import models
 
 def __create_ecosystem(record: database.Ecosystem):
     return models.Ecosystem(
-        id=record.id,
+        id=str(record.id),
         type="ecosystems",
         attributes=models.EcosystemAttributes(
             name=record.name,

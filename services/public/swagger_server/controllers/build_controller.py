@@ -30,7 +30,7 @@ build_status_table = {
 
 def __create_build(record: database.Build):
     return models.Build(
-        id=record.id,
+        id=str(record.id),
         type="builds",
         attributes=models.BuildAttributes(
             status=record.status.name

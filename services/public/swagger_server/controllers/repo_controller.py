@@ -7,7 +7,7 @@ from swagger_server import models
 
 def __create_repo(record: database.Repo):
     return models.Repo(
-        id=record.id,
+        id=str(record.id),
         type="repos",
         attributes=models.RepoAttributes(
             name=record.name,

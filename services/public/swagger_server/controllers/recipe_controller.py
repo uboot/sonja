@@ -5,7 +5,7 @@ from swagger_server import models
 
 def __create_recipe(record: database.Recipe):
     return models.Recipe(
-        id=record.id,
+        id=str(record.id),
         type="recipes",
         attributes=models.RecipeAttributes(
             name=record.name,
@@ -31,7 +31,7 @@ def __create_recipe(record: database.Recipe):
 
 def __create_recipe_revision(record: database.RecipeRevision):
     return models.RecipeRevision(
-        id=record.id,
+        id=str(record.id),
         type="recipe-revision",
         attributes=models.RecipeRevisionAttributes(
             revision=record.revision

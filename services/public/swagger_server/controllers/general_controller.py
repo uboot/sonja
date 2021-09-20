@@ -60,7 +60,7 @@ def login(body=None):  # noqa: E501
         if not test_password(body.password, record.password):
             abort(401, 'Wrong credentials')
 
-        user = auth.User(record.id)
+        user = auth.User(str(record.id))
 
     login_user(user)
 

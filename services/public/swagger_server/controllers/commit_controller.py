@@ -5,7 +5,7 @@ from swagger_server import models
 
 def __create_commit(record: database.Commit):
     return models.Commit(
-        id=record.id,
+        id=str(record.id),
         type="commits",
         attributes=models.CommitAttributes(
             sha=record.sha,

@@ -15,7 +15,7 @@ permission_label_table = {
 
 def __create_user(record: database.User):
     return models.User(
-        id=record.id,
+        id=str(record.id),
         type="users",
         attributes=models.UserAttributes(
             user_name=record.user_name,

@@ -13,7 +13,7 @@ platform_table = {
 
 def __create_profile(record: database.Profile):
     return models.Profile(
-        id=record.id,
+        id=str(record.id),
         type="profiles",
         attributes=models.ProfileAttributes(
             name=record.name,
