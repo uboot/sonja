@@ -26,7 +26,10 @@ class TestUserController(BaseTestCase):
             attributes=models.UserAttributes(
                 user_name="name",
                 password="passw0rd",
-                permissions=["read", "write"]
+                permissions=[
+                    models.UserAttributesPermissions("read"),
+                    models.UserAttributesPermissions("write")
+                ]
             )
         ))
         response = self.client.open(
@@ -150,7 +153,10 @@ class TestUserController(BaseTestCase):
                 email="xyz@test.com",
                 password="new_password",
                 old_password="password",
-                permissions=["read", "write"]
+                permissions=[
+                    models.UserAttributesPermissions("read"),
+                    models.UserAttributesPermissions("write")
+                ]
             )
         ))
         response = self.client.open(

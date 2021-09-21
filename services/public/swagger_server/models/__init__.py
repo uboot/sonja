@@ -49,8 +49,6 @@ from swagger_server.models.log_attributes import LogAttributes
 from swagger_server.models.log_data import LogData
 from swagger_server.models.profile import Profile
 from swagger_server.models.profile_attributes import ProfileAttributes
-from swagger_server.models.profile_attributes_settings import ProfileAttributesSettings
-from swagger_server.models.profile_attributes_options import ProfileAttributesOptions
 from swagger_server.models.profile_data import ProfileData
 from swagger_server.models.profile_relationships import ProfileRelationships
 from swagger_server.models.recipe import Recipe
@@ -88,5 +86,5 @@ from swagger_server.models.user import User
 from swagger_server.models.user_data import UserData
 from swagger_server.models.user_list import UserList
 from swagger_server.models.user_attributes import UserAttributes
+from swagger_server.models.user_attributes_permissions import UserAttributesPermissions
 from swagger_server.models.user_token import UserToken
-

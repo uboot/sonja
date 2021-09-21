@@ -1046,8 +1046,8 @@ components:
           old-password: passxyz
           user-name: user
           permissions:
-          - read
-          - write
+          - permission: read
+          - permission: read
           first-name: Joe
           email: joe.doe@acme.com
           last-name: Doe
@@ -1067,8 +1067,8 @@ components:
             old-password: passxyz
             user-name: user
             permissions:
-            - read
-            - write
+            - permission: read
+            - permission: read
             first-name: Joe
             email: joe.doe@acme.com
             last-name: Doe
@@ -1090,8 +1090,8 @@ components:
             old-password: passxyz
             user-name: user
             permissions:
-            - read
-            - write
+            - permission: read
+            - permission: read
             first-name: Joe
             email: joe.doe@acme.com
             last-name: Doe
@@ -1102,8 +1102,8 @@ components:
             old-password: passxyz
             user-name: user
             permissions:
-            - read
-            - write
+            - permission: read
+            - permission: read
             first-name: Joe
             email: joe.doe@acme.com
             last-name: Doe
@@ -2033,6 +2033,18 @@ components:
             package-id: cda61897af86d277c61b93fa40c92da744abdf33
           id: "1"
           type: recipe
+    User_attributes_permissions:
+      type: object
+      properties:
+        permission:
+          type: string
+          example: read
+          enum:
+          - read
+          - write
+          - admin
+      example:
+        permission: read
     User_attributes:
       type: object
       properties:
@@ -2056,22 +2068,15 @@ components:
           example: passxyz
         permissions:
           type: array
-          example:
-          - read
-          - write
           items:
-            type: string
-            enum:
-            - read
-            - write
-            - admin
+            $ref: '#/components/schemas/User_attributes_permissions'
       example:
         password: passw0rd
         old-password: passxyz
         user-name: user
         permissions:
-        - read
-        - write
+        - permission: read
+        - permission: read
         first-name: Joe
         email: joe.doe@acme.com
         last-name: Doe

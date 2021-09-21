@@ -63,6 +63,8 @@ class Credentials(Model):
         :param user_name: The user_name of this Credentials.
         :type user_name: str
         """
+        if user_name is None:
+            raise ValueError("Invalid value for `user_name`, must not be `None`")  # noqa: E501
 
         self._user_name = user_name
 

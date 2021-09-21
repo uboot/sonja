@@ -6,6 +6,7 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
+from swagger_server.models.user_attributes_permissions import UserAttributesPermissions  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -14,7 +15,7 @@ class UserAttributes(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, user_name: str=None, first_name: str=None, last_name: str=None, email: str=None, password: str=None, old_password: str=None, permissions: List[str]=None):  # noqa: E501
+    def __init__(self, user_name: str=None, first_name: str=None, last_name: str=None, email: str=None, password: str=None, old_password: str=None, permissions: List[UserAttributesPermissions]=None):  # noqa: E501
         """UserAttributes - a model defined in Swagger
 
         :param user_name: The user_name of this UserAttributes.  # noqa: E501
@@ -30,7 +31,7 @@ class UserAttributes(Model):
         :param old_password: The old_password of this UserAttributes.  # noqa: E501
         :type old_password: str
         :param permissions: The permissions of this UserAttributes.  # noqa: E501
-        :type permissions: List[str]
+        :type permissions: List[UserAttributesPermissions]
         """
         self.swagger_types = {
             'user_name': str,
@@ -39,7 +40,7 @@ class UserAttributes(Model):
             'email': str,
             'password': str,
             'old_password': str,
-            'permissions': List[str]
+            'permissions': List[UserAttributesPermissions]
         }
 
         self.attribute_map = {
@@ -197,29 +198,22 @@ class UserAttributes(Model):
         self._old_password = old_password
 
     @property
-    def permissions(self) -> List[str]:
+    def permissions(self) -> List[UserAttributesPermissions]:
         """Gets the permissions of this UserAttributes.
 
 
         :return: The permissions of this UserAttributes.
-        :rtype: List[str]
+        :rtype: List[UserAttributesPermissions]
         """
         return self._permissions
 
     @permissions.setter
-    def permissions(self, permissions: List[str]):
+    def permissions(self, permissions: List[UserAttributesPermissions]):
         """Sets the permissions of this UserAttributes.
 
 
         :param permissions: The permissions of this UserAttributes.
-        :type permissions: List[str]
+        :type permissions: List[UserAttributesPermissions]
         """
-        allowed_values = ["read", "write", "admin"]  # noqa: E501
-        if not set(permissions).issubset(set(allowed_values)):
-            raise ValueError(
-                "Invalid values for `permissions` [{0}], must be a subset of [{1}]"  # noqa: E501
-                .format(", ".join(map(str, set(permissions) - set(allowed_values))),  # noqa: E501
-                        ", ".join(map(str, allowed_values)))
-            )
 
         self._permissions = permissions

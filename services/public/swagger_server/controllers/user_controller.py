@@ -22,7 +22,7 @@ def __create_user(record: database.User):
             last_name=record.last_name,
             first_name=record.first_name,
             email=record.email,
-            permissions=[p.label.name for p in record.permissions]
+            permissions=[models.UserAttributesPermissions(p.label.name) for p in record.permissions]
         )
     )
 
@@ -44,7 +44,7 @@ def add_user(body=None):
     if body.data.attributes.permissions:
         for p in body.data.attributes.permissions:
             permission = database.Permission()
-            permission.label = permission_label_table[p]
+            permission.label = permission_label_table[p.permission]
             record.permissions.append(permission)
     try:
         with database.session_scope() as session:
@@ -100,6 +100,13 @@ def update_user(user_id, body=None):
                     record.password = hash_password(body.data.attributes.password)
                 else:
                     abort(400)
+
+            record.permissions.clear()
+            if body.data.attributes.permissions:
+                for p in body.data.attributes.permissions:
+                    permission = database.Permission()
+                    permission.label = permission_label_table[p.permission]
+                    record.permissions.append(permission)
 
             return models.EcosystemData(data=__create_user(record))
     except sqlalchemy.exc.IntegrityError:
