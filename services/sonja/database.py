@@ -129,6 +129,7 @@ class Channel(Base):
     ecosystem_id = Column(Integer, ForeignKey('ecosystem.id'))
     ecosystem = relationship("Ecosystem", backref="channels")
     name = Column(String(255), nullable=False)
+    conan_channel = Column(String(255))
     branch = Column(String(255))
 
 
@@ -370,8 +371,9 @@ def populate_database():
 
         channel = Channel()
         channel.ecosystem = ecosystem
+        channel.name = "Releases"
         channel.branch = "master"
-        channel.name = "stable"
+        channel.conan_channel = "stable"
         session.add(channel)
 
         session.commit()

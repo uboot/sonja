@@ -11,6 +11,7 @@ def __createChannel(record: database.Channel):
         type="channels",
         attributes=models.ChannelAttributes(
             name=record.name,
+            conan_channel=record.conan_channel,
             branch=record.branch
         ),
         relationships=models.ProfileRelationships(
@@ -34,6 +35,7 @@ def add_channel(body=None):
             abort(400)
         record = database.Channel()
         record.name = body.data.attributes.name
+        record.conan_channel = body.data.attributes.conan_channel
         record.ecosystem = ecosystem
         record.branch = body.data.attributes.branch
         session.add(record)
@@ -68,5 +70,6 @@ def update_channel(channel_id, body=None):
             abort(404)
 
         record.name = body.data.attributes.name
+        record.conan_channel = body.data.attributes.conan_channel
         record.branch = body.data.attributes.branch
         return models.ChannelData(data=__createChannel(record))

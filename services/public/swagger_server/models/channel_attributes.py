@@ -14,24 +14,29 @@ class ChannelAttributes(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, name: str=None, branch: str=None):  # noqa: E501
+    def __init__(self, name: str=None, conan_channel: str=None, branch: str=None):  # noqa: E501
         """ChannelAttributes - a model defined in Swagger
 
         :param name: The name of this ChannelAttributes.  # noqa: E501
         :type name: str
+        :param conan_channel: The conan_channel of this ChannelAttributes.  # noqa: E501
+        :type conan_channel: str
         :param branch: The branch of this ChannelAttributes.  # noqa: E501
         :type branch: str
         """
         self.swagger_types = {
             'name': str,
+            'conan_channel': str,
             'branch': str
         }
 
         self.attribute_map = {
             'name': 'name',
+            'conan_channel': 'conan-channel',
             'branch': 'branch'
         }
         self._name = name
+        self._conan_channel = conan_channel
         self._branch = branch
 
     @classmethod
@@ -65,6 +70,27 @@ class ChannelAttributes(Model):
         """
 
         self._name = name
+
+    @property
+    def conan_channel(self) -> str:
+        """Gets the conan_channel of this ChannelAttributes.
+
+
+        :return: The conan_channel of this ChannelAttributes.
+        :rtype: str
+        """
+        return self._conan_channel
+
+    @conan_channel.setter
+    def conan_channel(self, conan_channel: str):
+        """Sets the conan_channel of this ChannelAttributes.
+
+
+        :param conan_channel: The conan_channel of this ChannelAttributes.
+        :type conan_channel: str
+        """
+
+        self._conan_channel = conan_channel
 
     @property
     def branch(self) -> str:

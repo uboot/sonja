@@ -1470,7 +1470,8 @@ components:
               id: "1"
               type: ecosystems
         attributes:
-          name: stable
+          conan-channel: stable
+          name: Releases
           branch: master
         id: "1"
         type: channels
@@ -1489,7 +1490,8 @@ components:
                 id: "1"
                 type: ecosystems
           attributes:
-            name: stable
+            conan-channel: stable
+            name: Releases
             branch: master
           id: "1"
           type: channels
@@ -2398,12 +2400,16 @@ components:
       properties:
         name:
           type: string
+          example: Releases
+        conan-channel:
+          type: string
           example: stable
         branch:
           type: string
           example: master
       example:
-        name: stable
+        conan-channel: stable
+        name: Releases
         branch: master
     Commit_attributes:
       type: object

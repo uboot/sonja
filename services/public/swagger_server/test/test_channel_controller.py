@@ -24,7 +24,7 @@ class TestChannelController(BaseTestCase):
 
         add a new channel
         """
-        body = self.__create_channel("stable", "master")
+        body = self.__create_channel("Releases", "stable", "master")
         response = self.client.open(
             '/api/v1/channel',
             method='POST',
@@ -60,7 +60,7 @@ class TestChannelController(BaseTestCase):
 
         update a channel
         """
-        body = self.__create_channel("stable", "master")
+        body = self.__create_channel("Releases", "stable", "master")
         response = self.client.open(
             '/api/v1/channel/{channel_id}'.format(channel_id=1),
             method='PATCH',
@@ -69,12 +69,13 @@ class TestChannelController(BaseTestCase):
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
-    def __create_channel(self, name, branch):
+    def __create_channel(self, name, conan_channel, branch):
         return models.ChannelData(
             data=models.Channel(
                 type="channels",
                 attributes=models.ChannelAttributes(
                     name=name,
+                    conan_channel=conan_channel,
                     branch=branch
                 ),
                 relationships=models.ProfileRelationships(
