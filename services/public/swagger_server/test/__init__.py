@@ -40,3 +40,6 @@ class BaseTestCase(TestCase):
 
     def assert204(self, response, message=None):
         self.assertStatus(response, 204, message)
+
+    def assert409(self, response, message=None):
+        self.assertStatus(response, 409, message)

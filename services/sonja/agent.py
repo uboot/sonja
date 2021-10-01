@@ -67,7 +67,7 @@ class Agent(Worker):
                 "git_url": build.commit.repo.url,
                 "git_sha": build.commit.sha,
                 "sonja_user": build.profile.ecosystem.user,
-                "channel": build.commit.channel.name,
+                "channel": build.commit.channel.conan_channel,
                 "path": "{0}/{1}".format(build.commit.repo.path, "conanfile.py")
                         if build.commit.repo.path != "" else "conanfile.py",
                 "ssh_key": build.profile.ecosystem.ssh_key,

@@ -1,8 +1,7 @@
-from sqlalchemy import and_, create_engine, Column, Enum, exists, ForeignKey, Integer, literal, select, String,\
+from sqlalchemy import create_engine, Column, Enum, exists, ForeignKey, Integer, literal, select, String,\
     Table, Text
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.exc import OperationalError
-from sqlalchemy.sql.expression import func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from sonja.ssh import hash_password
@@ -12,14 +11,17 @@ import enum
 import logging
 import os
 
+# start MySQL:
+# docker run --rm -d --name mysql -p 3306:3306 -e MYSQL_DATABASE=sonja -e MYSQL_ROOT_PASSWORD=secret mysql:8.0.21
+# docker run --rm -d --name phpmyadmin --link mysql:db -p 8081:80 phpmyadmin:5.0.4
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("sonja")
 
 
-# start MySQL:
-# docker run --rm -d --name mysql -p 3306:3306 -e MYSQL_DATABASE=sonja -e MYSQL_ROOT_PASSWORD=secret mysql:8.0.21
-# docker run --rm -d --name phpmyadmin --link mysql:db -p 8081:80 phpmyadmin:5.0.4
+class ErrorCodes(object):
+    DUPLICATE_ENTRY = 1062
+
 
 connection_string = 'mysql+mysqldb://root:{0}@{1}/sonja'.format(
     os.environ.get('MYSQL_ROOT_PASSWORD', 'secret'),

@@ -55,7 +55,7 @@ def login(body=None):  # noqa: E501
 
     with database.session_scope() as session:
         record = session.query(database.User).filter_by(user_name=body.user_name).first()
-        if not record:
+        if not record or not record.password:
             abort(401, 'Wrong credentials')
         if not test_password(body.password, record.password):
             abort(401, 'Wrong credentials')

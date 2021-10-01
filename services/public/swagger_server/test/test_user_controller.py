@@ -40,6 +40,25 @@ class TestUserController(BaseTestCase):
         self.assert201(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
+    def test_add_user_no_password(self):
+        """Test case for add_user
+
+        add a new user
+        """
+        body = models.UserData(data=models.User(
+            type="users",
+            attributes=models.UserAttributes(
+                user_name="name"
+            )
+        ))
+        response = self.client.open(
+            '/api/v1/user',
+            method='POST',
+            data=json.dumps(body),
+            content_type='application/json')
+        self.assert201(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
     def test_add_duplicate_user(self):
         """Test case for add_user
 
@@ -56,7 +75,7 @@ class TestUserController(BaseTestCase):
             method='POST',
             data=json.dumps(body),
             content_type='application/json')
-        self.assert400(response,
+        self.assert409(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
     def test_add_user_no_name(self):
@@ -94,7 +113,7 @@ class TestUserController(BaseTestCase):
             method='POST',
             data=json.dumps(body),
             content_type='application/json')
-        self.assert400(response,
+        self.assert201(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
     def test_delete_user(self):
@@ -183,13 +202,14 @@ class TestUserController(BaseTestCase):
             method='PATCH',
             data=json.dumps(body),
             content_type='application/json')
-        self.assert400(response,
+        self.assert409(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
-    def test_update_user_wrong_password(self):
+    def test_update_current_user_wrong_password(self):
         body = models.UserData(data=models.User(
             type="users",
             attributes=models.UserAttributes(
+                user_name="user",
                 password="new_password",
                 old_password="wrong",
             )
@@ -200,6 +220,27 @@ class TestUserController(BaseTestCase):
             data=json.dumps(body),
             content_type='application/json')
         self.assert400(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
+    def test_update_other_user_wrong_password(self):
+        with database.session_scope() as session:
+            user = util.create_user({"user.user_name": "other_user"})
+            session.add(user)
+
+        body = models.UserData(data=models.User(
+            type="users",
+            attributes=models.UserAttributes(
+                user_name="other_user",
+                password="new_password",
+                old_password="wrong",
+            )
+        ))
+        response = self.client.open(
+            '/api/v1/user/{user_id}'.format(user_id=2),
+            method='PATCH',
+            data=json.dumps(body),
+            content_type='application/json')
+        self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
     def test_update_user_no_password(self):
