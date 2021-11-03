@@ -53,20 +53,27 @@ def cancel_build(builder, seconds):
     return canceller
 
 
-def get_build_parameters(profile):
+def get_build_parameters(profile, https=False):
     return {
         "conan_config_url": "git@github.com:uboot/sonja.git",
         "conan_config_path": "conan-config",
         "conan_config_branch": "",
         "conan_remote": "uboot",
-        "conan_user": "user",
+        "conan_user": "agent",
         "conan_password": os.environ.get("CONAN_PASSWORD", ""),
         "conan_profile": profile,
-        "git_url": "git@github.com:uboot/sonja.git",
-        "git_sha": "08979da6c039dd919292f7408785e2ad711b2fd5",
+        "git_url": "https://uboot@github.com/uboot/conan-packages.git" if https else "git@github.com:uboot/sonja.git",
+        "git_sha": "ef89f593ea439d8986aca1a52257e44e7b8fea29" if https else "c25c786b0f4e4b8fcaa247feb4809b68e671522d",
+        "git_credentials": [
+            {
+                "url": "https://uboot@github.com",
+                "username": "",
+                "password": os.environ.get("GIT_PAT", "")
+            }
+        ],
         "sonja_user": "sonja",
         "channel": "latest",
-        "path": "packages/hello/conanfile.py",
+        "path": "./base/conanfile.py" if https else "./packages/base/conanfile.py",
         "ssh_key": os.environ.get("SSH_KEY", ""),
         "known_hosts": known_hosts,
         "docker_user": "",
@@ -79,6 +86,18 @@ class BuilderTest(unittest.TestCase):
     def test_run_linux(self):
         docker_host = os.environ.get("LINUX_DOCKER_HOST", "")
         parameters = get_build_parameters("linux-debug")
+        with environment("DOCKER_HOST", docker_host), Builder("Linux", "uboot/gcc9:latest") as builder:
+            builder.pull(parameters)
+            builder.setup(parameters)
+            builder.run()
+            logs = [line for line in builder.get_log_lines()]
+            self.assertGreater(len(logs), 0)
+            self.assertTrue("create" in builder.build_output.keys())
+            self.assertTrue("info" in builder.build_output.keys())
+
+    def test_run_linux_https(self):
+        docker_host = os.environ.get("LINUX_DOCKER_HOST", "")
+        parameters = get_build_parameters("linux-debug", https=True)
         with environment("DOCKER_HOST", docker_host), Builder("Linux", "uboot/gcc9:latest") as builder:
             builder.pull(parameters)
             builder.setup(parameters)
@@ -113,6 +132,18 @@ class BuilderTest(unittest.TestCase):
     def test_run_windows(self):
         docker_host = os.environ.get("WINDOWS_DOCKER_HOST", "")
         parameters = get_build_parameters("windows-debug")
+        with environment("DOCKER_HOST", docker_host), Builder("Windows", "uboot/msvc15:latest") as builder:
+            builder.pull(parameters)
+            builder.setup(parameters)
+            builder.run()
+            logs = [line for line in builder.get_log_lines()]
+            self.assertGreater(len(logs), 0)
+            self.assertTrue("create" in builder.build_output.keys())
+            self.assertTrue("info" in builder.build_output.keys())
+
+    def test_run_windows_https(self):
+        docker_host = os.environ.get("WINDOWS_DOCKER_HOST", "")
+        parameters = get_build_parameters("windows-debug", https=True)
         with environment("DOCKER_HOST", docker_host), Builder("Windows", "uboot/msvc15:latest") as builder:
             builder.pull(parameters)
             builder.setup(parameters)

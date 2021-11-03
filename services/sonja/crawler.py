@@ -1,5 +1,6 @@
 from sonja import database
 from sonja.config import connect_to_database, logger
+from sonja.credential_helper import build_credential_helper
 from sonja.ssh import decode
 from sonja.worker import Worker
 from queue import Empty, SimpleQueue
@@ -10,6 +11,7 @@ import os.path
 import re
 import shutil
 import stat
+import string
 
 
 data_dir = os.environ.get("VCS_DATA_DIR", "/data")
@@ -52,6 +54,16 @@ class RepoController(object):
         with repo.config_writer() as config:
             config.set_value("core", "sshCommand", "ssh -i {0} -o UserKnownHostsFile={1}".format(ssh_key_path,
                                                                                                  known_hosts_path))
+
+    def setup_http(self, credentials):
+        credential_helper = build_credential_helper(credentials)
+        credential_helper_path = os.path.abspath(os.path.join(self.work_dir, "credential_helper.sh"))
+        with open(credential_helper_path, "w") as f:
+            f.write(credential_helper)
+        os.chmod(credential_helper_path, stat.S_IRWXU)
+        repo = git.Repo(self.repo_dir)
+        with repo.config_writer() as config:
+            config.set_value("credential", "helper", "{0}".format(credential_helper_path))
 
     def fetch(self):
         repo = git.Repo(self.repo_dir)
@@ -141,9 +153,18 @@ class Crawler(Worker):
                     if not controller.is_clone_of(repo.url):
                         logger.info("Create repo for URL '%s' in '%s'", repo.url, work_dir)
                         await loop.run_in_executor(None, controller.create_new_repo, repo.url)
-                    logger.info("Setup SSH for in '%s'", work_dir)
+                    logger.info("Setup SSH in '%s'", work_dir)
                     await loop.run_in_executor(None, controller.setup_ssh, repo.ecosystem.ssh_key,
                                                repo.ecosystem.known_hosts)
+                    logger.info("Setup HTTP credentials in '%s'", work_dir)
+                    credentials = [
+                        {
+                            "url": c.url,
+                            "username": c.username,
+                            "password": c.password
+                        } for c in repo.ecosystem.credentials
+                    ]
+                    await loop.run_in_executor(None, controller.setup_http, credentials)
                     logger.info("Fetch repo '%s' for URL '%s'", work_dir, repo.url)
                     await loop.run_in_executor(None, controller.fetch)
 

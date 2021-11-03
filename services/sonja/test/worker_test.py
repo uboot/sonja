@@ -12,9 +12,6 @@ import unittest
 #
 # 1. MySQL database
 # docker run --rm -d --name mysql -p 3306:3306 -e MYSQL_DATABASE=sonja -e MYSQL_ROOT_PASSWORD=secret mysql:8.0.21
-#
-# 2. Conan server
-# cf. builder_test.py
 
 
 class AgentTest(unittest.TestCase):
@@ -54,6 +51,12 @@ class AgentTest(unittest.TestCase):
     def test_complete_build(self):
         with database.session_scope() as session:
             session.add(util.create_build(dict()))
+        self.agent.start()
+        self.assertEquals(self.__wait_for_build_status(database.BuildStatus.success, 15), database.BuildStatus.success)
+
+    def test_complete_build_https(self):
+        with database.session_scope() as session:
+            session.add(util.create_build({"repo.https": True}))
         self.agent.start()
         self.assertEquals(self.__wait_for_build_status(database.BuildStatus.success, 15), database.BuildStatus.success)
 
@@ -106,6 +109,18 @@ class CrawlerTest(unittest.TestCase):
     def test_start_repo_and_channel(self):
         with database.session_scope() as session:
             session.add(util.create_repo(dict()))
+            session.add(util.create_channel(dict()))
+        self.crawler.start()
+        time.sleep(5)
+        called = self.crawler.query(lambda: self.scheduler.process_commits.called)
+        self.assertTrue(called)
+        with database.session_scope() as session:
+            commit = session.query(database.Commit).first()
+            self.assertEqual(database.CommitStatus.new, commit.status)
+
+    def test_http_repo(self):
+        with database.session_scope() as session:
+            session.add(util.create_repo({"repo.https": True}))
             session.add(util.create_channel(dict()))
         self.crawler.start()
         time.sleep(5)

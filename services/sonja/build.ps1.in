@@ -11,10 +11,12 @@ $$adapters | ForEach-Object({
     netsh interface ipv4 set subinterface "$$_" mtu=$mtu store=persistent
 })
 
-echo '### Setup SSH ###'
+echo '### Setup git ###'
 mkdir -p "$$env:userprofile\.ssh"; ThrowOnNonZero
 Copy-Item "$build_package_dir\id_rsa" -Destination "$$env:userprofile\.ssh"; ThrowOnNonZero
 Copy-Item "$build_package_dir\known_hosts" -Destination "$$env:userprofile\.ssh"; ThrowOnNonZero
+git config --global advice.detachedHead false
+git config --global credential.helper $escaped_build_package_dir/credential_helper.sh; ThrowOnNonZero
 
 echo '### Setup Conan ###'
 conan config install $conan_config_args; ThrowOnNonZero

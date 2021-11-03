@@ -1,11 +1,13 @@
 #!/bin/bash
 set -e
 
-echo '### Setup SSH ###'
+echo '### Setup git ###'
 mkdir -p ~/.ssh
 cp $build_package_dir/id_rsa ~/.ssh
 chmod 600 ~/.ssh/id_rsa
 cp $build_package_dir/known_hosts ~/.ssh
+git config --global advice.detachedHead false
+git config --global credential.helper $build_package_dir/credential_helper.sh
 
 echo '### Setup Conan ###'
 conan config install $conan_config_args

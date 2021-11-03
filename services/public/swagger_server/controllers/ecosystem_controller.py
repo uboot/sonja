@@ -20,7 +20,9 @@ def __create_ecosystem(record: database.Ecosystem):
             conan_user=record.conan_user,
             conan_password=record.conan_password,
             public_ssh_key=record.public_ssh_key,
-            known_hosts=record.known_hosts
+            known_hosts=record.known_hosts,
+            credentials=[models.EcosystemAttributesCredentials(url=c.url, password=c.password, username=c.username)
+                         for c in record.credentials]
         ),
         relationships=models.EcosystemRelationships(
             builds=models.EcosystemRelationshipsBuilds(
@@ -75,6 +77,13 @@ def add_ecosystem(body=None):
     private, public = generate_rsa_key()
     record.ssh_key = encode(private)
     record.public_ssh_key = encode(public)
+    credentials = []
+    for c in body.data.attributes.credentials:
+        git_credential = database.GitCredential()
+        git_credential.url = c.url
+        git_credential.username = c.username
+        git_credential.password = c.password
+    record.credentials = credentials
     with database.session_scope() as session:
         session.add(record)
         session.commit()
@@ -123,6 +132,13 @@ def update_ecosystem(ecosystem_id, body=None):
         record.conan_user = body.data.attributes.conan_user
         record.conan_password = body.data.attributes.conan_password
         record.known_hosts = body.data.attributes.known_hosts
+        credentials = []
+        for c in body.data.attributes.credentials:
+            git_credential = database.GitCredential()
+            git_credential.url = c.url
+            git_credential.username = c.username
+            git_credential.password = c.password
+        record.credentials = credentials
         if body.data.attributes.public_ssh_key == '':
             private, public = generate_rsa_key()
             record.ssh_key = encode(private)

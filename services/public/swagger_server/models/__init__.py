@@ -33,6 +33,7 @@ from swagger_server.models.ecosystem import Ecosystem
 from swagger_server.models.ecosystem_attributes import EcosystemAttributes
 from swagger_server.models.ecosystem_data import EcosystemData
 from swagger_server.models.ecosystem_list import EcosystemList
+from swagger_server.models.ecosystem_attributes_credentials import EcosystemAttributesCredentials
 from swagger_server.models.ecosystem_relationships import EcosystemRelationships
 from swagger_server.models.ecosystem_relationships_builds import EcosystemRelationshipsBuilds
 from swagger_server.models.ecosystem_relationships_builds_links import EcosystemRelationshipsBuildsLinks

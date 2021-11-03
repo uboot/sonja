@@ -33,8 +33,13 @@ def create_ecosystem(parameters):
     ecosystem.conan_config_path = "conan-config"
     ecosystem.conan_config_branch = ""
     ecosystem.conan_remote = "uboot"
-    ecosystem.conan_user = "user"
+    ecosystem.conan_user = "agent"
     ecosystem.conan_password = os.environ.get("CONAN_PASSWORD", "")
+    git_credential = database.GitCredential()
+    git_credential.url = "https://uboot@github.com"
+    git_credential.username = ""
+    git_credential.password = os.environ.get("GIT_PAT", "")
+    ecosystem.credentials = [git_credential]
     parameters["ecosystem"] = ecosystem
     return ecosystem
 
@@ -47,30 +52,15 @@ def create_repo(parameters):
         repo.ecosystem = create_ecosystem(parameters)
     if parameters.get("repo.invalid", False):
         repo.url = "https://github.com/uboot/nonsense.git"
+    elif parameters.get("repo.https", False):
+        repo.url = "https://uboot@github.com/uboot/conan-packages.git"
+        repo.path = "base"
     else:
         repo.url = "https://github.com/uboot/sonja.git"
-    if parameters.get("repo.deadlock", False):
-        repo.path = "packages/deadlock"
-    else:
-        repo.path = "packages/hello"
-    repo.exclude = [database.Label("desktop")]
-    return repo
-
-
-def create_repo(parameters):
-    repo = database.Repo()
-    if "ecosystem" in parameters.keys():
-        repo.ecosystem = parameters["ecosystem"]
-    else:
-        repo.ecosystem = create_ecosystem(parameters)
-    if parameters.get("repo.invalid", False):
-        repo.url = "https://github.com/uboot/nonsense.git"
-    else:
-        repo.url = "https://github.com/uboot/sonja.git"
-    if parameters.get("repo.deadlock", False):
-        repo.path = "packages/deadlock"
-    else:
-        repo.path = "packages/hello"
+        if parameters.get("repo.deadlock", False):
+            repo.path = "packages/deadlock"
+        else:
+            repo.path = "packages/base"
     repo.exclude = [database.Label("desktop")]
     return repo
 
@@ -79,7 +69,12 @@ def create_commit(parameters):
     commit = database.Commit()
     commit.repo = create_repo(parameters)
     commit.channel = create_channel(parameters)
-    commit.sha = "08979da6c039dd919292f7408785e2ad711b2fd5"
+
+    if parameters.get("repo.https", False):
+        commit.sha = "ef89f593ea439d8986aca1a52257e44e7b8fea29"
+    else:
+        commit.sha = "c25c786b0f4e4b8fcaa247feb4809b68e671522d"
+
     commit.message = "Initial commit\n\nVery long and verbose description"
     commit.status = parameters.get("commit.status", database.CommitStatus.new)
     return commit

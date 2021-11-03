@@ -80,6 +80,17 @@ class Permission(Base):
     label = Column(Enum(PermissionLabel), nullable=False)
 
 
+class GitCredential(Base):
+    __tablename__ = 'git_credential'
+
+    id = Column(Integer, primary_key=True)
+    url = Column(String(255), nullable=False)
+    username = Column(String(255))
+    password = Column(String(255))
+    ecosystem_id = Column(Integer, ForeignKey('ecosystem.id'))
+    ecosystem = relationship("Ecosystem", backref="credentials")
+
+
 class Ecosystem(Base):
     __tablename__ = 'ecosystem'
 

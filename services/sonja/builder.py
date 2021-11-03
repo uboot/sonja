@@ -6,6 +6,7 @@ import tarfile
 import threading
 
 from sonja.config import logger
+from sonja.credential_helper import build_credential_helper
 from sonja.ssh import decode
 from io import BytesIO, FileIO
 from queue import Empty, SimpleQueue
@@ -19,10 +20,12 @@ build_output_dir_name = "conan_output"
 
 def create_build_tar(script_template_name: str, parameters: dict):
 
-    def add_content(tar_archive, file_name, text_data):
+    def add_content(tar_archive, file_name, text_data, is_script = False):
         tar_info = tarfile.TarInfo("{0}/{1}".format(build_package_dir_name, file_name))
         content = BytesIO(bytes(text_data, "utf-8"))
         tar_info.size = len(content.getbuffer())
+        if is_script:
+            tar_info.mode = 0o555
         tar_archive.addfile(tar_info, content)
 
     setup_file_path = os.path.join(os.path.dirname(__file__), script_template_name)
@@ -30,11 +33,14 @@ def create_build_tar(script_template_name: str, parameters: dict):
         template = string.Template(setup_template_file.read())
     script = template.substitute(parameters)
 
+    credential_helper = build_credential_helper(parameters["git_credentials"])
+
     # place into archive
     f = BytesIO()
     tar = tarfile.open(mode="w", fileobj=f, dereference=True)
     script_name = script_template_name[:-3]
     add_content(tar, script_name, script)
+    add_content(tar, "credential_helper.sh", credential_helper, is_script=True)
     add_content(tar, "id_rsa", decode(parameters["ssh_key"]))
     add_content(tar, "known_hosts", decode(parameters["known_hosts"]))
     tar.close()
@@ -99,6 +105,12 @@ class Builder(object):
             return "/{0}".format(build_package_dir_name)
         else:
             return "C:\\{0}".format(build_package_dir_name)
+    @property
+    def escaped_build_package_dir(self):
+        if self.__build_os == "Linux":
+            return "/{0}".format(build_package_dir_name)
+        else:
+            return "C:\\\\{0}".format(build_package_dir_name)
 
     @property
     def root_dir(self):
@@ -159,6 +171,7 @@ class Builder(object):
             **parameters,
             "conan_config_args": " ".join([config_url, config_branch, config_path]),
             "build_package_dir": self.build_package_dir,
+            "escaped_build_package_dir": self.escaped_build_package_dir,
             "build_output_dir": self.build_output_dir
         }
         build_tar = create_build_tar(self.script_template, patched_parameters)

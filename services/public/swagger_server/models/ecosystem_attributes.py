@@ -6,6 +6,7 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
+from swagger_server.models.ecosystem_attributes_credentials import EcosystemAttributesCredentials  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -14,7 +15,7 @@ class EcosystemAttributes(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, name: str=None, user: str=None, conan_remote: str=None, conan_config_url: str=None, conan_config_path: str=None, conan_config_branch: str=None, conan_user: str=None, conan_password: str=None, public_ssh_key: str=None, known_hosts: str=None):  # noqa: E501
+    def __init__(self, name: str=None, user: str=None, conan_remote: str=None, conan_config_url: str=None, conan_config_path: str=None, conan_config_branch: str=None, conan_user: str=None, conan_password: str=None, public_ssh_key: str=None, known_hosts: str=None, credentials: List[EcosystemAttributesCredentials]=None):  # noqa: E501
         """EcosystemAttributes - a model defined in Swagger
 
         :param name: The name of this EcosystemAttributes.  # noqa: E501
@@ -37,6 +38,8 @@ class EcosystemAttributes(Model):
         :type public_ssh_key: str
         :param known_hosts: The known_hosts of this EcosystemAttributes.  # noqa: E501
         :type known_hosts: str
+        :param credentials: The credentials of this EcosystemAttributes.  # noqa: E501
+        :type credentials: List[EcosystemAttributesCredentials]
         """
         self.swagger_types = {
             'name': str,
@@ -48,7 +51,8 @@ class EcosystemAttributes(Model):
             'conan_user': str,
             'conan_password': str,
             'public_ssh_key': str,
-            'known_hosts': str
+            'known_hosts': str,
+            'credentials': List[EcosystemAttributesCredentials]
         }
 
         self.attribute_map = {
@@ -61,7 +65,8 @@ class EcosystemAttributes(Model):
             'conan_user': 'conan-user',
             'conan_password': 'conan-password',
             'public_ssh_key': 'public-ssh-key',
-            'known_hosts': 'known-hosts'
+            'known_hosts': 'known-hosts',
+            'credentials': 'credentials'
         }
         self._name = name
         self._user = user
@@ -73,6 +78,7 @@ class EcosystemAttributes(Model):
         self._conan_password = conan_password
         self._public_ssh_key = public_ssh_key
         self._known_hosts = known_hosts
+        self._credentials = credentials
 
     @classmethod
     def from_dict(cls, dikt) -> 'EcosystemAttributes':
@@ -294,3 +300,24 @@ class EcosystemAttributes(Model):
         """
 
         self._known_hosts = known_hosts
+
+    @property
+    def credentials(self) -> List[EcosystemAttributesCredentials]:
+        """Gets the credentials of this EcosystemAttributes.
+
+
+        :return: The credentials of this EcosystemAttributes.
+        :rtype: List[EcosystemAttributesCredentials]
+        """
+        return self._credentials
+
+    @credentials.setter
+    def credentials(self, credentials: List[EcosystemAttributesCredentials]):
+        """Sets the credentials of this EcosystemAttributes.
+
+
+        :param credentials: The credentials of this EcosystemAttributes.
+        :type credentials: List[EcosystemAttributesCredentials]
+        """
+
+        self._credentials = credentials
