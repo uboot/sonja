@@ -219,7 +219,7 @@ class TestUserController(BaseTestCase):
             method='PATCH',
             data=json.dumps(body),
             content_type='application/json')
-        self.assert400(response,
+        self.assert403(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
     def test_update_other_user_wrong_password(self):

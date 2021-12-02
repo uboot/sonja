@@ -3,6 +3,7 @@ import connexion
 from sonja import database
 from flask import abort
 from swagger_server import models
+from swagger_server.controllers.authorization import require
 
 
 def __create_repo(record: database.Repo):
@@ -31,6 +32,7 @@ def __create_repo(record: database.Repo):
     )
 
 
+@require(database.PermissionLabel.write)
 def add_repo(body=None):
     if connexion.request.is_json:
         body = models.RepoData.from_dict(connexion.request.get_json())  # noqa: E501
@@ -52,6 +54,7 @@ def add_repo(body=None):
         return models.RepoData(data=__create_repo(record)), 201
 
 
+@require(database.PermissionLabel.write)
 def delete_repo(repo_id):
     with database.session_scope() as session:
         record = session.query(database.Repo).filter_by(id=repo_id).first()
@@ -61,6 +64,7 @@ def delete_repo(repo_id):
     return None
 
 
+@require(database.PermissionLabel.read)
 def get_repo(repo_id):
     with database.session_scope() as session:
         record = session.query(database.Repo).filter_by(id=repo_id).first()
@@ -69,6 +73,7 @@ def get_repo(repo_id):
         return models.RepoData(data=__create_repo(record))
 
 
+@require(database.PermissionLabel.read)
 def get_repos(ecosystem_id):
     with database.session_scope() as session:
         return models.RepoList(
@@ -76,6 +81,8 @@ def get_repos(ecosystem_id):
                   session.query(database.Repo).filter_by(ecosystem_id=ecosystem_id).all()]
         )
 
+
+@require(database.PermissionLabel.write)
 def update_repo(repo_id, body=None):
     if connexion.request.is_json:
         body = models.RepoData.from_dict(connexion.request.get_json())  # noqa: E501

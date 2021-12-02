@@ -83,6 +83,7 @@ def add_ecosystem(body=None):
         git_credential.url = c.url
         git_credential.username = c.username
         git_credential.password = c.password
+        credentials.append(git_credential)
     record.credentials = credentials
     with database.session_scope() as session:
         session.add(record)
@@ -138,6 +139,7 @@ def update_ecosystem(ecosystem_id, body=None):
             git_credential.url = c.url
             git_credential.username = c.username
             git_credential.password = c.password
+            credentials.append(git_credential)
         record.credentials = credentials
         if body.data.attributes.public_ssh_key == '':
             private, public = generate_rsa_key()

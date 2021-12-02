@@ -89,7 +89,13 @@ class TestEcosystemController(BaseTestCase):
             attributes=models.EcosystemAttributes(
                 name="Company",
                 user="company",
-                credentials=[]
+                credentials=[
+                    models.EcosystemAttributesCredentials(
+                        url="https://github.com",
+                        username="user",
+                        password="Passw0rd"
+                    )
+                ]
             )
         ))
         response = self.client.open(
