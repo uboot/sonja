@@ -67,6 +67,7 @@ def create_repo(parameters):
             repo.path = "packages/deadlock"
         else:
             repo.path = "packages/base"
+            repo.options = [database.Option("base:with_tests", "False")]
     repo.exclude = [database.Label("desktop")]
     return repo
 

@@ -64,6 +64,8 @@ class Agent(Worker):
                 "conan_user": build.profile.ecosystem.conan_user,
                 "conan_password": build.profile.ecosystem.conan_password,
                 "conan_profile": build.profile.conan_profile,
+                "conan_options": " ".join(["-o {0}={1}".format(option.key, option.value)
+                                           for option in build.commit.repo.options]),
                 "git_url": build.commit.repo.url,
                 "git_sha": build.commit.sha,
                 "git_credentials": [

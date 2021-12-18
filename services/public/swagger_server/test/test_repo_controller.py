@@ -88,7 +88,8 @@ class TestRepoController(BaseTestCase):
                     name=name,
                     url=url,
                     path=path,
-                    exclude=[models.RepoAttributesExclude("embedded")]
+                    exclude=[models.RepoAttributesExclude("embedded")],
+                    options=[models.RepoAttributesOptions(key=f"{name}:shared", value="True")]
                 ),
                 relationships=models.RepoRelationships(
                     ecosystem=models.RepoRelationshipsEcosystem(

@@ -14,7 +14,8 @@ def __create_repo(record: database.Repo):
             name=record.name,
             url=record.url,
             path=record.path,
-            exclude=[models.RepoAttributesExclude(label=r.value) for r in record.exclude]
+            exclude=[models.RepoAttributesExclude(label=r.value) for r in record.exclude],
+            options=[models.RepoAttributesOptions(key=r.key, value=r.value) for r in record.options]
         ),
         relationships=models.RepoRelationships(
             commits=models.RepoRelationshipsCommits(
@@ -47,7 +48,8 @@ def add_repo(body=None):
         record.name = body.data.attributes.name
         record.path = body.data.attributes.path
         record.url = body.data.attributes.url
-        record.exclude = [database.Label(l.label) for l in body.data.attributes.exclude]
+        record.exclude = [database.Label(l.label) for l in body.data.attributes.exclude if l.label]
+        record.options = [database.Option(o.key, o.value) for o in body.data.attributes.options if o.key]
         record.ecosystem = ecosystem
         session.add(record)
         session.commit()
@@ -95,6 +97,7 @@ def update_repo(repo_id, body=None):
         record.name = body.data.attributes.name
         record.path = body.data.attributes.path
         record.url = body.data.attributes.url
-        record.exclude = [database.Label(l.label) for l in body.data.attributes.exclude]
+        record.exclude = [database.Label(l.label) for l in body.data.attributes.exclude if l.label]
+        record.options = [database.Option(o.key, o.value) for o in body.data.attributes.options if o.key]
         return models.RepoData(data=__create_repo(record))
 

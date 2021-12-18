@@ -7,6 +7,7 @@ from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
 from swagger_server.models.repo_attributes_exclude import RepoAttributesExclude  # noqa: F401,E501
+from swagger_server.models.repo_attributes_options import RepoAttributesOptions  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -15,7 +16,7 @@ class RepoAttributes(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, name: str=None, url: str=None, path: str=None, exclude: List[RepoAttributesExclude]=None):  # noqa: E501
+    def __init__(self, name: str=None, url: str=None, path: str=None, exclude: List[RepoAttributesExclude]=None, options: List[RepoAttributesOptions]=None):  # noqa: E501
         """RepoAttributes - a model defined in Swagger
 
         :param name: The name of this RepoAttributes.  # noqa: E501
@@ -26,24 +27,29 @@ class RepoAttributes(Model):
         :type path: str
         :param exclude: The exclude of this RepoAttributes.  # noqa: E501
         :type exclude: List[RepoAttributesExclude]
+        :param options: The options of this RepoAttributes.  # noqa: E501
+        :type options: List[RepoAttributesOptions]
         """
         self.swagger_types = {
             'name': str,
             'url': str,
             'path': str,
-            'exclude': List[RepoAttributesExclude]
+            'exclude': List[RepoAttributesExclude],
+            'options': List[RepoAttributesOptions]
         }
 
         self.attribute_map = {
             'name': 'name',
             'url': 'url',
             'path': 'path',
-            'exclude': 'exclude'
+            'exclude': 'exclude',
+            'options': 'options'
         }
         self._name = name
         self._url = url
         self._path = path
         self._exclude = exclude
+        self._options = options
 
     @classmethod
     def from_dict(cls, dikt) -> 'RepoAttributes':
@@ -139,3 +145,24 @@ class RepoAttributes(Model):
         """
 
         self._exclude = exclude
+
+    @property
+    def options(self) -> List[RepoAttributesOptions]:
+        """Gets the options of this RepoAttributes.
+
+
+        :return: The options of this RepoAttributes.
+        :rtype: List[RepoAttributesOptions]
+        """
+        return self._options
+
+    @options.setter
+    def options(self, options: List[RepoAttributesOptions]):
+        """Sets the options of this RepoAttributes.
+
+
+        :param options: The options of this RepoAttributes.
+        :type options: List[RepoAttributesOptions]
+        """
+
+        self._options = options

@@ -1342,6 +1342,11 @@ components:
         attributes:
           path: packages/hello
           name: Sonja
+          options:
+          - value: "true"
+            key: hello:shared
+          - value: "true"
+            key: hello:shared
           exclude:
           - label: embedded
           - label: embedded
@@ -1368,6 +1373,11 @@ components:
           attributes:
             path: packages/hello
             name: Sonja
+            options:
+            - value: "true"
+              key: hello:shared
+            - value: "true"
+              key: hello:shared
             exclude:
             - label: embedded
             - label: embedded
@@ -1396,6 +1406,11 @@ components:
           attributes:
             path: packages/hello
             name: Sonja
+            options:
+            - value: "true"
+              key: hello:shared
+            - value: "true"
+              key: hello:shared
             exclude:
             - label: embedded
             - label: embedded
@@ -1413,6 +1428,11 @@ components:
           attributes:
             path: packages/hello
             name: Sonja
+            options:
+            - value: "true"
+              key: hello:shared
+            - value: "true"
+              key: hello:shared
             exclude:
             - label: embedded
             - label: embedded
@@ -2330,6 +2350,21 @@ components:
           example: embedded
       example:
         label: embedded
+    Repo_attributes_options:
+      required:
+      - key
+      - value
+      type: object
+      properties:
+        key:
+          type: string
+          example: hello:shared
+        value:
+          type: string
+          example: "true"
+      example:
+        value: "true"
+        key: hello:shared
     Repo_attributes:
       type: object
       properties:
@@ -2346,9 +2381,18 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Repo_attributes_exclude'
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/Repo_attributes_options'
       example:
         path: packages/hello
         name: Sonja
+        options:
+        - value: "true"
+          key: hello:shared
+        - value: "true"
+          key: hello:shared
         exclude:
         - label: embedded
         - label: embedded

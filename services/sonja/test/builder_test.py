@@ -62,6 +62,7 @@ def get_build_parameters(profile, https=False):
         "conan_user": "agent",
         "conan_password": os.environ.get("CONAN_PASSWORD", ""),
         "conan_profile": profile,
+        "conan_options": "-o base:with_tests=False",
         "git_url": "https://uboot@github.com/uboot/conan-packages.git" if https else "git@github.com:uboot/sonja.git",
         "git_sha": "ef89f593ea439d8986aca1a52257e44e7b8fea29" if https else "c25c786b0f4e4b8fcaa247feb4809b68e671522d",
         "git_credentials": [

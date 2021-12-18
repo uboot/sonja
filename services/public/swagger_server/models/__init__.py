@@ -76,6 +76,7 @@ from swagger_server.models.package_relationships_reciperevision_data import Pack
 from swagger_server.models.repo import Repo
 from swagger_server.models.repo_attributes import RepoAttributes
 from swagger_server.models.repo_attributes_exclude import RepoAttributesExclude
+from swagger_server.models.repo_attributes_options import RepoAttributesOptions
 from swagger_server.models.repo_data import RepoData
 from swagger_server.models.repo_list import RepoList
 from swagger_server.models.repo_relationships import RepoRelationships

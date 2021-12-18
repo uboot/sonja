@@ -79,6 +79,9 @@ class Permission(Base):
     user = relationship("User", backref="permissions")
     label = Column(Enum(PermissionLabel), nullable=False)
 
+    def __init__(self, label):
+        self.label = label
+
 
 class GitCredential(Base):
     __tablename__ = 'git_credential'
@@ -123,6 +126,19 @@ repo_label = Table('repo_label', Base.metadata,
                    Column('label_id', Integer, ForeignKey('label.id')))
 
 
+class Option(Base):
+    __tablename__ = 'option'
+
+    id = Column(Integer, primary_key=True)
+    key = Column(String(255), nullable=False)
+    value = Column(String(255), nullable=False)
+    repo_id = Column(Integer, ForeignKey('repo.id'), nullable=False)
+
+    def __init__(self, key, value):
+        self.key = key
+        self.value = value
+
+
 class Repo(Base):
     __tablename__ = 'repo'
 
@@ -133,6 +149,8 @@ class Repo(Base):
     url = Column(String(255))
     path = Column(String(255))
     exclude = relationship("Label", secondary=repo_label)
+    options = relationship('Option', backref='repo', lazy=True,
+                            cascade="all, delete, delete-orphan")
 
 
 class Channel(Base):
@@ -281,9 +299,11 @@ def insert_first_user(name: str, password: str):
 
         if result.lastrowid:
             user = session.query(User).filter_by(id=result.lastrowid).first()
-            permission = Permission()
-            permission.label = PermissionLabel.admin
-            user.permissions.append(permission)
+            user.permissions = [
+                Permission(PermissionLabel.read),
+                Permission(PermissionLabel.write),
+                Permission(PermissionLabel.admin)
+            ]
             logger.info("Created initial user with ID %d", user.id)
 
 
@@ -321,6 +341,9 @@ def populate_database():
         hello.path = "packages/hello"
         hello.exclude = [
             Label("debug")
+        ]
+        hello.options = [
+             Option("hello:shared", "False")
         ]
         session.add(hello)
 
