@@ -6,7 +6,7 @@ RUN npm install -g ember-cli@3.23.0
 
 RUN git clone https://github.com/uboot/sonja-frontend.git \
   && cd sonja-frontend \
-  && git checkout 731aec210f6f0be630e51a762387e5eb9bd9d391 \
+  && git checkout 2cc3c47a62ca205f616574276b29d281da40dbef \
   && npm install \
   && ember build --environment production
 

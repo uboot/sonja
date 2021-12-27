@@ -1,3 +1,18 @@
+#########
+# Setup #
+#########
+
+Login
+=====
+
+az login
+az account set --subscription "Visual Studio Professional-Abonnement"
+
+Install Helm
+============
+
+curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+
 ####################
 # Virtual Machine  #
 ####################
@@ -6,7 +21,7 @@ Create VM
 =========
 
 az group create --name vm --location westeurope
-az vm create --resource-group vm --name vm --image UbuntuLTS --admin-username azureuser --public-ip-address-dns-name <name> --size Standard_D8s_v4 --os-disk-size-gb 128
+az vm create --resource-group vm --name vm --image UbuntuLTS --admin-username azureuser --public-ip-address-dns-name $VM --size Standard_D8s_v4 --os-disk-size-gb 128
 (Note: --generate-ssh-keys to automatically create a SSH key on the host)
 ssh-copy-id -f -i <public-key> azureuser@<ip>
 
@@ -20,60 +35,62 @@ az vm deallocate -g vm --name vm
 az vm start -g vm --name vm
 az vm list-ip-addresses -g vm --name vm --output table
 
-Install Helm
-============
-
-curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
-
-
 ####################
 # Kubernetes       #
-####################
-
-Create Cluster
-==============
-
-az login
-az account set --subscription "Visual Studio Professional-Abonnement"
-az group create --name cluster --location westeurope
-az aks create --resource-group cluster --name cluster --node-count 1 --node-vm-size Standard_D2s_v3 --generate-ssh-keys
-az aks update --resource-group cluster --name cluster --attach-acr <registry> 
-az aks get-credentials --resource-group cluster --name cluster --overwrite-existing
-sudo az aks install-cli
-
-Install Ingress
-===============
-
-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-kubectl create namespace ingress-basic
-helm install nginx-ingress ingress-nginx/ingress-nginx \
-    --namespace ingress-basic \
-    --set controller.replicaCount=2 \
-    --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux \
-    --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux \
-    --set controller.admissionWebhooks.patch.nodeSelector."beta\.kubernetes\.io/os"=linux
-    
-Delete Cluster
-==============
-
-az group delete --name cluster --yes --no-wait
-
-
-####################
-# Docker Registry  #
 ####################
 
 Create Registry
 ===============
 
 az group create --name registry --location westeurope
-az acr create --resource-group registry --name <registry> --sku Basic
-az acr login --name <registry> --expose-token
-az acr update -n <registry> --admin-enabled true
-az acr credential show --name <registry>
+az acr create --resource-group registry --name $REGISTRY --sku Basic
+az acr login --name $REGISTRY --expose-token
+az acr update -n $REGISTRY --admin-enabled true
+az acr credential show --name $REGISTRY
 
 Build Docker Images
 ===================
 
-az acr build --image msvc15:1.0 --platform windows --registry <registry> --file Dockerfile .
-az acr build --image windows1909:1.0 --registry <registry> --file Dockerfile.windows_1909_docker windows_server_1909_docker-qemu/
+az acr build --image msvc15:1.0 --platform windows --registry $REGISTRY --file Dockerfile .
+az acr build --image windows1909:1.0 --registry $REGISTRY --file Dockerfile.windows_1909_docker windows_server_1909_docker-qemu/
+
+Create Cluster
+==============
+
+az group create --name cluster --location westeurope
+az aks create --resource-group cluster --name cluster --node-count 1 --node-vm-size Standard_D8s_v4 --generate-ssh-keys
+az aks update --resource-group cluster --name cluster --attach-acr $REGISTRY 
+az aks get-credentials --resource-group cluster --name cluster --overwrite-existing
+sudo az aks install-cli
+
+Install Ingress
+===============
+
+az network public-ip create \
+  --resource-group mc_cluster_cluster_westeurope \
+  --name ip \
+  --sku Standard \
+  --allocation-method static \
+  --dns-name $CLUSTER \
+  --query publicIp.ipAddress -o tsv
+
+helm upgrade --install ingress-nginx ingress-nginx \
+  --repo https://kubernetes.github.io/ingress-nginx \
+  --namespace ingress-basic --create-namespace \
+  --set controller.nodeSelector."kubernetes\.io/os"=linux \
+  --set controller.service.loadBalancerIP=$STATIC_IP \
+  --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"=$CLUSTER
+
+Install Kubevirt
+================
+
+export KUBEVIRT_VERSION=v0.38.1
+kubectl create namespace kubevirt
+kubectl apply -f https://github.com/kubevirt/kubevirt/releases/download/$KUBEVIRT_VERSION/kubevirt-operator.yaml
+kubectl apply -f https://github.com/kubevirt/kubevirt/releases/download/$KUBEVIRT_VERSION/kubevirt-cr.yaml
+    
+Delete Cluster
+==============
+
+az group delete --name cluster --yes --no-wait
+

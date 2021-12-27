@@ -1,9 +1,10 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ template "sonja.fullname" $ }}-ingress-frontend
+  name: {{ template "sonja.fullname" $ }}-ingress
   annotations:
     ingress.kubernetes.io/ssl-redirect: "true"
+    kubernetes.io/ingress.class: nginx
 spec:
   tls:
   - hosts:
@@ -27,23 +28,3 @@ spec:
             name: {{ template "sonja.fullname" $ }}-public
             port: 
               number: 8080
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: {{ template "sonja.fullname" $ }}-ingress-phpmyadmin
-  annotations:
-    traefik.ingress.kubernetes.io/request-modifier: "ReplacePathRegex: ^/phpmyadmin/(.*) /$1"
-    ingress.kubernetes.io/ssl-redirect: "true"
-spec:
-  rules:
-  - host: {{ .Values.hostName }}
-    http:
-      paths:
-      - path: /phpmyadmin
-        pathType: Prefix
-        backend:
-          service:
-            name: {{ .Release.Name }}-phpmyadmin
-            port: 
-              number: 80

@@ -26,6 +26,3 @@ dependencies:
 - name: mysql
   version: "8.8.6"
   repository: "https://charts.bitnami.com/bitnami"
-- name: phpmyadmin
-  version: "6.5.3"
-  repository: "https://charts.bitnami.com/bitnami"

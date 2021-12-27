@@ -9,10 +9,6 @@ mysql:
     rootPassword: secret
     database: sonja
 
-phpmyadmin:
-  db:
-    chartName: mysql
-
 mtu: 1450
 insecureRegistries: []
 
@@ -21,7 +17,6 @@ auth:
   secretKey: MDAwMDAwMDAwMDAwMDAwMA==
   user: user
   password: paSSw0rd
-
 
 services:
   - name: public
