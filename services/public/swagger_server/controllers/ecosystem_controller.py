@@ -78,12 +78,13 @@ def add_ecosystem(body=None):
     record.ssh_key = encode(private)
     record.public_ssh_key = encode(public)
     credentials = []
-    for c in body.data.attributes.credentials:
-        git_credential = database.GitCredential()
-        git_credential.url = c.url
-        git_credential.username = c.username
-        git_credential.password = c.password
-        credentials.append(git_credential)
+    if body.data.attributes.credentials:
+        for c in body.data.attributes.credentials:
+            git_credential = database.GitCredential()
+            git_credential.url = c.url
+            git_credential.username = c.username
+            git_credential.password = c.password
+            credentials.append(git_credential)
     record.credentials = credentials
     with database.session_scope() as session:
         session.add(record)
@@ -134,12 +135,13 @@ def update_ecosystem(ecosystem_id, body=None):
         record.conan_password = body.data.attributes.conan_password
         record.known_hosts = body.data.attributes.known_hosts
         credentials = []
-        for c in body.data.attributes.credentials:
-            git_credential = database.GitCredential()
-            git_credential.url = c.url
-            git_credential.username = c.username
-            git_credential.password = c.password
-            credentials.append(git_credential)
+        if body.data.attributes.credentials:
+            for c in body.data.attributes.credentials:
+                git_credential = database.GitCredential()
+                git_credential.url = c.url
+                git_credential.username = c.username
+                git_credential.password = c.password
+                credentials.append(git_credential)
         record.credentials = credentials
         if body.data.attributes.public_ssh_key == '':
             private, public = generate_rsa_key()

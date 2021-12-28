@@ -18,9 +18,9 @@ spec:
       containers:
       - name:  {{ .name }}
 {{- if .image }}
-        image: uboot/{{ .image }}:latest
+        image: uboot/sonja-{{ .image }}:latest
 {{- else }}
-        image: uboot/{{ .name }}:latest
+        image: uboot/sonja-{{ .name }}:latest
 {{- end }}
         livenessProbe:
           httpGet:
@@ -98,9 +98,9 @@ spec:
       containers:
       - name:  windows-agent
 {{- if .image }}
-        image: uboot/{{ .image }}:latest
+        image: uboot/sonja-{{ .image }}:latest
 {{- else }}
-        image: uboot/{{ .name }}:latest
+        image: uboot/sonja-{{ .name }}:latest
 {{- end }}
         livenessProbe:
           httpGet:
