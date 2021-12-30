@@ -134,15 +134,15 @@ def update_ecosystem(ecosystem_id, body=None):
         record.conan_user = body.data.attributes.conan_user
         record.conan_password = body.data.attributes.conan_password
         record.known_hosts = body.data.attributes.known_hosts
-        credentials = []
         if body.data.attributes.credentials:
+            credentials = []
             for c in body.data.attributes.credentials:
                 git_credential = database.GitCredential()
                 git_credential.url = c.url
                 git_credential.username = c.username
                 git_credential.password = c.password
                 credentials.append(git_credential)
-        record.credentials = credentials
+            record.credentials = credentials
         if body.data.attributes.public_ssh_key == '':
             private, public = generate_rsa_key()
             record.ssh_key = encode(private)

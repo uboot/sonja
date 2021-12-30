@@ -62,7 +62,7 @@ def __create_build(record: database.Build):
             ),
             package=models.BuildRelationshipsPackage(
                 data=models.BuildRelationshipsPackageData(
-                    id=record.package_id,
+                    id=record.package_id if record.package_id else "",
                     type="packages"
                 )
             )

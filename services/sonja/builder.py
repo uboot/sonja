@@ -105,6 +105,7 @@ class Builder(object):
             return "/{0}".format(build_package_dir_name)
         else:
             return "C:\\{0}".format(build_package_dir_name)
+
     @property
     def escaped_build_package_dir(self):
         if self.__build_os == "Linux":
