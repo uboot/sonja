@@ -14,7 +14,7 @@ from alembic.runtime import migration
 
 app = connexion.App(__name__, specification_dir='./swagger/')
 initial_user = os.environ.get('SONJA_INITIAL_USER', 'user')
-initial_password = os.environ.get('SONJA_INITIAL_PASSWORD', 'paSSwOrd')
+initial_password = os.environ.get('SONJA_INITIAL_PASSWORD', 'password')
 
 
 class PingFilter(logging.Filter):

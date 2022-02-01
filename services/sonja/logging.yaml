@@ -25,7 +25,7 @@ loggers:
     level: INFO
     handlers: [console]
     propagate: no
-  werkzeug:
+  uvicorn:
     level: INFO
     handlers: [short]
     filters: [ping]

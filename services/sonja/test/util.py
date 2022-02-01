@@ -1,21 +1,33 @@
 from sonja import database
-from sonja.ssh import hash_password
+from sonja.auth import hash_password
+from typing import Callable
 
 import os
 
 
-def create_user(parameters):
+def run_create_operation(op: Callable[[dict], database.Base], parameter: dict) -> int:
+    with database.session_scope() as session:
+        obj = op(parameter)
+        session.add(obj)
+        session.commit()
+        return obj.id
+
+
+def create_user(parameters: dict) -> database.User:
     user = database.User()
     user.user_name = parameters.get("user.user_name", "user")
     user.first_name = "Joe"
     user.last_name = "Doe"
     user.password = hash_password("password")
-    admin = database.Permission(database.PermissionLabel.admin)
-    user.permissions.append(admin)
-    write = database.Permission(database.PermissionLabel.write)
-    user.permissions.append(write)
     read = database.Permission(database.PermissionLabel.read)
     user.permissions.append(read)
+    if parameters.get("user.permissions", "admin") in ("write", "admin"):
+        write = database.Permission(database.PermissionLabel.write)
+        user.permissions.append(write)
+    if parameters.get("user.permissions", "admin") == "admin":
+        admin = database.Permission(database.PermissionLabel.admin)
+        user.permissions.append(admin)
+
     return user
 
 

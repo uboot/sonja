@@ -13,8 +13,8 @@ mtu: 1450
 insecureRegistries: []
 
 auth:
-  # python -c 'import base64, os; print(base64.b64encode(os.urandom(16)))'
-  secretKey: MDAwMDAwMDAwMDAwMDAwMA==
+  # openssl rand -hex 32
+  secretKey: 1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef
   user: user
   password: paSSw0rd
 

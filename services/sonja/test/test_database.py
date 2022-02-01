@@ -27,7 +27,8 @@ class TestDatabase(unittest.TestCase):
             user.user_name = "user"
             session.add(user)
 
-        self.assertRaises(database.OperationFailed, lambda: database.remove_but_last_user("1"))
+        with database.session_scope() as session:
+            self.assertRaises(database.OperationFailed, lambda: database.remove_but_last_user(session, "1"))
 
         with database.session_scope() as session:
             user = session.query(database.User).filter_by(id="1").first()
@@ -43,7 +44,8 @@ class TestDatabase(unittest.TestCase):
             session.add(user2)
 
         # should not raise an exception
-        database.remove_but_last_user("1")
+        with database.session_scope() as session:
+            database.remove_but_last_user(session, "1")
 
         with database.session_scope() as session:
             num_users = session.query(database.User).count()
@@ -59,8 +61,6 @@ class TestDatabase(unittest.TestCase):
         with database.session_scope() as session:
             num_packages = session.query(database.Package).count()
             self.assertEqual(1, num_packages)
-            package = session.query(database.Package).first()
-            self.assertEqual(1, len(package.waiting_builds))
 
     def test_create_build_with_missing_recipe(self):
         with database.session_scope() as session:
@@ -72,5 +72,3 @@ class TestDatabase(unittest.TestCase):
         with database.session_scope() as session:
             num_recipes = session.query(database.Recipe).count()
             self.assertEqual(1, num_recipes)
-            recipe = session.query(database.Recipe).first()
-            self.assertEqual(1, len(recipe.waiting_builds))

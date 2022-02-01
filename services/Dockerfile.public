@@ -1,10 +1,10 @@
 FROM uboot/sonja-base-image:latest
 
 COPY sonja /usr/src/app/sonja
-COPY public /usr/src/app
+COPY public /usr/src/app/public
 
 EXPOSE 8080
 
-ENTRYPOINT ["gunicorn"]
+ENTRYPOINT ["python"]
 
-CMD ["-w", "4", "-b", "0.0.0.0:8080", "-k", "gevent", "swagger_server:create_app()"]
+CMD ["-m", "public"]

@@ -4,7 +4,7 @@ from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
-from sonja.ssh import hash_password
+from sonja.auth import hash_password
 
 from contextlib import contextmanager
 import enum
@@ -40,9 +40,7 @@ class OperationFailed(Exception):
     pass
 
 
-@contextmanager
-def session_scope():
-    """Provide a transactional scope around a series of operations."""
+def get_session():
     session = Session()
     try:
         yield session
@@ -54,6 +52,12 @@ def session_scope():
         session.close()
 
 
+@contextmanager
+def session_scope():
+    """Provide a transactional scope around a series of operations."""
+    return get_session()
+
+
 class User(Base):
     __tablename__ = 'user'
 
@@ -63,6 +67,22 @@ class User(Base):
     last_name = Column(String(255))
     password = Column(String(255))
     email = Column(String(255))
+
+    @property
+    def permission_labels(self):
+        return [p.label.name for p in self.permissions]
+
+    @permission_labels.setter
+    def permission_labels(self, value):
+        self.permissions = [Permission(label) for label in value]
+
+    @property
+    def plain_password(self):
+        return ""
+
+    @plain_password.setter
+    def plain_password(self, value):
+        self.password = hash_password(value)
 
 
 class PermissionLabel(enum.Enum):
@@ -318,15 +338,14 @@ def insert_first_user(name: str, password: str):
             logger.info("Created initial user with ID %d", user.id)
 
 
-def remove_but_last_user(user_id: str):
-    with session_scope() as session:
-        record = session.query(User).filter_by(id=user_id).first()
-        if not record:
-            raise NotFound
-        session.delete(record)
-        if session.query(User).count() == 0:
-            session.rollback()
-            raise OperationFailed
+def remove_but_last_user(session: Session, user_id: str):
+    record = session.query(User).filter_by(id=user_id).first()
+    if not record:
+        raise NotFound
+    session.delete(record)
+    if session.query(User).count() == 0:
+        session.rollback()
+        raise OperationFailed
 
 
 def reset_database():
@@ -426,32 +445,49 @@ def populate_database():
         session.commit()
 
 
+def _drop_table(table):
+    try:
+        table.drop(engine)
+    except OperationalError as e:
+        logger.warning("Failed to drop table %s", table.name)
+            
+            
+def _drop_data_tables():
+    _drop_table(missing_package)
+    _drop_table(missing_recipe)
+    _drop_table(Build.__table__)
+    _drop_table(Log.__table__)
+    _drop_table(package_requirement)
+    _drop_table(Package.__table__)
+    _drop_table(RecipeRevision.__table__)
+    _drop_table(Recipe.__table__)
+    _drop_table(Commit.__table__)
+    _drop_table(Channel.__table__)
+    _drop_table(profile_label)
+    _drop_table(Profile.__table__)
+    _drop_table(repo_label)
+    _drop_table(Label.__table__)
+    _drop_table(Option.__table__)
+    _drop_table(Repo.__table__)
+    
+            
 def clear_database():
-    reset_database()
+    _drop_data_tables()
+
+    _drop_table(GitCredential.__table__)
+    _drop_table(Ecosystem.__table__)
+    _drop_table(Permission.__table__)
+    _drop_table(User.__table__)
+
+    try:
+        Base.metadata.create_all(engine)
+    except OperationalError:
+        logger.warning("Failed to connect to database")
+        raise
 
 
 def clear_ecosystems():
-    def drop_table(table):
-        try:
-            table.drop(engine)
-        except OperationalError as e:
-            logger.warning("Failed to drop table %s", table.name)
-
-    drop_table(missing_package)
-    drop_table(missing_recipe)
-    drop_table(Build.__table__)
-    drop_table(Log.__table__)
-    drop_table(package_requirement)
-    drop_table(Package.__table__)
-    drop_table(RecipeRevision.__table__)
-    drop_table(Recipe.__table__)
-    drop_table(Commit.__table__)
-    drop_table(Channel.__table__)
-    drop_table(profile_label)
-    drop_table(Profile.__table__)
-    drop_table(repo_label)
-    drop_table(Repo.__table__)
-    drop_table(Label.__table__)
+    _drop_data_tables()
 
     try:
         Base.metadata.create_all(engine)
