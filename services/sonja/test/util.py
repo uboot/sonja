@@ -5,8 +5,11 @@ from typing import Callable
 import os
 
 
-def run_create_operation(op: Callable[[dict], database.Base], parameter: dict) -> int:
+def run_create_operation(op: Callable[[dict], database.Base], parameter: dict, ecosystem_id: int = 0) -> int:
     with database.session_scope() as session:
+        if ecosystem_id:
+            ecosystem = session.query(database.Ecosystem).filter(database.Ecosystem.id == ecosystem_id).first()
+            parameter["ecosystem"] = ecosystem
         obj = op(parameter)
         session.add(obj)
         session.commit()
@@ -50,10 +53,7 @@ def create_ecosystem(parameters):
     ecosystem.conan_remote = "uboot"
     ecosystem.conan_user = "agent"
     ecosystem.conan_password = os.environ.get("CONAN_PASSWORD", "")
-    git_credential = database.GitCredential()
-    git_credential.url = "https://uboot@github.com"
-    git_credential.username = ""
-    git_credential.password = os.environ.get("GIT_PAT", "")
+    git_credential = database.GitCredential("https://uboot@github.com", "", os.environ.get("GIT_PAT", ""))
     ecosystem.credentials = [git_credential]
     parameters["ecosystem"] = ecosystem
     return ecosystem

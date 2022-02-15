@@ -58,7 +58,7 @@ def get_user_item(user_id: str, user_item: UserWriteItem, session: Session = Dep
     400: {"description": "Last user or current users can not be deleted"},
     403: {"description": "Not allowed"},
     404: {"description": "User not found"}
-})
+}, status_code=status.HTTP_204_NO_CONTENT)
 def delete_user_item(user_id: str, session: Session = Depends(get_session),
                      current_user: User = Depends(get_current_user),
                      authorized: bool = Depends(get_admin)):

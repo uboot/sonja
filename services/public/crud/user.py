@@ -12,7 +12,7 @@ def read_users(session: Session) -> List[User]:
 
 
 def create_user(session: Session, user_item: UserWriteItem) -> User:
-    user = User(**user_item.data.attributes.dict(exclude_unset=True, exclude={"old_password"}))
+    user = User(**user_item.data.attributes.dict(exclude_unset=True, exclude={"old_password"}, by_alias=True))
     session.add(user)
     session.commit()
     return user

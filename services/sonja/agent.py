@@ -1,5 +1,4 @@
 from sonja import database, manager
-from sonja.client import ApiException, MaxRetryError
 from sonja.builder import Builder
 from sonja.config import connect_to_database, logger
 from sonja.worker import Worker
@@ -178,7 +177,5 @@ class Agent(Worker):
 
     def __trigger_scheduler(self):
         logger.info('Trigger scheduler: process commits')
-        try:
-            self.__scheduler.process_commits()
-        except (ApiException, MaxRetryError):
+        if self.__scheduler.process_commits():
             logger.error("Failed to trigger scheduler")

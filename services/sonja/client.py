@@ -1,20 +1,39 @@
 import os
+from requests import get
+from requests.exceptions import RequestException
+from requests.status_codes import codes
 
-from sonja.swagger_client import AgentApi, ApiClient, Configuration, SchedulerApi
-from urllib3.exceptions import MaxRetryError
-from sonja.swagger_client.rest import ApiException
 
-linux_agent_url = os.environ.get('SONJA_LINUXAGENT_URL', '127.0.0.1')
-linux_agent_configuration = Configuration()
-linux_agent_configuration.host = "http://{0}:8080".format(linux_agent_url)
-linux_agent = AgentApi(ApiClient(linux_agent_configuration))
+class ClientBase:
+    def call_get(self, url, path) -> bool:
+        host = f"http://{url}:8080"
+        try:
+            r = get(f"{host}/{path}", timeout=1)
+        except RequestException:
+            return False
 
-windows_agent_url = os.environ.get('SONJA_WINDOWSAGENT_URL', '127.0.0.1')
-windows_agent_configuration = Configuration()
-windows_agent_configuration.host = "http://{0}:8080".format(windows_agent_url)
-windows_agent = AgentApi(ApiClient(windows_agent_configuration))
+        return r.status_code != codes.ok
 
-scheduler_url = os.environ.get('SONJA_SCHEDULER_URL', '127.0.0.1')
-configuration = Configuration()
-configuration.host = "http://{0}:8080".format(scheduler_url)
-scheduler = SchedulerApi(ApiClient(configuration))
+
+class LinuxAgent(ClientBase):
+    def process_builds(self) -> bool:
+        url = os.environ.get('SONJA_LINUXAGENT_URL', '127.0.0.1')
+        self.call_get(url, "process_builds")
+
+
+class WindowsAgent(ClientBase):
+    def process_builds(self) -> bool:
+        url = os.environ.get('SONJA_WINDOWSAGENT_URL', '127.0.0.1')
+        self.call_get(url, "process_builds")
+
+
+class Scheduler(ClientBase):
+    def process_commits(self) -> bool:
+        url = os.environ.get('SONJA_SCHEDULER_URL', '127.0.0.1')
+        self.call_get(url, "process_commits")
+
+
+class Crawler(ClientBase):
+    def process_repo(self, repo_id: str) -> bool:
+        url = os.environ.get('SONJA_SCHEDULER_URL', '127.0.0.1')
+        self.call_get(url, f"process_repo/{repo_id}")

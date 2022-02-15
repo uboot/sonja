@@ -69,11 +69,11 @@ class User(Base):
     email = Column(String(255))
 
     @property
-    def permission_labels(self):
+    def permission_values(self):
         return [p.label.name for p in self.permissions]
 
-    @permission_labels.setter
-    def permission_labels(self, value):
+    @permission_values.setter
+    def permission_values(self, value):
         self.permissions = [Permission(label) for label in value]
 
     @property
@@ -113,6 +113,11 @@ class GitCredential(Base):
     ecosystem_id = Column(Integer, ForeignKey('ecosystem.id'))
     ecosystem = relationship("Ecosystem", backref="credentials")
 
+    def __init__(self, url: str, username: str, password: str):
+        self.url = url
+        self.username = username
+        self.password = password
+
 
 class Ecosystem(Base):
     __tablename__ = 'ecosystem'
@@ -129,6 +134,14 @@ class Ecosystem(Base):
     conan_remote = Column(String(255))
     conan_user = Column(String(255))
     conan_password = Column(String(255))
+
+    @property
+    def credential_values(self):
+        return [{"url": c.url, "username": c.username, "password": c.password} for c in self.credentials]
+
+    @credential_values.setter
+    def credential_values(self, value):
+        self.credentials = [GitCredential(**v) for v in value]
 
 
 class Label(Base):

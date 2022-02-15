@@ -1,5 +1,4 @@
 from sonja import database
-from sonja.client import ApiException, MaxRetryError
 from sonja.config import connect_to_database, logger
 from sonja.credential_helper import build_credential_helper
 from sonja.ssh import decode
@@ -214,9 +213,7 @@ class Crawler(Worker):
         if new_commits:
             logger.info("Finish crawling with *new* commits")
             logger.info('Trigger scheduler: process commits')
-            try:
-                self.__scheduler.process_commits()
-            except (ApiException, MaxRetryError):
+            if self.__scheduler.process_commits():
                 logger.error("Failed to trigger scheduler")
         else:
             logger.info("Finish crawling with *no* new commits")

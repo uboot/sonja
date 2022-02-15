@@ -2,7 +2,6 @@ import asyncio
 from sonja import database
 from sonja.config import connect_to_database, logger
 from sonja.worker import Worker
-from sonja.client import ApiException, MaxRetryError
 
 
 SCHEDULER_PERIOD_SECONDS = 60
@@ -65,15 +64,11 @@ class Scheduler(Worker):
             return new_commits
 
         logger.info('Trigger linux agent: process builds')
-        try:
-            self.__linux_agent.process_builds()
-        except (ApiException, MaxRetryError):
+        if self.__linux_agent.process_builds():
             logger.error("Failed to trigger Linux agent")
 
         logger.info('Trigger windows agent: process builds')
-        try:
-            self.__windows_agent.process_builds()
-        except (ApiException, MaxRetryError):
+        if self.__windows_agent.process_builds():
             logger.error("Failed to trigger Windows agent")
 
         return new_commits
