@@ -16,6 +16,8 @@ class TestUser(ApiTestCase):
     def test_get_user(self):
         response = client.get(f"{api_prefix}/user/1", headers=self.reader_headers)
         self.assertEqual(200, response.status_code)
+        attributes = response.json()["data"]["attributes"]
+        self.assertListEqual(["read", "write", "admin"], attributes["permissions"])
 
     def test_get_users(self):
         response = client.get(f"{api_prefix}/user", headers=self.reader_headers)
@@ -27,7 +29,7 @@ class TestUser(ApiTestCase):
                 "type": "users",
                 "attributes": {
                     "user_name": "test_create_user",
-                    "permissions": []
+                    "permissions": ["read"]
                 }
             }
         }, headers=self.admin_headers)
@@ -46,7 +48,9 @@ class TestUser(ApiTestCase):
             }
         }, headers=self.admin_headers)
         self.assertEqual(200, response.status_code)
-        self.assertEqual("First", response.json()["data"]["attributes"]["first_name"])
+        attributes = response.json()["data"]["attributes"]
+        self.assertEqual("First", attributes["first_name"])
+        self.assertEqual("read", attributes["permissions"][0])
 
     def test_patch_my_user(self):
         response = client.patch(f"{api_prefix}/user/3", json={

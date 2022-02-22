@@ -12,7 +12,7 @@ class PermissionEnum(str, Enum):
 
 @attributes
 class UserRead(BaseModel):
-    permissions: List[PermissionEnum] = Field(default_factory=list, alias="permission_values")
+    permissions: List[PermissionEnum] = Field(default_factory=list, alias="permission_value")
     user_name: str = ""
     first_name: Optional[str] = None
     last_name: Optional[str] = None

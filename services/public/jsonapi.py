@@ -10,7 +10,8 @@ def attributes(cls: Type):
 
 def data(cls: Type):
     example = dict()
-    example["id"] = "1"
+    if "id" in cls.__fields__:
+        example["id"] = "1"
     example["type"] = cls.__fields__["type"].default
     example["attributes"] = cls.__fields__["attributes"].type_.Config.schema_extra["example"]
     if "relationships" in cls.__fields__:
@@ -127,7 +128,10 @@ class DataItem:
 
         @staticmethod
         def from_db(obj: object):
-            return {"data": {"id": getattr(obj, self.name).id, "type": self.type_}}
+            related = getattr(obj, self.name)
+            if not related:
+                return {"data": {"id": "", "type": self.type_}}
+            return {"data": {"id": related.id, "type": self.type_}}
 
         setattr(model, "from_db", from_db)
         return model

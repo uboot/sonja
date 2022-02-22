@@ -22,13 +22,13 @@ def create_user(parameters: dict) -> database.User:
     user.first_name = "Joe"
     user.last_name = "Doe"
     user.password = hash_password("password")
-    read = database.Permission(database.PermissionLabel.read)
+    read = database.Permission(label=database.PermissionLabel.read)
     user.permissions.append(read)
     if parameters.get("user.permissions", "admin") in ("write", "admin"):
-        write = database.Permission(database.PermissionLabel.write)
+        write = database.Permission(label=database.PermissionLabel.write)
         user.permissions.append(write)
     if parameters.get("user.permissions", "admin") == "admin":
-        admin = database.Permission(database.PermissionLabel.admin)
+        admin = database.Permission(label=database.PermissionLabel.admin)
         user.permissions.append(admin)
 
     return user
@@ -53,7 +53,8 @@ def create_ecosystem(parameters):
     ecosystem.conan_remote = "uboot"
     ecosystem.conan_user = "agent"
     ecosystem.conan_password = os.environ.get("CONAN_PASSWORD", "")
-    git_credential = database.GitCredential("https://uboot@github.com", "", os.environ.get("GIT_PAT", ""))
+    git_credential = database.GitCredential(url="https://uboot@github.com", username="",
+                                            password=os.environ.get("GIT_PAT", ""))
     ecosystem.credentials = [git_credential]
     parameters["ecosystem"] = ecosystem
     return ecosystem
@@ -61,6 +62,7 @@ def create_ecosystem(parameters):
 
 def create_repo(parameters):
     repo = database.Repo()
+    repo.name = "Repo Name"
     if "ecosystem" in parameters.keys():
         repo.ecosystem = parameters["ecosystem"]
     else:
@@ -78,8 +80,8 @@ def create_repo(parameters):
             repo.path = "packages/hello"
         else:
             repo.path = "packages/base"
-            repo.options = [database.Option("base:with_tests", "False")]
-    repo.exclude = [database.Label("desktop")]
+            repo.options = [database.Option(key="base:with_tests", value="False")]
+    repo.exclude = [database.Label(value="desktop")]
     return repo
 
 
@@ -121,14 +123,14 @@ def create_profile(parameters):
         profile.platform = database.Platform.linux
         profile.container = "uboot/gcc9:latest"
         profile.conan_profile = "linux-debug"
-        profile.labels = [database.Label("embedded")]
+        profile.labels = [database.Label(value="embedded")]
         profile.platform = database.Platform.linux
     else:
         profile.name = "MSVC 15"
         profile.platform = database.Platform.windows
         profile.container = "msvc15:local"
         profile.conan_profile = "windows-release"
-        profile.labels = [database.Label("desktop")]
+        profile.labels = [database.Label(value="desktop")]
         profile.platform = database.Platform.windows
     return profile
 

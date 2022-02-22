@@ -69,12 +69,12 @@ class User(Base):
     email = Column(String(255))
 
     @property
-    def permission_values(self):
+    def permission_value(self):
         return [p.label.name for p in self.permissions]
 
-    @permission_values.setter
-    def permission_values(self, value):
-        self.permissions = [Permission(label) for label in value]
+    @permission_value.setter
+    def permission_value(self, value):
+        self.permissions = [Permission(label=PermissionLabel[label]) for label in value]
 
     @property
     def plain_password(self):
@@ -99,9 +99,6 @@ class Permission(Base):
     user = relationship("User", backref="permissions")
     label = Column(Enum(PermissionLabel), nullable=False)
 
-    def __init__(self, label):
-        self.label = label
-
 
 class GitCredential(Base):
     __tablename__ = 'git_credential'
@@ -112,11 +109,6 @@ class GitCredential(Base):
     password = Column(String(255))
     ecosystem_id = Column(Integer, ForeignKey('ecosystem.id'))
     ecosystem = relationship("Ecosystem", backref="credentials")
-
-    def __init__(self, url: str, username: str, password: str):
-        self.url = url
-        self.username = username
-        self.password = password
 
 
 class Ecosystem(Base):
@@ -150,9 +142,6 @@ class Label(Base):
     id = Column(Integer, primary_key=True)
     value = Column(String(255), nullable=False)
 
-    def __init__(self, value):
-        self.value = value
-
 
 repo_label = Table('repo_label', Base.metadata,
                    Column('repo_id', Integer, ForeignKey('repo.id')),
@@ -167,10 +156,6 @@ class Option(Base):
     value = Column(String(255), nullable=False)
     repo_id = Column(Integer, ForeignKey('repo.id'), nullable=False)
 
-    def __init__(self, key, value):
-        self.key = key
-        self.value = value
-
 
 class Repo(Base):
     __tablename__ = 'repo'
@@ -184,6 +169,22 @@ class Repo(Base):
     exclude = relationship("Label", secondary=repo_label)
     options = relationship('Option', backref='repo', lazy=True,
                             cascade="all, delete, delete-orphan")
+
+    @property
+    def exclude_values(self):
+        return [{"label": e.value} for e in self.exclude]
+
+    @exclude_values.setter
+    def exclude_values(self, value):
+        self.exclude = [Label(value=v["label"]) for v in value]
+
+    @property
+    def options_values(self):
+        return [{"key": o.key, "value": o.value} for o in self.options]
+
+    @options_values.setter
+    def options_values(self, value):
+        self.options = [Option(**v) for v in value]
 
 
 class Channel(Base):
@@ -220,6 +221,22 @@ class Profile(Base):
     docker_user = Column(String(255))
     docker_password = Column(String(255))
     labels = relationship("Label", secondary=profile_label)
+
+    @property
+    def platform_value(self):
+        return self.platform.name
+
+    @platform_value.setter
+    def platform_value(self, value):
+        self.platform = Platform[value.name]
+
+    @property
+    def labels_value(self):
+        return [{"label": l.value} for l in self.labels]
+
+    @labels_value.setter
+    def labels_value(self, value):
+        self.labels = [Label(value=v["label"]) for v in value]
 
 
 class CommitStatus(enum.Enum):
@@ -344,9 +361,9 @@ def insert_first_user(name: str, password: str):
         if result.lastrowid:
             user = session.query(User).filter_by(id=result.lastrowid).first()
             user.permissions = [
-                Permission(PermissionLabel.read),
-                Permission(PermissionLabel.write),
-                Permission(PermissionLabel.admin)
+                Permission(label=PermissionLabel.read),
+                Permission(label=PermissionLabel.write),
+                Permission(label=PermissionLabel.admin)
             ]
             logger.info("Created initial user with ID %d", user.id)
 
@@ -383,10 +400,10 @@ def populate_database():
         hello.url = "git@github.com:uboot/sonja.git"
         hello.path = "packages/hello"
         hello.exclude = [
-            Label("debug")
+            Label(value="debug")
         ]
         hello.options = [
-             Option("hello:shared", "False")
+             Option(key="hello:shared", value="False")
         ]
         session.add(hello)
 
@@ -396,7 +413,7 @@ def populate_database():
         base.url = "git@github.com:uboot/sonja.git"
         base.path = "packages/base"
         base.exclude = [
-            Label("debug")
+            Label(value="debug")
         ]
         session.add(hello)
 
@@ -406,7 +423,7 @@ def populate_database():
         app.url = "git@github.com:uboot/sonja.git"
         app.path = "packages/app"
         app.exclude = [
-            Label("debug")
+            Label(value="debug")
         ]
         session.add(hello)
 
@@ -425,7 +442,7 @@ def populate_database():
         linux_debug.container = "uboot/gcc9:latest"
         linux_debug.conan_profile = "linux-debug"
         linux_debug.labels = [
-            Label("debug")
+            Label(value="debug")
         ]
         session.add(linux_debug)
 
@@ -444,7 +461,7 @@ def populate_database():
         windows_debug.container = "uboot/msvc15:latest"
         windows_debug.conan_profile = "windows-debug"
         windows_debug.labels = [
-            Label("debug")
+            Label(value="debug")
         ]
         session.add(windows_debug)
 

@@ -9,12 +9,12 @@ from typing import List
 router = APIRouter()
 
 
-@router.get("/user/me", response_model=UserReadItem)
+@router.get("/user/me", response_model=UserReadItem, response_model_by_alias=False)
 def get_current_user_item(user: User = Depends(get_current_user), authorized: bool = Depends(get_read)):
     return UserReadItem.from_db(user)
 
 
-@router.get("/user/{user_id}", response_model=UserReadItem)
+@router.get("/user/{user_id}", response_model=UserReadItem, response_model_by_alias=False)
 def get_user_item(user_id: str, session: Session = Depends(get_session), authorized: bool = Depends(get_read)):
     user = read_user_by_id(session, user_id)
     if user is None:
@@ -22,20 +22,20 @@ def get_user_item(user_id: str, session: Session = Depends(get_session), authori
     return UserReadItem.from_db(user)
 
 
-@router.get("/user", response_model=UserReadList)
-def get_user_item(session: Session = Depends(get_session), authorized: bool = Depends(get_read)):
+@router.get("/user", response_model=UserReadList, response_model_by_alias=False)
+def get_user_list(session: Session = Depends(get_session), authorized: bool = Depends(get_read)):
     users = read_users(session)
     return UserReadList.from_db(users)
 
 
-@router.post("/user", response_model=UserReadItem, status_code=status.HTTP_201_CREATED)
+@router.post("/user", response_model=UserReadItem, response_model_by_alias=False, status_code=status.HTTP_201_CREATED)
 def post_user_item(user: UserWriteItem, session: Session = Depends(get_session), authorized: bool = Depends(get_admin)):
     new_user = create_user(session, user)
     return UserReadItem.from_db(new_user)
 
 
-@router.patch("/user/{user_id}", response_model=UserReadItem)
-def get_user_item(user_id: str, user_item: UserWriteItem, session: Session = Depends(get_session),
+@router.patch("/user/{user_id}", response_model=UserReadItem, response_model_by_alias=False)
+def patch_user_item(user_id: str, user_item: UserWriteItem, session: Session = Depends(get_session),
                   current_user: User = Depends(get_current_user),
                   permissions: List[PermissionEnum] = Depends(get_permissions),
                   authorized: bool = Depends(get_read)):

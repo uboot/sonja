@@ -63,7 +63,6 @@ class EcosystemRead(EcosystemWrite):
 
 @data
 class EcosystemWriteData(BaseModel):
-    id: Optional[str]
     type: str = "users"
     attributes: EcosystemWrite = Field(default_factory=EcosystemWrite)
 

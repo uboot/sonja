@@ -26,9 +26,9 @@ class TestEcosystem(ApiTestCase):
             "data": {
                 "type": "ecosystems",
                 "attributes": {
-                    "name": "test_create_ecosystem",
+                    "name": "test_post_ecosystem",
                     "credentials": [{
-                        "url": "https:url",
+                        "url": "https://url",
                         "username": "user",
                         "password": "password"
                     }]
@@ -36,7 +36,10 @@ class TestEcosystem(ApiTestCase):
             }
         }, headers=self.user_headers)
         self.assertEqual(201, response.status_code)
-        self.assertEqual("test_create_ecosystem", response.json()["data"]["attributes"]["name"])
+        self.assertEqual("test_post_ecosystem", response.json()["data"]["attributes"]["name"])
+        attributes = response.json()["data"]["attributes"]
+        self.assertDictEqual({"url": "https://url", "username": "user", "password": "password"},
+                             attributes["credentials"][0])
 
     def test_patch_ecosystem(self):
         ecosystem_id = run_create_operation(create_ecosystem, dict())
@@ -44,12 +47,12 @@ class TestEcosystem(ApiTestCase):
             "data": {
                 "type": "ecosystems",
                 "attributes": {
-                    "name": "test_update_ecosystem",
+                    "name": "test_patch_ecosystem",
                 }
             }
         }, headers=self.user_headers)
         self.assertEqual(200, response.status_code)
-        self.assertEqual("test_update_ecosystem", response.json()["data"]["attributes"]["name"])
+        self.assertEqual("test_patch_ecosystem", response.json()["data"]["attributes"]["name"])
 
     def test_delete_ecosystem(self):
         ecosystem_id = run_create_operation(create_ecosystem, dict())
