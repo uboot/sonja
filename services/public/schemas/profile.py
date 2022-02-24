@@ -46,7 +46,7 @@ profile_relationships = create_relationships("ProfileRelationships", [
 
 @data
 class ProfileWriteData(BaseModel):
-    type: str = "users"
+    type: str = "profiles"
     attributes: Profile = Field(default_factory=Profile)
     relationships: profile_relationships = Field(default_factory=profile_relationships)
 
@@ -65,7 +65,7 @@ class ProfileWriteItem(BaseModel):
 @data
 class ProfileReadData(BaseModel):
     id: Optional[str]
-    type: str = "users"
+    type: str = "profiles"
     attributes: Profile = Field(default_factory=Profile)
     relationships: profile_relationships = Field(default_factory=profile_relationships)
 

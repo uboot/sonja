@@ -9,7 +9,7 @@ router = APIRouter()
 
 @router.post("/profile", response_model=ProfileReadItem, response_model_by_alias=False,
              status_code=status.HTTP_201_CREATED)
-def post_user_item(profile: ProfileWriteItem, session: Session = Depends(get_session),
+def post_profile_item(profile: ProfileWriteItem, session: Session = Depends(get_session),
                    authorized: bool = Depends(get_write)):
     new_profile = create_profile(session, profile)
     return ProfileReadItem.from_db(new_profile)

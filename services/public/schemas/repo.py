@@ -41,7 +41,7 @@ repo_write_relationships = create_relationships("RepoWriteRelationships", [
 
 @data
 class RepoWriteData(BaseModel):
-    type: str = "users"
+    type: str = "repos"
     attributes: Repo = Field(default_factory=Repo)
     relationships: repo_write_relationships = Field(default_factory=repo_write_relationships)
 
@@ -66,7 +66,7 @@ repo_read_relationships = create_relationships("RepoReadRelationships", [
 @data
 class RepoReadData(BaseModel):
     id: Optional[str]
-    type: str = "users"
+    type: str = "repos"
     attributes: Repo = Field(default_factory=Repo)
     relationships: repo_read_relationships = Field(default_factory=repo_read_relationships)
 

@@ -8,7 +8,7 @@ router = APIRouter()
 
 
 @router.post("/repo", response_model=RepoReadItem, response_model_by_alias=False, status_code=status.HTTP_201_CREATED)
-def post_user_item(repo: RepoWriteItem, session: Session = Depends(get_session),
+def post_repo_item(repo: RepoWriteItem, session: Session = Depends(get_session),
                    authorized: bool = Depends(get_write)):
     new_repo = create_repo(session, repo)
     return RepoReadItem.from_db(new_repo)
