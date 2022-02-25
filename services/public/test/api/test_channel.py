@@ -9,7 +9,9 @@ client = TestClient(app)
 
 
 class TestChannel(ApiTestCase):
-    def SetUp(self):
+    @classmethod
+    def setUpClass(cls):
+        ApiTestCase.setUpClass()
         run_create_operation(create_channel, dict())
 
     def test_post_channel(self):
@@ -52,7 +54,7 @@ class TestChannel(ApiTestCase):
         attributes = response.json()["data"]["attributes"]
         self.assertEqual("test_patch_channel", attributes["name"])
 
-    def test_read_channel(self):
+    def test_get_channel(self):
         channel_id = run_create_operation(create_channel, dict())
         response = client.get(f"{api_prefix}/channel/{channel_id}", headers=self.reader_headers)
         self.assertEqual(200, response.status_code)

@@ -9,7 +9,9 @@ client = TestClient(app)
 
 
 class TestProfile(ApiTestCase):
-    def SetUp(self):
+    @classmethod
+    def setUpClass(cls):
+        ApiTestCase.setUpClass()
         run_create_operation(create_profile, dict())
 
     def test_post_profile(self):
@@ -61,7 +63,7 @@ class TestProfile(ApiTestCase):
         self.assertEqual("windows", attributes["platform"])
         self.assertEqual("test_label", attributes["labels"][0]["label"])
 
-    def test_read_profile(self):
+    def test_get_profile(self):
         profile_id = run_create_operation(create_profile, dict())
         response = client.get(f"{api_prefix}/profile/{profile_id}", headers=self.reader_headers)
         self.assertEqual(200, response.status_code)

@@ -9,7 +9,9 @@ client = TestClient(app)
 
 
 class TestRepo(ApiTestCase):
-    def SetUp(self):
+    @classmethod
+    def setUpClass(cls):
+        ApiTestCase.setUpClass()
         run_create_operation(create_repo, dict())
 
     def test_post_repo(self):
@@ -61,12 +63,12 @@ class TestRepo(ApiTestCase):
         self.assertEqual("test_patch_repo", attributes["name"])
         self.assertEqual("test_patch_repo", attributes["name"])
 
-    def test_read_repo(self):
+    def test_get_repo(self):
         repo_id = run_create_operation(create_repo, dict())
         response = client.get(f"{api_prefix}/repo/{repo_id}", headers=self.reader_headers)
         self.assertEqual(200, response.status_code)
 
-    def test_read_repos(self):
+    def test_get_repos(self):
         response = client.get(f"{api_prefix}/ecosystem/1/repo", headers=self.reader_headers)
         self.assertEqual(200, response.status_code)
 

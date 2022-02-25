@@ -296,6 +296,18 @@ class Build(Base):
     missing_packages = relationship("Package", secondary=missing_package)
     missing_recipes = relationship("Recipe", secondary=missing_recipe)
 
+    @property
+    def ecosystem(self):
+        return self.profile.ecosystem
+
+    @property
+    def status_value(self):
+        return self.status.name
+
+    @status_value.setter
+    def status_value(self, value):
+        self.status = BuildStatus[value.name]
+
 
 class Log(Base):
     __tablename__ = 'log'
