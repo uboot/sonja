@@ -96,6 +96,8 @@ def create_commit(parameters):
         commit.sha = "c25c786b0f4e4b8fcaa247feb4809b68e671522d"
 
     commit.message = "Initial commit\n\nVery long and verbose description"
+    commit.user_name = "Joe Smith"
+    commit.user_email = "joe.smith@acme.com"
     commit.status = parameters.get("commit.status", database.CommitStatus.new)
     return commit
 

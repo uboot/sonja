@@ -367,7 +367,7 @@ def insert_first_user(name: str, password: str):
             User.__table__.insert(). \
             from_select([User.user_name, User.password],
                         select([literal(name), literal(password_hash)]).
-                        where(~exists().where(User.__table__)))
+                        where(~exists().where(User.id)))
         result = session.execute(statement)
 
         if result.lastrowid:

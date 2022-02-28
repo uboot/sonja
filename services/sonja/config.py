@@ -1,5 +1,4 @@
 from sonja.database import Base, engine, insert_first_user, logger, session_scope
-import connexion
 import logging
 import logging.config
 import os
@@ -12,7 +11,6 @@ from alembic.config import Config
 from alembic.runtime import migration
 
 
-app = connexion.App(__name__, specification_dir='./swagger/')
 initial_user = os.environ.get('SONJA_INITIAL_USER', 'user')
 initial_password = os.environ.get('SONJA_INITIAL_PASSWORD', 'password')
 
