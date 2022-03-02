@@ -8,7 +8,7 @@ from sonja.test.util import create_commit, run_create_operation
 client = TestClient(app)
 
 
-class TestRecipe(ApiTestCase):
+class TestCommit(ApiTestCase):
     @classmethod
     def setUpClass(cls):
         ApiTestCase.setUpClass()
