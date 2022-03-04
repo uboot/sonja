@@ -11,9 +11,9 @@ import os.path
 import re
 import shutil
 import stat
+import tempfile
 
 
-data_dir = os.environ.get("VCS_DATA_DIR", "/data")
 CRAWLER_PERIOD_SECONDS = 300
 
 
@@ -112,9 +112,11 @@ class Crawler(Worker):
     def __init__(self, scheduler):
         super().__init__()
         connect_to_database()
+        self.__data_dir = tempfile.mkdtemp()
         self.__scheduler = scheduler
         self.__repos = SimpleQueue()
         self.__next_crawl = datetime.datetime.now()
+        logger.info("Created data directory '%s'", self.__data_dir)
 
     def post_repo(self, repo_id):
         self.__repos.put(repo_id)
@@ -125,13 +127,13 @@ class Crawler(Worker):
         except Exception as e:
             logger.error("Processing repos failed: %s", e)
 
+    def cleanup(self):
+        shutil.rmtree(self.__data_dir)
+        logger.info("Removed data directory '%s'", self.__data_dir)
+
     async def __process_repos(self):
         logger.info("Start crawling")
         loop = asyncio.get_running_loop()
-
-        if not os.path.exists(data_dir):
-            os.makedirs(data_dir, exist_ok=True)
-            logger.info("Created directory '%s'", data_dir)
 
         new_commits = False
         with database.session_scope() as session:
@@ -147,7 +149,7 @@ class Crawler(Worker):
             channels = session.query(database.Channel).all()
             for repo in repos:
                 try:
-                    work_dir = os.path.join(data_dir, str(repo.id))
+                    work_dir = os.path.join(self.__data_dir, str(repo.id))
                     controller = RepoController(work_dir)
                     if not controller.is_clone_of(repo.url):
                         logger.info("Create repo for URL '%s' in '%s'", repo.url, work_dir)

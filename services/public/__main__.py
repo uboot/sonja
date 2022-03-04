@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import uvicorn
-from .main import app
+from public.main import app
 from sonja.config import connect_to_database, setup_logging
 
 

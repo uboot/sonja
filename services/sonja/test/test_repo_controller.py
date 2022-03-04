@@ -1,6 +1,7 @@
 import os
 import shutil
 import unittest
+import tempfile
 
 from sonja.crawler import RepoController
 
@@ -15,7 +16,9 @@ known_hosts = ("Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVB
 
 class TestRepoController(unittest.TestCase):
     def setUp(self):
-        self.work_dir = os.environ.get("VCS_DATA_DIR", ".")
+        self.work_dir = tempfile.mkdtemp()
+
+    def tearDown(self):
         shutil.rmtree(self.work_dir)
 
     def test_checkout_master(self):

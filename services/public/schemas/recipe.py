@@ -75,7 +75,7 @@ recipe_revision_relationships = create_relationships("RecipeRevisionRelationship
 @data
 class RecipeRevisionReadData(BaseModel):
     id: Optional[str]
-    type: str = "recipe_revisions"
+    type: str = "recipe-revisions"
     attributes: RecipeRevision = Field(default_factory=RecipeRevision)
     relationships: recipe_revision_relationships = Field(default_factory=recipe_revision_relationships)
 

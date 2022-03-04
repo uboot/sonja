@@ -14,8 +14,7 @@
             "args": ["sonja.test"],
             "env": {
                 "PYTHONPATH": "${workspaceFolder}/services",
-                "MYSQL_URL": "mysql.sonja",
-                "VCS_DATA_DIR": "./temp"
+                "MYSQL_URL": "mysql.sonja"
             }
         },
         {
@@ -36,7 +35,6 @@
             "module": "swagger_server",
             "cwd": "${workspaceFolder}/services/crawler",
             "env": {
-                "VCS_DATA_DIR": "./temp",
                 "PYTHONPATH": "${workspaceFolder}/services",
                 "MYSQL_URL": "mysql.sonja"
             }
