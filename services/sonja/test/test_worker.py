@@ -17,7 +17,7 @@ import unittest
 class TestAgent(unittest.TestCase):
     def setUp(self):
         self.scheduler = Mock()
-        self.scheduler = Agent(self.scheduler)
+        self.agent = Agent(self.scheduler)
         database.reset_database()
 
     def tearDown(self):

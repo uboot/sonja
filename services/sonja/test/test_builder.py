@@ -131,7 +131,7 @@ class TestBuilder(unittest.TestCase):
             canceller.join()
 
     def test_run_windows(self):
-        docker_host = os.environ.get("WINDOWS_DOCKER_HOST", "")
+        docker_host = os.environ.get("WINDOWS_DOCKER_HOST", "127.0.0.1:2375")
         parameters = get_build_parameters("windows-debug")
         with environment("DOCKER_HOST", docker_host), Builder("Windows", "uboot/msvc15:latest") as builder:
             builder.pull(parameters)
@@ -143,7 +143,7 @@ class TestBuilder(unittest.TestCase):
             self.assertTrue("info" in builder.build_output.keys())
 
     def test_run_windows_https(self):
-        docker_host = os.environ.get("WINDOWS_DOCKER_HOST", "")
+        docker_host = os.environ.get("WINDOWS_DOCKER_HOST", "127.0.0.1:2375")
         parameters = get_build_parameters("windows-debug", https=True)
         with environment("DOCKER_HOST", docker_host), Builder("Windows", "uboot/msvc15:latest") as builder:
             builder.pull(parameters)
@@ -155,7 +155,7 @@ class TestBuilder(unittest.TestCase):
             self.assertTrue("info" in builder.build_output.keys())
 
     def test_cancel_windows(self):
-        docker_host = os.environ.get("WINDOWS_DOCKER_HOST", "")
+        docker_host = os.environ.get("WINDOWS_DOCKER_HOST", "127.0.0.1:2375")
         parameters = get_build_parameters("windows-debug")
         parameters["path"] = "packages/deadlock/conanfile.py"
         with environment("DOCKER_HOST", docker_host), Builder("Windows", "uboot/msvc15:latest") as builder:

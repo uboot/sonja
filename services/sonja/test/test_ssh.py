@@ -1,6 +1,6 @@
 import unittest
 
-from sonja import ssh
+from sonja import auth, ssh
 
 
 class TestSsh(unittest.TestCase):
@@ -22,8 +22,8 @@ class TestSsh(unittest.TestCase):
         self.assertEqual("", ssh.decode(None))
 
     def test_hash_password(self):
-        self.assertEqual("$2b$12$", ssh.hash_password("password")[:7])
+        self.assertEqual("$2b$12$", auth.hash_password("password")[:7])
 
     def test_test_password(self):
-        hashed = ssh.hash_password("password")
-        self.assertTrue(ssh.test_password("password", hashed))
+        hashed = auth.hash_password("password")
+        self.assertTrue(auth.test_password("password", hashed))

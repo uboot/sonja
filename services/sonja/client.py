@@ -12,28 +12,28 @@ class ClientBase:
         except RequestException:
             return False
 
-        return r.status_code != codes.ok
+        return r.status_code == codes.ok
 
 
 class LinuxAgent(ClientBase):
     def process_builds(self) -> bool:
         url = os.environ.get('SONJA_LINUXAGENT_URL', '127.0.0.1')
-        self.call_get(url, "process_builds")
+        return self.call_get(url, "process_builds")
 
 
 class WindowsAgent(ClientBase):
     def process_builds(self) -> bool:
         url = os.environ.get('SONJA_WINDOWSAGENT_URL', '127.0.0.1')
-        self.call_get(url, "process_builds")
+        return self.call_get(url, "process_builds")
 
 
 class Scheduler(ClientBase):
     def process_commits(self) -> bool:
         url = os.environ.get('SONJA_SCHEDULER_URL', '127.0.0.1')
-        self.call_get(url, "process_commits")
+        return self.call_get(url, "process_commits")
 
 
 class Crawler(ClientBase):
     def process_repo(self, repo_id: str) -> bool:
         url = os.environ.get('SONJA_SCHEDULER_URL', '127.0.0.1')
-        self.call_get(url, f"process_repo/{repo_id}")
+        return self.call_get(url, f"process_repo/{repo_id}")
