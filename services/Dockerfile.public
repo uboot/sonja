@@ -1,10 +1,9 @@
 FROM uboot/sonja-base-image:latest
 
-COPY sonja /usr/src/app/sonja
-COPY public /usr/src/app/public
+COPY . /usr/src/app
 
 EXPOSE 8080
 
-ENTRYPOINT ["python"]
+ENTRYPOINT ["python3"]
 
 CMD ["-m", "public"]

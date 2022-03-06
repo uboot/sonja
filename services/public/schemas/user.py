@@ -1,6 +1,6 @@
 from enum import Enum
 from public.jsonapi import attributes, data, item, item_list
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, Field
 from typing import List, Optional
 
 
@@ -16,7 +16,7 @@ class UserRead(BaseModel):
     user_name: str = ""
     first_name: Optional[str] = None
     last_name: Optional[str] = None
-    email: Optional[EmailStr] = None
+    email: Optional[str] = None
 
     class Config:
         schema_extra = {

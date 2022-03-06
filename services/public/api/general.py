@@ -3,7 +3,7 @@ from datetime import timedelta
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from public.auth import get_admin, get_write
-from sonja.database import get_session, Session, User, populate_database, reset_database, clear_ecosystems
+from sonja.database import get_session, Session, User, populate_database, clear_ecosystems
 from sonja.auth import test_password, create_access_token
 from sonja.client import Crawler
 
