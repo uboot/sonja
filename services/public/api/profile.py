@@ -33,7 +33,7 @@ def get_profile_item(profile_id: str, profile_item: ProfileWriteItem, session: S
     return ProfileReadItem.from_db(patched_profile)
 
 
-@router.delete("/profile/{profile_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/profile/{profile_id}")
 def delete_profile_item(profile_id: str, session: Session = Depends(get_session), authorized: bool = Depends(get_write)):
     profile = read_profile(session, profile_id)
     if not profile:

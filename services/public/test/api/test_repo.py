@@ -75,4 +75,4 @@ class TestRepo(ApiTestCase):
     def test_delete_repo(self):
         repo_id = run_create_operation(create_repo, dict())
         response = client.delete(f"{api_prefix}/repo/{repo_id}", headers=self.user_headers)
-        self.assertEqual(204, response.status_code)
+        self.assertEqual(200, response.status_code)

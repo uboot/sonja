@@ -17,7 +17,10 @@ class TestUser(ApiTestCase):
         response = client.get(f"{api_prefix}/user/1", headers=self.reader_headers)
         self.assertEqual(200, response.status_code)
         attributes = response.json()["data"]["attributes"]
-        self.assertListEqual(["read", "write", "admin"], attributes["permissions"])
+        self.assertListEqual([
+            {"permission": "read"},
+            {"permission": "write"},
+            {"permission": "admin"}], attributes["permissions"])
 
     def test_get_users(self):
         response = client.get(f"{api_prefix}/user", headers=self.reader_headers)
@@ -29,7 +32,7 @@ class TestUser(ApiTestCase):
                 "type": "users",
                 "attributes": {
                     "user_name": "test_create_user",
-                    "permissions": ["read"]
+                    "permissions": [{"permission": "read"}]
                 }
             }
         }, headers=self.admin_headers)
@@ -43,14 +46,14 @@ class TestUser(ApiTestCase):
                 "attributes": {
                     "first_name": "First",
                     "password": "new_password",
-                    "permissions": ["read"]
+                    "permissions": [{"permission": "read"}]
                 }
             }
         }, headers=self.admin_headers)
         self.assertEqual(200, response.status_code)
         attributes = response.json()["data"]["attributes"]
         self.assertEqual("First", attributes["first_name"])
-        self.assertEqual("read", attributes["permissions"][0])
+        self.assertEqual("read", attributes["permissions"][0]["permission"])
 
     def test_patch_my_user(self):
         response = client.patch(f"{api_prefix}/user/3", json={
@@ -96,7 +99,7 @@ class TestUser(ApiTestCase):
     def test_delete_user(self):
         user_id = run_create_operation(create_user, {"user.user_name": "test_delete_user"})
         response = client.delete(f"{api_prefix}/user/{user_id}", headers=self.admin_headers)
-        self.assertEqual(204, response.status_code)
+        self.assertEqual(200, response.status_code)
 
         response = client.get(f"{api_prefix}/user/{user_id}", headers=self.admin_headers)
         self.assertEqual(404, response.status_code)

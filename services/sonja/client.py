@@ -35,5 +35,5 @@ class Scheduler(ClientBase):
 
 class Crawler(ClientBase):
     def process_repo(self, repo_id: str) -> bool:
-        url = os.environ.get('SONJA_SCHEDULER_URL', '127.0.0.1')
+        url = os.environ.get('SONJA_CRAWLER_URL', '127.0.0.1')
         return self.call_get(url, f"process_repo/{repo_id}")

@@ -71,4 +71,4 @@ class TestProfile(ApiTestCase):
     def test_delete_profile(self):
         profile_id = run_create_operation(create_profile, dict())
         response = client.delete(f"{api_prefix}/profile/{profile_id}", headers=self.user_headers)
-        self.assertEqual(204, response.status_code)
+        self.assertEqual(200, response.status_code)

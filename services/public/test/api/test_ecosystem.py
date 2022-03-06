@@ -57,7 +57,7 @@ class TestEcosystem(ApiTestCase):
     def test_delete_ecosystem(self):
         ecosystem_id = run_create_operation(create_ecosystem, dict())
         response = client.delete(f"{api_prefix}/ecosystem/{ecosystem_id}", headers=self.admin_headers)
-        self.assertEqual(204, response.status_code)
+        self.assertEqual(200, response.status_code)
 
     def test_delete_unknown_ecosystem(self):
         response = client.delete(f"{api_prefix}/ecosystem/100", headers=self.admin_headers)

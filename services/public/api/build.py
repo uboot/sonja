@@ -1,10 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from public.auth import get_read, get_write
-from public.schemas.build import BuildReadItem, BuildReadList, BuildWriteItem
+from public.schemas.build import BuildReadItem, BuildReadList, BuildWriteItem, StatusEnum
 from public.crud.build import read_builds, read_build, update_build
 from sonja.database import get_session, Session
+from sonja.client import LinuxAgent, WindowsAgent
+from sonja.config import logger
 
 router = APIRouter()
+linux_agent = LinuxAgent()
+windows_agent = WindowsAgent()
 
 
 @router.get("/ecosystem/{ecosystem_id}/build", response_model=BuildReadList, response_model_by_alias=False)
@@ -27,5 +31,15 @@ def patch_build_item(build_id: str, build_item: BuildWriteItem, session: Session
     if build is None:
         raise HTTPException(status_code=404, detail="Build not found")
     patched_build = update_build(session, build, build_item)
+
+    if build_item.data.attributes.status == StatusEnum.new:
+        logger.info('Trigger linux agent: process builds')
+        if not linux_agent.process_builds():
+            logger.error("Failed to trigger Linux agent")
+
+        logger.info('Trigger windows agent: process builds')
+        if not windows_agent.process_builds():
+            logger.error("Failed to trigger Windows agent")
+
     t = BuildReadItem.from_db(patched_build)
     return t

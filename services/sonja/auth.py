@@ -2,7 +2,7 @@ import bcrypt
 import os
 
 from datetime import datetime, timedelta
-from jose import jwt
+from jose import jwt, ExpiredSignatureError
 
 secret_key = os.environ.get('SONJA_SECRET_KEY', '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef')
 

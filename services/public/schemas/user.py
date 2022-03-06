@@ -10,9 +10,13 @@ class PermissionEnum(str, Enum):
     admin = "admin"
 
 
+class Permission(BaseModel):
+    permission: PermissionEnum
+
+
 @attributes
 class UserRead(BaseModel):
-    permissions: List[PermissionEnum] = Field(default_factory=list, alias="permission_value")
+    permissions: List[Permission] = Field(default_factory=list, alias="permission_value")
     user_name: str = ""
     first_name: Optional[str] = None
     last_name: Optional[str] = None
@@ -25,7 +29,10 @@ class UserRead(BaseModel):
                 "first_name": "Joe",
                 "last_name": "Doe",
                 "email": "joe.doe@acme.com",
-                "permissions": ["read", "write"]
+                "permissions": [
+                    { "permission": "read" },
+                    { "permission": "write"}
+                ]
             }
         }
 

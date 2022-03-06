@@ -62,4 +62,4 @@ class TestChannel(ApiTestCase):
     def test_delete_channel(self):
         channel_id = run_create_operation(create_channel, dict())
         response = client.delete(f"{api_prefix}/channel/{channel_id}", headers=self.user_headers)
-        self.assertEqual(204, response.status_code)
+        self.assertEqual(200, response.status_code)

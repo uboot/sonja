@@ -38,7 +38,7 @@ def get_repo_item(repo_id: str, repo_item: RepoWriteItem, session: Session = Dep
     return t
 
 
-@router.delete("/repo/{repo_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/repo/{repo_id}")
 def delete_repo_item(repo_id: str, session: Session = Depends(get_session), authorized: bool = Depends(get_write)):
     repo = read_repo(session, repo_id)
     if not repo:

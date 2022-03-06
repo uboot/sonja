@@ -25,13 +25,13 @@ def get_ecosystem_item(ecosystem_id: str, session: Session = Depends(get_session
 
 @router.post("/ecosystem", response_model=EcosystemReadItem, response_model_by_alias=False,
              status_code=status.HTTP_201_CREATED)
-def post_user_item(ecosystem: EcosystemWriteItem, session: Session = Depends(get_session),
+def post_ecosystem_item(ecosystem: EcosystemWriteItem, session: Session = Depends(get_session),
                    authorized: bool = Depends(get_write)):
     new_ecosystem = create_ecosystem(session, ecosystem)
     return EcosystemReadItem.from_db(new_ecosystem)
 
 
-@router.delete("/ecosystem/{ecosystem_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/ecosystem/{ecosystem_id}")
 def delete_ecosystem_item(ecosystem_id: str, session: Session = Depends(get_session),
                           authorized: bool = Depends(get_write)):
     ecosystem = read_ecosystem(session, ecosystem_id)

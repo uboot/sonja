@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from public.crud.user import read_user_by_id
 from public.schemas.user import PermissionEnum
-from sonja.auth import decode_access_token
+from sonja.auth import decode_access_token, ExpiredSignatureError
 from sonja.database import get_session, Session, User
 from typing import List
 
@@ -11,7 +11,10 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 def get_current_user(token: str = Depends(oauth2_scheme), session: Session = Depends(get_session)) -> User:
-    user_id = decode_access_token(token)
+    try:
+        user_id = decode_access_token(token)
+    except ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Signature has expired")
     return read_user_by_id(session, user_id)
 
 

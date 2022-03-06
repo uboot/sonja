@@ -63,7 +63,7 @@ class EcosystemRead(EcosystemWrite):
 
 @data
 class EcosystemWriteData(BaseModel):
-    type: str = "users"
+    type: str = "ecosystems"
     attributes: EcosystemWrite = Field(default_factory=EcosystemWrite)
 
     class Config:
@@ -90,7 +90,7 @@ ecosystem_relationships = create_relationships("EcosystemRelationships", [
 @data
 class EcosystemReadData(BaseModel):
     id: Optional[str]
-    type: str = "users"
+    type: str = "ecosystems"
     attributes: EcosystemRead = Field(default_factory=EcosystemRead)
     relationships: ecosystem_relationships = Field(default_factory=ecosystem_relationships)
 

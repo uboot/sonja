@@ -70,11 +70,11 @@ class User(Base):
 
     @property
     def permission_value(self):
-        return [p.label.name for p in self.permissions]
+        return [{"permission": p.label.name} for p in self.permissions]
 
     @permission_value.setter
     def permission_value(self, value):
-        self.permissions = [Permission(label=PermissionLabel[label]) for label in value]
+        self.permissions = [Permission(label=PermissionLabel[v["permission"]]) for v in value]
 
     @property
     def plain_password(self):

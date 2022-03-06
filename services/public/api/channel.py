@@ -33,7 +33,7 @@ def get_channel_item(channel_id: str, channel_item: ChannelWriteItem, session: S
     return t
 
 
-@router.delete("/channel/{channel_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/channel/{channel_id}")
 def delete_channel_item(channel_id: str, session: Session = Depends(get_session), authorized: bool = Depends(get_write)):
     channel = read_channel(session, channel_id)
     if not channel:
