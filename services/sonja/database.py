@@ -166,6 +166,7 @@ class Repo(Base):
     name = Column(String(255))
     url = Column(String(255))
     path = Column(String(255))
+    version = Column(String(255))
     exclude = relationship("Label", secondary=repo_label)
     options = relationship('Option', backref='repo', lazy=True,
                             cascade="all, delete, delete-orphan")

@@ -23,6 +23,7 @@ class TestRepo(ApiTestCase):
                     "name": "test_post_repo",
                     "url": "https://github.com/uboot/sonja.git",
                     "path": "packages/hello",
+                    "version": "1.2.3",
                     "exclude": [{
                         "label": "embedded"
                     }],
@@ -44,6 +45,7 @@ class TestRepo(ApiTestCase):
         self.assertEqual(201, response.status_code)
         attributes = response.json()["data"]["attributes"]
         self.assertEqual("test_post_repo", attributes["name"])
+        self.assertEqual("1.2.3", attributes["version"])
         self.assertDictEqual({"key": "hello:shared", "value": "True"}, attributes["options"][0])
         self.assertDictEqual({"label": "embedded"}, attributes["exclude"][0])
         self.assertEqual(f"{ecosystem_id}", response.json()["data"]["relationships"]["ecosystem"]["data"]["id"])

@@ -36,7 +36,7 @@ echo '### Build package ###'
 mkdir -p "$build_output_dir"; ThrowOnNonZero
 $$package_name=[string](conan inspect --raw name $path); ThrowOnNonZero
 $$package_version=[string](conan inspect --raw version $path); ThrowOnNonZero
-conan create -pr $conan_profile $conan_options --json $build_output_dir/create.json $path @$sonja_user/$channel; ThrowOnNonZero
+conan create -pr $conan_profile $conan_options --json $build_output_dir/create.json $path $version@$sonja_user/$channel; ThrowOnNonZero
 
 echo '### Collect package data ###'
 conan info -pr $conan_profile $conan_options --json $build_output_dir/info.json $$package_name/$$package_version@$sonja_user/$channel; ThrowOnNonZero

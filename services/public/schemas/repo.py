@@ -14,6 +14,7 @@ class Repo(BaseModel):
     name: str = ""
     url: Optional[str]
     path: Optional[str]
+    version: Optional[str]
     exclude: List[Label] = Field(default_factory=list, alias="exclude_values")
     options: List[Option] = Field(default_factory=list, alias="options_values")
 
@@ -23,6 +24,7 @@ class Repo(BaseModel):
                 "name": "Hello",
                 "url": "https://github.com/uboot/sonja.git",
                 "path": "packages/hello",
+                "version": "1.2.3",
                 "exclude": [{
                     "label": "embedded"
                 }],
