@@ -21,7 +21,7 @@ class TestRepo(ApiTestCase):
                 "type": "repos",
                 "attributes": {
                     "name": "test_post_repo",
-                    "url": "https://github.com/uboot/sonja.git",
+                    "url": "https://github.com/uboot/sonja-backend.git",
                     "path": "packages/hello",
                     "version": "1.2.3",
                     "exclude": [{

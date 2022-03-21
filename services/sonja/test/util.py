@@ -73,7 +73,7 @@ def create_repo(parameters):
         repo.url = "https://uboot@github.com/uboot/conan-packages.git"
         repo.path = "base"
     else:
-        repo.url = "https://github.com/uboot/sonja.git"
+        repo.url = "https://github.com/uboot/sonja-backend.git"
         if parameters.get("repo.deadlock", False):
             repo.path = "packages/deadlock"
         elif parameters.get("repo.dependent", False):

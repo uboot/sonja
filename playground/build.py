@@ -83,7 +83,7 @@ conan_url = "conan-server"
 conan_password = "demo"
 docker_image_pattern = ("([a-z0-9\\.-]+(:[0-9]+)?/)?"
                         "[a-z0-9\\.-/]+([:@][a-z0-9\\.-]+)$")
-git_url = "https://github.com/uboot/sonja.git"
+git_url = "https://github.com/uboot/sonja-backend.git"
 git_sha = "ce8ad84282be5583989bdbdf0c42e95a53527657"
 package_path = "./sonja/packages/hello/"
 package = "hello"

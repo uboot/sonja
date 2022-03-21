@@ -22,7 +22,7 @@ class Repo(BaseModel):
         schema_extra = {
             "example": {
                 "name": "Hello",
-                "url": "https://github.com/uboot/sonja.git",
+                "url": "https://github.com/uboot/sonja-backend.git",
                 "path": "packages/hello",
                 "version": "1.2.3",
                 "exclude": [{

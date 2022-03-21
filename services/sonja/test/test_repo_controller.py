@@ -23,7 +23,7 @@ class TestRepoController(unittest.TestCase):
 
     def test_checkout_master(self):
         controller = RepoController(self.work_dir)
-        controller.create_new_repo("git@github.com:uboot/sonja.git")
+        controller.create_new_repo("git@github.com:uboot/sonja-backend.git")
         controller.setup_ssh(os.environ.get("SSH_KEY", ""), known_hosts)
         controller.fetch()
         controller.checkout("master")
@@ -31,7 +31,7 @@ class TestRepoController(unittest.TestCase):
 
     def test_setup_ssh(self):
         controller = RepoController(self.work_dir)
-        controller.create_new_repo("git@github.com:uboot/sonja.git")
+        controller.create_new_repo("git@github.com:uboot/sonja-backend.git")
         controller.setup_ssh(os.environ.get("SSH_KEY", ""), known_hosts)
         self.assertTrue(os.path.exists(os.path.join(self.work_dir, "id_rsa")))
         self.assertTrue(os.path.exists(os.path.join(self.work_dir, "known_hosts")))

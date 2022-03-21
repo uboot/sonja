@@ -410,7 +410,7 @@ def populate_database():
         hello = Repo()
         hello.name = "Hello"
         hello.ecosystem = ecosystem
-        hello.url = "git@github.com:uboot/sonja.git"
+        hello.url = "git@github.com:uboot/sonja-backend.git"
         hello.path = "packages/hello"
         hello.exclude = [
             Label(value="debug")
@@ -423,7 +423,7 @@ def populate_database():
         base = Repo()
         base.name = "Base"
         base.ecosystem = ecosystem
-        base.url = "git@github.com:uboot/sonja.git"
+        base.url = "git@github.com:uboot/sonja-backend.git"
         base.path = "packages/base"
         base.exclude = [
             Label(value="debug")
@@ -433,7 +433,7 @@ def populate_database():
         app = Repo()
         app.name = "App"
         app.ecosystem = ecosystem
-        app.url = "git@github.com:uboot/sonja.git"
+        app.url = "git@github.com:uboot/sonja-backend.git"
         app.path = "packages/app"
         app.exclude = [
             Label(value="debug")
