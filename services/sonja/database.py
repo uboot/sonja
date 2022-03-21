@@ -481,7 +481,7 @@ def populate_database():
         channel = Channel()
         channel.ecosystem = ecosystem
         channel.name = "Releases"
-        channel.branch = "master"
+        channel.branch = "main"
         channel.conan_channel = "stable"
         session.add(channel)
 

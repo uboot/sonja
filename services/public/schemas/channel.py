@@ -19,7 +19,7 @@ class Channel(BaseModel):
             "example": {
                 "name": "Releases",
                 "conan_channel": "stable",
-                "branch": "master"
+                "branch": "main"
             }
         }
 

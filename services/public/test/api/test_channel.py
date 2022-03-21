@@ -22,7 +22,7 @@ class TestChannel(ApiTestCase):
                 "attributes": {
                     "name": "Releases",
                     "conan_channel": "stable",
-                    "branch": "master"
+                    "branch": "main"
                 },
                 "relationships": {
                     "ecosystem": {
@@ -37,7 +37,7 @@ class TestChannel(ApiTestCase):
         self.assertEqual(201, response.status_code)
         attributes = response.json()["data"]["attributes"]
         self.assertEqual("stable", attributes["conan_channel"])
-        self.assertEqual("master", attributes["branch"])
+        self.assertEqual("main", attributes["branch"])
         self.assertEqual(f"{ecosystem_id}", response.json()["data"]["relationships"]["ecosystem"]["data"]["id"])
 
     def test_patch_channel(self):
