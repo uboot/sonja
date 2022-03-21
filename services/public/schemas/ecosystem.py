@@ -16,6 +16,7 @@ class EcosystemWrite(BaseModel):
     conan_remote: Optional[str]
     conan_config_url: Optional[str]
     conan_config_path: Optional[str]
+    conan_config_branch: Optional[str]
     conan_user: Optional[str]
     conan_password: Optional[str]
     credentials: List[GitCredential] = Field(default_factory=list, alias="credential_values")
@@ -29,7 +30,7 @@ class EcosystemWrite(BaseModel):
                 "conan_remote": "uboot",
                 "conan_config_url": "git@github.com:uboot/conan-config.git",
                 "conan_config_path": "conan-config",
-                "conan_config_branch": "master",
+                "conan_config_branch": "main",
                 "conan_user": "agent",
                 "conan_password": "Passw0rd",
                 "credentials": [{

@@ -21,13 +21,13 @@ class TestRepoController(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.work_dir)
 
-    def test_checkout_master(self):
+    def test_checkout_main(self):
         controller = RepoController(self.work_dir)
         controller.create_new_repo("git@github.com:uboot/sonja-backend.git")
         controller.setup_ssh(os.environ.get("SSH_KEY", ""), known_hosts)
         controller.fetch()
-        controller.checkout("master")
-        self.assertTrue(os.path.exists(os.path.join(self.work_dir, "repo", "chart")))
+        controller.checkout("main")
+        self.assertTrue(os.path.exists(os.path.join(self.work_dir, "repo", "services")))
 
     def test_setup_ssh(self):
         controller = RepoController(self.work_dir)

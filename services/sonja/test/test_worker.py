@@ -161,7 +161,7 @@ class TestCrawler(unittest.TestCase):
     def test_start_repo_and_regex_channel(self):
         with database.session_scope() as session:
             session.add(util.create_repo(dict()))
-            session.add(util.create_channel({"channel.branch": "mas.*"}))
+            session.add(util.create_channel({"channel.branch": "mai.*"}))
         self.crawler.start()
         time.sleep(5)
         called = self.crawler.query(lambda: self.scheduler.process_commits.called)
