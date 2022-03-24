@@ -8,15 +8,15 @@ class TestDatabase(unittest.TestCase):
     def setUp(self):
         database.reset_database()
 
-    def test_insert_first_user(self):
-        database.insert_first_user("user", "password")
+    def test_create_initial_user(self):
+        database.create_initial_user("user", "password")
         with database.session_scope() as session:
             users = session.query(database.User).all()
             self.assertEqual(len(users), 1)
 
-    def test_insert_first_user_twice(self):
-        database.insert_first_user("user1", "password")
-        database.insert_first_user("user2", "password")
+    def test_create_initial_user_twice(self):
+        database.create_initial_user("user1", "password")
+        database.create_initial_user("user2", "password")
         with database.session_scope() as session:
             users = session.query(database.User).all()
             self.assertEqual(len(users), 1)
