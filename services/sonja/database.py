@@ -357,7 +357,7 @@ class Package(Base):
                             backref='required_by')
 
 
-def insert_first_user(name: str, password: str):
+def create_initial_user(name: str, password: str):
     if not name or not password:
         logger.warning("No initial user/password provided")
         return

@@ -1,4 +1,4 @@
-from sonja.database import Base, engine, insert_first_user, logger, session_scope
+from sonja.database import Base, engine, create_initial_user, logger, session_scope
 import logging
 import logging.config
 import os
@@ -49,7 +49,7 @@ def connect_to_database():
                 new_revision = context.get_current_revision()
                 logger.info("Database is at revision %s", new_revision)
 
-                insert_first_user(initial_user, initial_password)
+                create_initial_user(initial_user, initial_password)
             logger.info("Connected")
             return
         except sqlalchemy.exc.OperationalError:
