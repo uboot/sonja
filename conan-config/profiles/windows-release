@@ -1,3 +1,0 @@
-include(windows)
-[settings]
-build_type=Release

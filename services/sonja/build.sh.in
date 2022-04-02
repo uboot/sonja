@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+mkdir -p $build_output_dir
 
 echo '### Setup git ###'
 mkdir -p ~/.ssh
@@ -24,7 +25,6 @@ git fetch origin $git_sha
 git checkout FETCH_HEAD
 
 echo '### Build package ###'
-mkdir -p $build_output_dir
 package_name=$$(conan inspect --raw name $path)
 package_version="$version"
 package_version=$${package_version:-$$(conan inspect --raw version $path)}

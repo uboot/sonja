@@ -1,5 +1,5 @@
 from public.schemas.build import BuildWriteItem, StatusEnum
-from sonja.database import Profile, Build, Session
+from sonja.database import Commit, Profile, Build, Session, CommitStatus
 from typing import List
 
 
@@ -20,6 +20,8 @@ def update_build(session: Session, build: Build, build_item: BuildWriteItem) -> 
 
     if build_item.data.attributes.status == StatusEnum.new:
         build.log.logs = ''
+        build.missing_recipes = []
+        build.missing_packages = []
 
     session.commit()
     return build

@@ -29,8 +29,8 @@ class EcosystemWrite(BaseModel):
                 "user": "mycompany",
                 "conan_remote": "uboot",
                 "conan_config_url": "git@github.com:uboot/conan-config.git",
-                "conan_config_path": "conan-config",
-                "conan_config_branch": "main",
+                "conan_config_path": "default",
+                "conan_config_branch": "master",
                 "conan_user": "agent",
                 "conan_password": "Passw0rd",
                 "credentials": [{
@@ -51,7 +51,7 @@ class EcosystemWrite(BaseModel):
 
 @attributes
 class EcosystemRead(EcosystemWrite):
-    public_ssh_key: str
+    public_ssh_key: Optional[str]
 
     class Config:
         schema_extra = {

@@ -2,7 +2,7 @@
 import uvicorn
 from crawler.config import crawler
 from crawler.main import app
-from sonja.config import setup_logging, logger
+from sonja.config import setup_logging, logger, log_config
 
 
 @app.on_event("shutdown")
@@ -16,4 +16,4 @@ def shutdown_event():
 if __name__ == '__main__':
     setup_logging()
     crawler.start()
-    uvicorn.run(app, host="0.0.0.0", port=8080)
+    uvicorn.run(app, host="0.0.0.0", port=8080, log_config=log_config)

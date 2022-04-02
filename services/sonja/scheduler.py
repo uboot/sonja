@@ -1,10 +1,11 @@
-import asyncio
 from sonja import database
 from sonja.config import connect_to_database, logger
 from sonja.worker import Worker
+import time
 
 
 SCHEDULER_PERIOD_SECONDS = 60
+TIMEOUT = 10
 
 
 class Scheduler(Worker):
@@ -21,6 +22,8 @@ class Scheduler(Worker):
                 new_commits = await self.__process_commits()
             except Exception as e:
                 logger.error("Processing commits failed: %s", e)
+                logger.info("Retry in %i seconds", TIMEOUT)
+                time.sleep(TIMEOUT)
         #self.reschedule_internally(SCHEDULER_PERIOD_SECONDS)
         
     async def __process_commits(self):
@@ -64,11 +67,11 @@ class Scheduler(Worker):
             return new_commits
 
         logger.info('Trigger linux agent: process builds')
-        if self.__linux_agent.process_builds():
+        if not self.__linux_agent.process_builds():
             logger.error("Failed to trigger Linux agent")
 
         logger.info('Trigger windows agent: process builds')
-        if self.__windows_agent.process_builds():
+        if not self.__windows_agent.process_builds():
             logger.error("Failed to trigger Windows agent")
 
         return new_commits
