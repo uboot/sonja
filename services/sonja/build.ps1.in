@@ -4,6 +4,8 @@ function ThrowOnNonZero {
     }
 }
 
+mkdir -p "$build_output_dir"; ThrowOnNonZero
+
 echo '### Setup MTU ###'
 echo 'Set mtu=$mtu'
 $$adapters = $$(Get-NetAdapter | Where { $$_.Name -Match 'Ethernet' }).Name
@@ -33,7 +35,6 @@ git fetch origin $git_sha; ThrowOnNonZero
 git checkout FETCH_HEAD; ThrowOnNonZero
 
 echo '### Build package ###'
-mkdir -p "$build_output_dir"; ThrowOnNonZero
 $$package_name=[string](conan inspect --raw name $path); ThrowOnNonZero
 $$package_version="$version"
 if ([String]::IsNullOrWhiteSpace($$package_version)) {

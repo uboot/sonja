@@ -12,9 +12,11 @@ import re
 import shutil
 import stat
 import tempfile
+import time
 
 
 CRAWLER_PERIOD_SECONDS = 300
+TIMEOUT = 10
 
 
 class RepoController(object):
@@ -126,6 +128,8 @@ class Crawler(Worker):
             await self.__process_repos()
         except Exception as e:
             logger.error("Processing repos failed: %s", e)
+            logger.info("Retry in %i seconds", TIMEOUT)
+            time.sleep(TIMEOUT)
 
     def cleanup(self):
         shutil.rmtree(self.__data_dir)
@@ -215,7 +219,7 @@ class Crawler(Worker):
         if new_commits:
             logger.info("Finish crawling with *new* commits")
             logger.info('Trigger scheduler: process commits')
-            if self.__scheduler.process_commits():
+            if not self.__scheduler.process_commits():
                 logger.error("Failed to trigger scheduler")
         else:
             logger.info("Finish crawling with *no* new commits")

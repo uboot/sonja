@@ -1,4 +1,5 @@
-from sonja.database import Base, engine, create_initial_user, logger, session_scope
+from sonja.database import Base, engine, create_initial_user, create_initial_ecosystem, logger, session_scope
+from sonja.demo import add_demo_data_to_ecosystem
 import logging
 import logging.config
 import os
@@ -13,20 +14,18 @@ from alembic.runtime import migration
 
 initial_user = os.environ.get('SONJA_INITIAL_USER', 'user')
 initial_password = os.environ.get('SONJA_INITIAL_PASSWORD', 'password')
-
-
-class PingFilter(logging.Filter):
-    def filter(self, record):
-        return not "GET /ping" in record.msg
+initial_ecosystem = os.environ.get('SONJA_INITIAL_ECOSYSTEM', 'MyEcosystem')
+log_config = os.path.join(os.path.dirname(__file__), "logging.yaml")
 
 
 def setup_logging():
-    with open(os.path.join(os.path.dirname(__file__), "logging.yaml")) as f:
+    with open(log_config) as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
     logging.config.dictConfig(config)
 
 
 def connect_to_database():
+    setup_logging()
     TIMEOUT = 10
     NUM_RETRIES = 18
     for i in range(1, NUM_RETRIES+1):
@@ -48,8 +47,6 @@ def connect_to_database():
                     command.stamp(alembic_cfg, "head")
                 new_revision = context.get_current_revision()
                 logger.info("Database is at revision %s", new_revision)
-
-                create_initial_user(initial_user, initial_password)
             logger.info("Connected")
             return
         except sqlalchemy.exc.OperationalError:
@@ -63,3 +60,13 @@ def connect_to_database():
     #os.kill(os.getpid(), signal.SIGKILL)
     exit(1)
 
+
+def setup_initial_data():
+    logger.info("Setup initial data")
+
+    create_initial_user(initial_user, initial_password)
+
+    if initial_ecosystem:
+        ecosytem_id = create_initial_ecosystem(initial_ecosystem)
+        if ecosytem_id:
+            add_demo_data_to_ecosystem(ecosytem_id)

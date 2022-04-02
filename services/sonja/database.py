@@ -381,6 +381,23 @@ def create_initial_user(name: str, password: str):
             logger.info("Created initial user with ID %d", user.id)
 
 
+def create_initial_ecosystem(name: str) -> int:
+    with session_scope() as session:
+        statement = \
+            Ecosystem.__table__.insert(). \
+            from_select([Ecosystem.name],
+                        select([literal(name)]).
+                        where(~exists().where(Ecosystem.id)))
+        result = session.execute(statement)
+
+        if result.lastrowid:
+            ecosystem = session.query(Ecosystem).filter_by(id=result.lastrowid).first()
+            logger.info("Created initial ecosystem with ID %d", ecosystem.id)
+            return ecosystem.id
+
+        return 0
+
+
 def remove_but_last_user(session: Session, user_id: str):
     record = session.query(User).filter_by(id=user_id).first()
     if not record:
@@ -398,94 +415,6 @@ def reset_database():
         except OperationalError:
             logger.warning("Failed to connect to database")
             raise
-
-
-def populate_database():
-    logger.info("Populate database")
-    with session_scope() as session:
-        ecosystem = session.query(Ecosystem).filter_by(id=1).first()
-        if not ecosystem:
-            raise Exception("Found no ecosystem with ID=1")
-
-        hello = Repo()
-        hello.name = "Hello"
-        hello.ecosystem = ecosystem
-        hello.url = "git@github.com:uboot/sonja-backend.git"
-        hello.path = "packages/hello"
-        hello.exclude = [
-            Label(value="debug")
-        ]
-        hello.options = [
-             Option(key="hello:shared", value="False")
-        ]
-        session.add(hello)
-
-        base = Repo()
-        base.name = "Base"
-        base.ecosystem = ecosystem
-        base.url = "git@github.com:uboot/sonja-backend.git"
-        base.path = "packages/base"
-        base.exclude = [
-            Label(value="debug")
-        ]
-        session.add(hello)
-
-        app = Repo()
-        app.name = "App"
-        app.ecosystem = ecosystem
-        app.url = "git@github.com:uboot/sonja-backend.git"
-        app.path = "packages/app"
-        app.exclude = [
-            Label(value="debug")
-        ]
-        session.add(hello)
-
-        linux_release = Profile()
-        linux_release.ecosystem = ecosystem
-        linux_release.platform = Platform.linux
-        linux_release.name = "GCC 9 Release"
-        linux_release.container = "uboot/gcc9:latest"
-        linux_release.conan_profile = "linux-release"
-        session.add(linux_release)
-
-        linux_debug = Profile()
-        linux_debug.ecosystem = ecosystem
-        linux_debug.platform = Platform.linux
-        linux_debug.name = "GCC 9 Debug"
-        linux_debug.container = "uboot/gcc9:latest"
-        linux_debug.conan_profile = "linux-debug"
-        linux_debug.labels = [
-            Label(value="debug")
-        ]
-        session.add(linux_debug)
-
-        windows_release = Profile()
-        windows_release.ecosystem = ecosystem
-        windows_release.platform = Platform.windows
-        windows_release.name = "MSVC 15 Release"
-        windows_release.container = "uboot/msvc15:latest"
-        windows_release.conan_profile = "windows-release"
-        session.add(windows_release)
-
-        windows_debug = Profile()
-        windows_debug.ecosystem = ecosystem
-        windows_debug.platform = Platform.windows
-        windows_debug.name = "MSVC 15 Debug"
-        windows_debug.container = "uboot/msvc15:latest"
-        windows_debug.conan_profile = "windows-debug"
-        windows_debug.labels = [
-            Label(value="debug")
-        ]
-        session.add(windows_debug)
-
-        channel = Channel()
-        channel.ecosystem = ecosystem
-        channel.name = "Releases"
-        channel.branch = "main"
-        channel.conan_channel = "stable"
-        session.add(channel)
-
-        session.commit()
 
 
 def _drop_table(table):

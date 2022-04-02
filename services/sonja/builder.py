@@ -18,6 +18,11 @@ build_package_dir_name = "conan_build_package"
 build_output_dir_name = "conan_output"
 
 
+class BuildFailed(Exception):
+    def __init__(self, status_code):
+        self.status_code = status_code
+
+
 def create_build_tar(script_template_name: str, parameters: dict):
 
     def add_content(tar_archive, file_name, text_data, is_script = False):
@@ -192,7 +197,7 @@ class Builder(object):
             self.__container.start()
             self.__container_logs = self.__container.logs(stream=True, follow=True)
         for byte_data in self.__container_logs:
-            line = byte_data.decode("utf-8").strip('\n\r')
+            line = byte_data.decode("utf-8", errors="replace").strip('\n\r')
             self.__logs.put(line)
         with self.__cancel_lock:
             self.__container_logs = None
@@ -205,12 +210,13 @@ class Builder(object):
         try:
             data, _ = self.__container.get_archive(self.build_output_dir)
             self.build_output = extract_output_tar(data)
-        except docker.errors.APIError:
-            logger.error("Failed to obtain build output from container '%s'", self.__container.short_id)
+        except docker.errors.APIError as e:
+            logger.error("Failed to obtain build output from container '%s': %s", self.__container.short_id, e)
 
         if result.get("StatusCode"):
-            raise Exception("Build in container '{0}' failed with status '{1}'".format(
-                            self.__container.short_id, result.get("StatusCode")))
+            logger.info("Build in container '%s' failed with status '%s'", self.__container.short_id,
+                        result.get("StatusCode"))
+            raise BuildFailed(result.get("StatusCode"))
 
     def cancel(self):
         with self.__cancel_lock:
