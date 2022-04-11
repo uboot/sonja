@@ -1,6 +1,7 @@
-from sonja import database
 from sonja.config import connect_to_database, logger
 from sonja.credential_helper import build_credential_helper
+from sonja.database import session_scope
+from sonja.model import CommitStatus, Commit, Channel, Repo
 from sonja.ssh import decode
 from sonja.worker import Worker
 from queue import Empty, SimpleQueue
@@ -140,17 +141,17 @@ class Crawler(Worker):
         loop = asyncio.get_running_loop()
 
         new_commits = False
-        with database.session_scope() as session:
+        with session_scope() as session:
             if datetime.datetime.now() >= self.__next_crawl:
                 logger.info("Crawl all repos")
-                repos = session.query(database.Repo).all()
+                repos = session.query(Repo).all()
                 self.__next_crawl = datetime.datetime.now() + datetime.timedelta(seconds=CRAWLER_PERIOD_SECONDS)
                 self.reschedule_internally(CRAWLER_PERIOD_SECONDS)
             else:
                 logger.info("Crawl manually triggered repos")
                 repo_ids = [repo for repo in self.__get_repos()]
-                repos = session.query(database.Repo).filter(database.Repo.id.in_(repo_ids)).all()
-            channels = session.query(database.Channel).all()
+                repos = session.query(Repo).filter(Repo.id.in_(repo_ids)).all()
+            channels = session.query(Channel).all()
             for repo in repos:
                 try:
                     work_dir = os.path.join(self.__data_dir, str(repo.id))
@@ -184,7 +185,7 @@ class Crawler(Worker):
                             controller.checkout(branch)
                             sha = controller.get_sha()
 
-                            commits = session.query(database.Commit).filter_by(repo=repo,
+                            commits = session.query(Commit).filter_by(repo=repo,
                                 sha=sha, channel=channel)
 
                             # continue if this commit has already been stored
@@ -193,26 +194,26 @@ class Crawler(Worker):
                                 continue
 
                             logger.info("Add commit '%s'", sha[:7])
-                            commit = database.Commit()
+                            commit = Commit()
                             commit.sha = sha
                             commit.message = controller.get_message()
                             commit.user_name = controller.get_user_name()
                             commit.user_email = controller.get_user_email()
                             commit.repo = repo
                             commit.channel = channel
-                            commit.status = database.CommitStatus.new
+                            commit.status = CommitStatus.new
                             session.add(commit)
                             new_commits = True
 
-                            old_commits = session.query(database.Commit).filter(
-                                database.Commit.repo == repo,
-                                database.Commit.channel == channel,
-                                database.Commit.sha != sha,
-                                database.Commit.status != database.CommitStatus.old
+                            old_commits = session.query(Commit).filter(
+                                Commit.repo == repo,
+                                Commit.channel == channel,
+                                Commit.sha != sha,
+                                Commit.status != CommitStatus.old
                             )
                             for c in old_commits:
                                 logger.info("Set status of '%s' to 'old'", c.sha[:7])
-                                c.status = database.CommitStatus.old
+                                c.status = CommitStatus.old
                 except git.exc.GitError as e:
                     logger.error("Failed to process repo '%s' with message '%s'", repo.url, e)
 

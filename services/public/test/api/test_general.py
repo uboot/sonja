@@ -4,6 +4,7 @@ from public.config import api_prefix
 from public.main import app
 from sonja.test.api import ApiTestCase
 from sonja.test.util import create_ecosystem, run_create_operation
+from sonja.demo import populate_database
 
 client = TestClient(app)
 
@@ -17,6 +18,12 @@ class TestGeneral(ApiTestCase):
     def test_populate_database(self):
         run_create_operation(create_ecosystem, dict())
         response = client.get(f"{api_prefix}/populate_database", headers=self.admin_headers)
+        self.assertEqual(200, response.status_code)
+
+    def test_add_build(self):
+        run_create_operation(create_ecosystem, dict())
+        populate_database()
+        response = client.get(f"{api_prefix}/add_build", headers=self.admin_headers)
         self.assertEqual(200, response.status_code)
 
     def test_process_repo(self):

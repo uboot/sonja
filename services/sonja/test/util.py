@@ -1,14 +1,17 @@
-from sonja import database
 from sonja.auth import hash_password
 from typing import Callable
 
 import os
 
+from sonja.database import session_scope
+from sonja.model import Permission, Ecosystem, PermissionLabel, Base, User, GitCredential, Repo, Option, Label, Commit, \
+    CommitStatus, Channel, Profile, Platform, Log, Build, BuildStatus, Recipe, RecipeRevision, Package
 
-def run_create_operation(op: Callable[[dict], database.Base], parameter: dict, ecosystem_id: int = 0) -> int:
-    with database.session_scope() as session:
+
+def run_create_operation(op: Callable[[dict], Base], parameter: dict, ecosystem_id: int = 0) -> int:
+    with session_scope() as session:
         if ecosystem_id:
-            ecosystem = session.query(database.Ecosystem).filter(database.Ecosystem.id == ecosystem_id).first()
+            ecosystem = session.query(Ecosystem).filter(Ecosystem.id == ecosystem_id).first()
             parameter["ecosystem"] = ecosystem
         obj = op(parameter)
         session.add(obj)
@@ -16,26 +19,26 @@ def run_create_operation(op: Callable[[dict], database.Base], parameter: dict, e
         return obj.id
 
 
-def create_user(parameters: dict) -> database.User:
-    user = database.User()
+def create_user(parameters: dict) -> User:
+    user = User()
     user.user_name = parameters.get("user.user_name", "user")
     user.first_name = "Joe"
     user.last_name = "Doe"
     user.password = hash_password("password")
-    read = database.Permission(label=database.PermissionLabel.read)
+    read = Permission(label=PermissionLabel.read)
     user.permissions.append(read)
     if parameters.get("user.permissions", "admin") in ("write", "admin"):
-        write = database.Permission(label=database.PermissionLabel.write)
+        write = Permission(label=PermissionLabel.write)
         user.permissions.append(write)
     if parameters.get("user.permissions", "admin") == "admin":
-        admin = database.Permission(label=database.PermissionLabel.admin)
+        admin = Permission(label=PermissionLabel.admin)
         user.permissions.append(admin)
 
     return user
 
 
 def create_ecosystem(parameters):
-    ecosystem = database.Ecosystem()
+    ecosystem = Ecosystem()
     ecosystem.name = "My Ecosystem"
     ecosystem.user = "sonja"
     ecosystem.known_hosts = ("Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN"
@@ -53,7 +56,7 @@ def create_ecosystem(parameters):
     ecosystem.conan_remote = "uboot"
     ecosystem.conan_user = "agent"
     ecosystem.conan_password = os.environ.get("CONAN_PASSWORD", "")
-    git_credential = database.GitCredential(url="https://uboot@github.com", username="",
+    git_credential = GitCredential(url="https://uboot@github.com", username="",
                                             password=os.environ.get("GIT_PAT", ""))
     ecosystem.credentials = [git_credential]
     parameters["ecosystem"] = ecosystem
@@ -61,7 +64,7 @@ def create_ecosystem(parameters):
 
 
 def create_repo(parameters):
-    repo = database.Repo()
+    repo = Repo()
     repo.name = "Repo Name"
     if "ecosystem" in parameters.keys():
         repo.ecosystem = parameters["ecosystem"]
@@ -80,13 +83,13 @@ def create_repo(parameters):
             repo.path = "packages/hello"
         else:
             repo.path = "packages/base"
-            repo.options = [database.Option(key="base:with_tests", value="False")]
-    repo.exclude = [database.Label(value="desktop")]
+            repo.options = [Option(key="base:with_tests", value="False")]
+    repo.exclude = [Label(value="desktop")]
     return repo
 
 
 def create_commit(parameters):
-    commit = database.Commit()
+    commit = Commit()
     commit.repo = create_repo(parameters)
     commit.channel = create_channel(parameters)
 
@@ -98,12 +101,12 @@ def create_commit(parameters):
     commit.message = "Initial commit\n\nVery long and verbose description"
     commit.user_name = "Joe Smith"
     commit.user_email = "joe.smith@acme.com"
-    commit.status = parameters.get("commit.status", database.CommitStatus.new)
+    commit.status = parameters.get("commit.status", CommitStatus.new)
     return commit
 
 
 def create_channel(parameters):
-    channel = database.Channel()
+    channel = Channel()
     if "ecosystem" in parameters.keys():
         channel.ecosystem = parameters["ecosystem"]
     else:
@@ -115,40 +118,40 @@ def create_channel(parameters):
 
 
 def create_profile(parameters):
-    profile = database.Profile()
+    profile = Profile()
     if "ecosystem" in parameters.keys():
         profile.ecosystem = parameters["ecosystem"]
     else:
         profile.ecosystem = create_ecosystem(parameters)
     if parameters.get("profile.os", "Linux") == "Linux":
         profile.name = "GCC 9"
-        profile.platform = database.Platform.linux
+        profile.platform = Platform.linux
         profile.container = "uboot/gcc9:latest"
         profile.conan_profile = "linux-debug"
-        profile.labels = [database.Label(value="embedded")]
-        profile.platform = database.Platform.linux
+        profile.labels = [Label(value="embedded")]
+        profile.platform = Platform.linux
     else:
         profile.name = "MSVC 15"
-        profile.platform = database.Platform.windows
+        profile.platform = Platform.windows
         profile.container = "msvc15:local"
         profile.conan_profile = "windows-release"
-        profile.labels = [database.Label(value="desktop")]
-        profile.platform = database.Platform.windows
+        profile.labels = [Label(value="desktop")]
+        profile.platform = Platform.windows
     return profile
 
 
 def create_log(parameters):
-    log = database.Log()
+    log = Log()
     log.logs = "Start build\nRun Build\nUpload..."
     return log
 
 
 def create_build(parameters):
-    build = database.Build()
-    parameters["commit.status"] = database.CommitStatus.building
+    build = Build()
+    parameters["commit.status"] = CommitStatus.building
     build.commit = create_commit(parameters)
     build.profile = create_profile(parameters)
-    build.status = database.BuildStatus.new
+    build.status = BuildStatus.new
     build.log = create_log(parameters)
     if parameters.get("build.with_dependencies", False):
         build.package = create_package(parameters)
@@ -159,7 +162,7 @@ def create_build(parameters):
 
 
 def create_recipe(parameters):
-    recipe = database.Recipe()
+    recipe = Recipe()
     if "ecosystem" in parameters.keys():
         recipe.ecosystem = parameters["ecosystem"]
     else:
@@ -173,7 +176,7 @@ def create_recipe(parameters):
 
 def create_recipe_revision(parameters):
     recipe = create_recipe(parameters)
-    recipe_revision = database.RecipeRevision()
+    recipe_revision = RecipeRevision()
     recipe_revision.recipe = recipe
     recipe_revision.revision = parameters.get("recipe_revision.revision", "2b44d2dde63878dd279ebe5d38c60dfaa97153fb")
     return recipe_revision
@@ -181,7 +184,7 @@ def create_recipe_revision(parameters):
 
 def create_package(parameters):
     recipe_revision = create_recipe_revision(parameters)
-    package = database.Package()
+    package = Package()
     package.package_id = parameters.get("package.package_id", "227220812d7ea3aa060187bae41abbc9911dfdfd")
     package.recipe_revision = recipe_revision
     return package

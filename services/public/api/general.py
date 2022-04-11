@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from public.auth import get_admin, get_write
 from sonja.database import get_session, Session, User, clear_ecosystems
-from sonja.demo import populate_database
+from sonja.demo import populate_database, add_build
 from sonja.auth import test_password, create_access_token
 from sonja.client import Crawler
 
@@ -25,6 +25,11 @@ def get_clear_ecosystems(authorized: bool = Depends(get_admin)):
 @router.get("/populate_database")
 def get_populate_database(authorized: bool = Depends(get_admin)):
     populate_database()
+
+
+@router.get("/add_build")
+def get_add_build(authorized: bool = Depends(get_admin)):
+    add_build()
 
 
 @router.get("/process_repo/{repo_id}")

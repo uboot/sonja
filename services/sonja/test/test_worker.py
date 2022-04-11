@@ -1,6 +1,7 @@
-from sonja import database
 from sonja.agent import Agent
 from sonja.crawler import Crawler
+from sonja.database import session_scope, reset_database
+from sonja.model import Commit, CommitStatus, BuildStatus, Build
 from sonja.scheduler import Scheduler
 from unittest.mock import Mock
 
@@ -17,8 +18,9 @@ import unittest
 class TestAgent(unittest.TestCase):
     def setUp(self):
         self.scheduler = Mock()
-        self.agent = Agent(self.scheduler)
-        database.reset_database()
+        self.redis_client = Mock()
+        self.agent = Agent(self.scheduler, self.redis_client)
+        reset_database()
 
     def tearDown(self):
         self.agent.cancel()
@@ -27,8 +29,8 @@ class TestAgent(unittest.TestCase):
     def __wait_for_build_status(self, status, timeout):
         start = time.time()
         while True:
-            with database.session_scope() as session:
-                build = session.query(database.Build).first()
+            with session_scope() as session:
+                build = session.query(Build).first()
                 if build.status == status:
                     return build.status
                 elif time.time() - start > timeout:
@@ -37,68 +39,76 @@ class TestAgent(unittest.TestCase):
 
     def test_start(self):
         self.agent.start()
+        self.assertEqual(self.redis_client.publish_build_update.call_count, 0)
 
     def test_cancel_and_join(self):
         self.agent.start()
         self.agent.cancel()
         self.agent.join()
+        self.assertEqual(self.redis_client.publish_build_update.call_count, 0)
 
     def test_start_build(self):
-        with database.session_scope() as session:
+        with session_scope() as session:
             session.add(util.create_build(dict()))
         self.agent.start()
-        self.assertEquals(self.__wait_for_build_status(database.BuildStatus.active, 15), database.BuildStatus.active)
+        self.assertEquals(self.__wait_for_build_status(BuildStatus.active, 15), BuildStatus.active)
+        self.assertEqual(self.redis_client.publish_build_update.call_count, 1)
 
     def test_complete_build(self):
-        with database.session_scope() as session:
+        with session_scope() as session:
             session.add(util.create_build(dict()))
         self.agent.start()
-        self.assertEquals(self.__wait_for_build_status(database.BuildStatus.success, 15), database.BuildStatus.success)
+        self.assertEquals(self.__wait_for_build_status(BuildStatus.success, 15), BuildStatus.success)
+        self.assertEqual(self.redis_client.publish_build_update.call_count, 2)
 
     def test_complete_build_with_dependency(self):
-        with database.session_scope() as session:
+        with session_scope() as session:
             session.add(util.create_build({
                 "repo.dependent": True,
                 "ecosystem.empty_remote": True
             }))
         self.agent.start()
-        self.assertEquals(self.__wait_for_build_status(database.BuildStatus.error, 15), database.BuildStatus.error)
-        with database.session_scope() as session:
-            build = session.query(database.Build).first()
+        self.assertEquals(self.__wait_for_build_status(BuildStatus.error, 15), BuildStatus.error)
+        with session_scope() as session:
+            build = session.query(Build).first()
             self.assertEquals(1, len(build.missing_recipes))
+        self.assertEqual(self.redis_client.publish_build_update.call_count, 2)
 
     def test_complete_build_https(self):
-        with database.session_scope() as session:
+        with session_scope() as session:
             session.add(util.create_build({"repo.https": True}))
         self.agent.start()
-        self.assertEquals(self.__wait_for_build_status(database.BuildStatus.success, 15), database.BuildStatus.success)
+        self.assertEquals(self.__wait_for_build_status(BuildStatus.success, 15), BuildStatus.success)
+        self.assertEqual(self.redis_client.publish_build_update.call_count, 2)
 
     def test_stop_build(self):
-        with database.session_scope() as session:
+        with session_scope() as session:
             build = util.create_build({"repo.deadlock": True})
             session.add(build)
         self.agent.start()
-        self.__wait_for_build_status(database.BuildStatus.active, 15)
-        with database.session_scope() as session:
-            build = session.query(database.Build).first()
-            build.status = database.BuildStatus.stopping
-        self.assertEqual(self.__wait_for_build_status(database.BuildStatus.stopped, 15), database.BuildStatus.stopped)
+        self.__wait_for_build_status(BuildStatus.active, 15)
+        with session_scope() as session:
+            build = session.query(Build).first()
+            build.status = BuildStatus.stopping
+        self.assertEqual(self.__wait_for_build_status(BuildStatus.stopped, 15), BuildStatus.stopped)
+        self.assertEqual(self.redis_client.publish_build_update.call_count, 2)
 
     def test_cancel_build(self):
-        with database.session_scope() as session:
+        with session_scope() as session:
             session.add(util.create_build(dict()))
         self.agent.start()
-        self.__wait_for_build_status(database.BuildStatus.active, 15)
+        self.__wait_for_build_status(BuildStatus.active, 15)
         self.agent.cancel()
         self.agent.join()
-        self.assertEquals(self.__wait_for_build_status(database.BuildStatus.new, 15), database.BuildStatus.new)
+        self.assertEquals(self.__wait_for_build_status(BuildStatus.new, 15), BuildStatus.new)
+        self.assertEqual(self.redis_client.publish_build_update.call_count, 2)
 
 
 class TestCrawler(unittest.TestCase):
     def setUp(self):
         self.scheduler = Mock()
         self.crawler = Crawler(self.scheduler)
-        database.reset_database()
+        reset_database()
 
     def tearDown(self):
         self.crawler.cancel()
@@ -113,40 +123,40 @@ class TestCrawler(unittest.TestCase):
         self.crawler.join()
 
     def test_start_repo_but_no_channel(self):
-        with database.session_scope() as session:
+        with session_scope() as session:
             session.add(util.create_repo(dict()))
         self.crawler.start()
         called = self.crawler.query(lambda: self.scheduler.process_commits.called)
         self.assertFalse(called)
 
     def test_start_repo_and_channel(self):
-        with database.session_scope() as session:
+        with session_scope() as session:
             session.add(util.create_repo(dict()))
             session.add(util.create_channel(dict()))
         self.crawler.start()
         time.sleep(5)
         called = self.crawler.query(lambda: self.scheduler.process_commits.called)
         self.assertTrue(called)
-        with database.session_scope() as session:
-            commit = session.query(database.Commit).first()
-            self.assertEqual(database.CommitStatus.new, commit.status)
+        with session_scope() as session:
+            commit = session.query(Commit).first()
+            self.assertEqual(CommitStatus.new, commit.status)
 
     def test_http_repo(self):
-        with database.session_scope() as session:
+        with session_scope() as session:
             session.add(util.create_repo({"repo.https": True}))
             session.add(util.create_channel(dict()))
         self.crawler.start()
         time.sleep(5)
         called = self.crawler.query(lambda: self.scheduler.process_commits.called)
         self.assertTrue(called)
-        with database.session_scope() as session:
-            commit = session.query(database.Commit).first()
-            self.assertEqual(database.CommitStatus.new, commit.status)
+        with session_scope() as session:
+            commit = session.query(Commit).first()
+            self.assertEqual(CommitStatus.new, commit.status)
 
     def test_post_repo(self):
         self.crawler.start()
         time.sleep(1)
-        with database.session_scope() as session:
+        with session_scope() as session:
             session.add(util.create_repo(dict()))
             session.add(util.create_channel(dict()))
         self.crawler.post_repo("1")
@@ -154,24 +164,24 @@ class TestCrawler(unittest.TestCase):
         time.sleep(5)
         called = self.crawler.query(lambda: self.scheduler.process_commits.called)
         self.assertTrue(called)
-        with database.session_scope() as session:
-            commit = session.query(database.Commit).first()
-            self.assertEqual(database.CommitStatus.new, commit.status)
+        with session_scope() as session:
+            commit = session.query(Commit).first()
+            self.assertEqual(CommitStatus.new, commit.status)
 
     def test_start_repo_and_regex_channel(self):
-        with database.session_scope() as session:
+        with session_scope() as session:
             session.add(util.create_repo(dict()))
             session.add(util.create_channel({"channel.branch": "mai.*"}))
         self.crawler.start()
         time.sleep(5)
         called = self.crawler.query(lambda: self.scheduler.process_commits.called)
         self.assertTrue(called)
-        with database.session_scope() as session:
-            commit = session.query(database.Commit).first()
-            self.assertEqual(database.CommitStatus.new, commit.status)
+        with session_scope() as session:
+            commit = session.query(Commit).first()
+            self.assertEqual(CommitStatus.new, commit.status)
 
     def test_start_repo_and_channel_no_match(self):
-        with database.session_scope() as session:
+        with session_scope() as session:
             session.add(util.create_repo(dict()))
             session.add(util.create_channel({"channel.branch": "maste"}))
         self.crawler.start()
@@ -180,30 +190,30 @@ class TestCrawler(unittest.TestCase):
         self.assertFalse(called)
 
     def test_start_repo_and_old_commits(self):
-        with database.session_scope() as session:
-            session.add(util.create_commit({"commit.status": database.CommitStatus.new}))
+        with session_scope() as session:
+            session.add(util.create_commit({"commit.status": CommitStatus.new}))
         self.crawler.start()
         time.sleep(5)
         called = self.crawler.query(lambda: self.scheduler.process_commits.called)
         self.assertTrue(called)
-        with database.session_scope() as session:
-            old_commit = session.query(database.Commit)\
-                .filter(database.Commit.status == database.CommitStatus.old)\
+        with session_scope() as session:
+            old_commit = session.query(Commit)\
+                .filter(Commit.status == CommitStatus.old)\
                 .first()
             self.assertIsNotNone(old_commit)
-            new_commit = session.query(database.Commit)\
-                .filter(database.Commit.status == database.CommitStatus.new)\
+            new_commit = session.query(Commit)\
+                .filter(Commit.status == CommitStatus.new)\
                 .first()
             self.assertIsNotNone(new_commit)
 
     def test_start_invalid_repo(self):
-        with database.session_scope() as session:
+        with session_scope() as session:
             session.add(util.create_repo({"repo.invalid": True}))
             session.add(util.create_channel(dict()))
         self.crawler.start()
         time.sleep(3)
-        with database.session_scope() as session:
-            commits = session.query(database.Commit).all()
+        with session_scope() as session:
+            commits = session.query(Commit).all()
             self.assertEqual(len(commits), 0)
 
 
@@ -211,8 +221,9 @@ class TestScheduler(unittest.TestCase):
     def setUp(self):
         self.linux_agent = Mock()
         self.windows_agent = Mock()
-        self.scheduler = Scheduler(self.linux_agent, self.windows_agent)
-        database.reset_database()
+        self.redis_client = Mock()
+        self.scheduler = Scheduler(self.linux_agent, self.windows_agent, self.redis_client)
+        reset_database()
 
     def tearDown(self):
         self.scheduler.cancel()
@@ -222,7 +233,7 @@ class TestScheduler(unittest.TestCase):
         self.scheduler.start()
 
     def test_start_commit_and_profile(self):
-        with database.session_scope() as session:
+        with session_scope() as session:
             session.add(util.create_commit(dict()))
             session.add(util.create_profile(dict()))
         self.scheduler.start()
@@ -231,9 +242,10 @@ class TestScheduler(unittest.TestCase):
         self.scheduler.join()
         self.assertTrue(self.linux_agent.process_builds.called)
         self.assertTrue(self.windows_agent.process_builds.called)
+        self.assertTrue(self.redis_client.publish_build_updates.called)
 
     def test_start_exclude_repo(self):
-        with database.session_scope() as session:
+        with session_scope() as session:
             session.add(util.create_commit(dict()))
             session.add(util.create_profile({"profile.os": "Windows"}))
         self.scheduler.start()
@@ -242,9 +254,10 @@ class TestScheduler(unittest.TestCase):
         self.scheduler.join()
         self.assertFalse(self.linux_agent.process_builds.called)
         self.assertFalse(self.windows_agent.process_builds.called)
+        self.assertFalse(self.redis_client.publish_build_updates.called)
 
     def test_start_new_builds(self):
-        with database.session_scope() as session:
+        with session_scope() as session:
             session.add(util.create_build(dict()))
         self.scheduler.start()
         time.sleep(1)
@@ -252,3 +265,4 @@ class TestScheduler(unittest.TestCase):
         self.scheduler.join()
         self.assertTrue(self.linux_agent.process_builds.called)
         self.assertTrue(self.windows_agent.process_builds.called)
+        self.assertFalse(self.redis_client.publish_build_updates.called)

@@ -1,6 +1,10 @@
-from sonja import database, manager
 from sonja.builder import Builder, BuildFailed
 from sonja.config import connect_to_database, logger
+from sonja.database import session_scope
+from sonja.redis import RedisClient
+from sonja.client import Scheduler
+from sonja.manager import Manager
+from sonja.model import BuildStatus, Build, Log, Profile, Platform
 from sonja.worker import Worker
 from sqlalchemy import func, update
 from sqlalchemy.exc import OperationalError
@@ -21,11 +25,13 @@ async def _run_build(builder, parameters):
 
 
 class Agent(Worker):
-    def __init__(self, scheduler):
+    def __init__(self, scheduler: Scheduler, redis_client: RedisClient):
         super().__init__()
         connect_to_database()
         self.__build_id = None
         self.__scheduler = scheduler
+        self.__redis_client = redis_client
+        self.__manager = Manager(redis_client)
 
     async def work(self):
         new_builds = True
@@ -39,16 +45,16 @@ class Agent(Worker):
 
     async def __process_builds(self):
         logger.info("Start processing builds")
-        platform = database.Platform.linux if sonja_os == "Linux" else database.Platform.windows
+        platform = Platform.linux if sonja_os == "Linux" else Platform.windows
         try:
-            with database.session_scope() as session:
+            with session_scope() as session:
                 build = session\
-                    .query(database.Build)\
-                    .join(database.Build.profile)\
-                    .filter(database.Profile.platform == platform,\
-                            database.Build.status == database.BuildStatus.new)\
+                    .query(Build)\
+                    .join(Build.profile)\
+                    .filter(Profile.platform == platform,\
+                            Build.status == BuildStatus.new)\
                     .populate_existing()\
-                    .with_for_update(skip_locked=True, of=database.Build)\
+                    .with_for_update(skip_locked=True, of=Build)\
                     .first()
 
                 if not build:
@@ -57,7 +63,9 @@ class Agent(Worker):
 
                 logger.info("Set status of build '%d' to 'active'", build.id)
                 self.__build_id = build.id
-                build.status = database.BuildStatus.active
+                build.status = BuildStatus.active
+                session.commit()
+                self.__redis_client.publish_build_update(build)
                 build.log.logs = ''
 
                 container = build.profile.container
@@ -116,17 +124,17 @@ class Agent(Worker):
                         return True
 
                 logger.info("Process build output")
-                result = manager.process_success(self.__build_id, builder.build_output)
+                result = self.__manager.process_success(self.__build_id, builder.build_output)
                 if result.get("new_builds", False):
                     self.__trigger_scheduler()
 
-                self.__set_build_status(database.BuildStatus.success)
+                self.__set_build_status(BuildStatus.success)
 
                 self.__build_id = None
         except BuildFailed as e:
             logger.info("Build '%d' failed with status code %d", self.__build_id, e.status_code)
-            manager.process_failure(self.__build_id, builder.build_output)
-            self.__set_build_status(database.BuildStatus.error)
+            self.__manager.process_failure(self.__build_id, builder.build_output)
+            self.__set_build_status(BuildStatus.error)
             self.__build_id = None
         except Exception as e:
             logger.error("Unexpected error while building: ", e)
@@ -138,7 +146,7 @@ class Agent(Worker):
         if not self.__build_id:
             return
 
-        self.__set_build_status(database.BuildStatus.new)
+        self.__set_build_status(BuildStatus.new)
 
     def __set_build_status(self, status):
         logger.info("Set status of build '%d' to '%s'", self.__build_id, status)
@@ -146,13 +154,15 @@ class Agent(Worker):
         if not self.__build_id:
             return
         try:
-            with database.session_scope() as session:
-                build = session.query(database.Build) \
+            with session_scope() as session:
+                build = session.query(Build) \
                     .filter_by(id=self.__build_id) \
                     .first()
                 if build:
                     build.status = status
                     self.__build_id = None
+                    session.commit()
+                    self.__redis_client.publish_build_update(build)
                 else:
                     logger.error("Failed to find build '%d' in database", self.__build_id)
         except OperationalError as e:
@@ -160,8 +170,8 @@ class Agent(Worker):
 
     def __update_logs(self, builder):
         try:
-            with database.session_scope() as session:
-                build = session.query(database.Build) \
+            with session_scope() as session:
+                build = session.query(Build) \
                     .filter_by(id=self.__build_id) \
                     .first()
 
@@ -170,18 +180,18 @@ class Agent(Worker):
 
                 log_lines = [line for line in builder.get_log_lines()]
                 log_tail = '\n' + '\n'.join(log_lines)
-                statement = update(database.Log) \
-                    .where(database.Log.id == build.log_id) \
-                    .values(logs=func.concat(database.Log.logs, log_tail.encode("cp1252", errors="replace")))
+                statement = update(Log) \
+                    .where(Log.id == build.log_id) \
+                    .values(logs=func.concat(Log.logs, log_tail.encode("cp1252", errors="replace")))
                 session.execute(statement)
         except OperationalError as e:
             logger.error("Failed to update logs: %s", e)
 
     def __cancel_stopping_build(self, builder) -> bool:
         try:
-            with database.session_scope() as session:
-                build = session.query(database.Build) \
-                    .filter_by(id=self.__build_id, status=database.BuildStatus.stopping) \
+            with session_scope() as session:
+                build = session.query(Build) \
+                    .filter_by(id=self.__build_id, status=BuildStatus.stopping) \
                     .first()
                 if not build:
                     return False
@@ -189,7 +199,9 @@ class Agent(Worker):
                 logger.info("Cancel build '%d'", self.__build_id)
                 builder.cancel()
                 logger.info("Set status of build '%d' to 'stopped'", self.__build_id)
-                build.status = database.BuildStatus.stopped
+                build.status = BuildStatus.stopped
+                session.commit()
+                self.__redis_client.publish_build_update(build)
                 self.__build_id = None
                 return True
         except OperationalError as e:
