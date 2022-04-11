@@ -1,4 +1,7 @@
-from sonja.database import Ecosystem, Repo, Label, logger, session_scope, Option, Profile, Platform, Channel, Session
+from sonja.model import Ecosystem, Repo, Label, Option, Profile, Platform, Channel,\
+    Commit, Build, CommitStatus, BuildStatus, Log
+from sonja.database import logger, Session, session_scope
+from sonja.redis import RedisClient
 from sonja.ssh import encode, generate_rsa_key
 from typing import Dict
 
@@ -88,7 +91,47 @@ def populate_database():
         channel.conan_channel = "stable"
         session.add(channel)
 
+        commit = Commit()
+        commit.status = CommitStatus.new
+        commit.sha = "6a8a5d108f13ccbc3435133cc28d035795f14698"
+        commit.channel = channel
+        commit.repo = base
+        commit.message = "Some commit"
+        commit.user_name = ""
+        commit.user_email = ""
+
+        log = Log()
+        log.logs = ""
+
+        build = Build()
+        build.commit = commit
+        build.profile = linux_release
+        build.status = BuildStatus.new
+        build.log = log
+        session.add(build)
+
         session.commit()
+
+
+def add_build():
+    logger.info("Add build")
+    with session_scope() as session:
+        commit = session.query(Commit).first()
+        profile = session.query(Profile).first()
+
+        log = Log()
+        log.logs = ""
+
+        build = Build()
+        build.commit = commit
+        build.profile = profile
+        build.status = BuildStatus.new
+        build.log = log
+        session.add(build)
+        session.commit()
+
+        RedisClient().publish_build_update(build)
+
 
 
 class DemoDataCreator(object):
@@ -134,7 +177,7 @@ class DemoDataCreator(object):
         channel.conan_channel = ""
         self.__session.add(channel)
 
-        self.__create_repo("glib",
+        repo = self.__create_repo("glib",
                            "https://github.com/conan-io/conan-center-index.git",
                            "recipes/glib/all",
                            "2.70.4",
@@ -208,6 +251,7 @@ class DemoDataCreator(object):
         repo.version = version
         repo.options = [Option(key=key, value=options[key]) for key in options]
         self.__session.add(repo)
+        return repo
 
 
 def add_demo_data_to_ecosystem(ecosystem_id: int):

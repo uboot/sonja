@@ -78,3 +78,21 @@ class BuildReadList(BaseModel):
 
     class Config:
         pass
+
+
+@data
+class BuildUpdateData(BaseModel):
+    id: Optional[str]
+    type: str = "builds"
+    attributes: Build = Field(default_factory=Build)
+
+    class Config:
+        pass
+
+
+@item
+class BuildUpdateItem(BaseModel):
+    data: BuildUpdateData = Field(default_factory=BuildUpdateData)
+
+    class Config:
+        pass

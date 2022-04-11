@@ -1,5 +1,6 @@
 from public.schemas.build import BuildWriteItem, StatusEnum
-from sonja.database import Commit, Profile, Build, Session, CommitStatus
+from aioredis import Redis
+from sonja.database import Profile, Build, Session
 from typing import List
 
 
@@ -13,7 +14,7 @@ def read_build(session: Session, build_id: str) -> Build:
     return session.query(Build).filter(Build.id == build_id).first()
 
 
-def update_build(session: Session, build: Build, build_item: BuildWriteItem) -> Build:
+async def update_build(session: Session, redis: Redis, build: Build, build_item: BuildWriteItem) -> Build:
     data = build_item.data.attributes.dict(exclude_unset=True, by_alias=True)
     for attribute in data:
         setattr(build, attribute, data[attribute])
@@ -24,4 +25,6 @@ def update_build(session: Session, build: Build, build_item: BuildWriteItem) -> 
         build.missing_packages = []
 
     session.commit()
+    await redis.publish_json(f"ecosystem:{build.ecosystem.id}:build", {"id": build.id})
+
     return build

@@ -1,4 +1,5 @@
 from fastapi.testclient import TestClient
+from fastapi_plugins import redis_plugin
 from starlette.datastructures import FormData
 
 from public.main import app
@@ -6,6 +7,7 @@ from public.config import api_prefix
 from sonja.database import reset_database, get_session, session_scope
 from sonja.test import util
 
+import asyncio
 import unittest
 
 
@@ -31,6 +33,10 @@ def _header_for_user(user_params: dict()):
 class ApiTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        if not redis_plugin.redis:
+            asyncio.run(redis_plugin.init_app(app))
+            asyncio.run(redis_plugin.init())
+
         reset_database()
 
         cls.admin_headers = _header_for_user({

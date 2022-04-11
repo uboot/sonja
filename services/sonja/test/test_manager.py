@@ -1,4 +1,7 @@
-from sonja import database, manager
+from sonja.manager import Manager
+from sonja.database import session_scope, reset_database
+from sonja.model import BuildStatus, Build, Recipe, RecipeRevision, Package
+from unittest.mock import Mock
 
 import sonja.test.util as util
 import os
@@ -20,7 +23,7 @@ def _setup_build_output(create_file="create.json"):
 
 def _create_waiting_build(session, ecosystem, missing_packages=[], missing_recipes=[]):
     build = util.create_build({"ecosystem": ecosystem})
-    build.status = database.BuildStatus.error
+    build.status = BuildStatus.error
     build.missing_packages = missing_packages
     build.missing_recipes = missing_recipes
     session.add(build)
@@ -37,23 +40,25 @@ def _create_build(session, ecosystem):
 
 class TestManager(unittest.TestCase):
     def setUp(self):
-        database.reset_database()
+        reset_database()
+        self.redis_client = Mock()
+        self.manager = Manager(self.redis_client)
 
     def test_process_success(self):
         build_output = _setup_build_output()
 
-        with database.session_scope() as session:
+        with session_scope() as session:
             build = util.create_build(dict())
             session.add(build)
             session.commit()
             build_id = build.id
 
-        result = manager.process_success(build_id, build_output)
+        result = self.manager.process_success(build_id, build_output)
 
         self.assertFalse("new_builds" in result.keys())
 
-        with database.session_scope() as session:
-            build = session.query(database.Build).filter_by(id=build_id).first()
+        with session_scope() as session:
+            build = session.query(Build).filter_by(id=build_id).first()
             self.assertIsNotNone(build.package)
             self.assertEqual("227220812d7ea3aa060187bae41abbc9911dfdfd", build.package.package_id)
             self.assertEqual("app", build.package.recipe_revision.recipe.name)
@@ -62,7 +67,7 @@ class TestManager(unittest.TestCase):
     def test_process_success_existing_recipe(self):
         build_output = _setup_build_output()
 
-        with database.session_scope() as session:
+        with session_scope() as session:
             parameters = dict()
             recipe = util.create_recipe(parameters)
             session.add(recipe)
@@ -71,12 +76,12 @@ class TestManager(unittest.TestCase):
             session.commit()
             build_id = build.id
 
-        manager.process_success(build_id, build_output)
+        self.manager.process_success(build_id, build_output)
 
-        with database.session_scope() as session:
-            build = session.query(database.Build).filter_by(id=build_id).first()
-            recipes = session.query(database.Recipe).all()
-            recipe_revisions = session.query(database.RecipeRevision).all()
+        with session_scope() as session:
+            build = session.query(Build).filter_by(id=build_id).first()
+            recipes = session.query(Recipe).all()
+            recipe_revisions = session.query(RecipeRevision).all()
             self.assertEqual(1, len(recipes))
             self.assertEqual(1, len(recipe_revisions))
             self.assertEqual(1, build.package.recipe_revision.id)
@@ -84,7 +89,7 @@ class TestManager(unittest.TestCase):
     def test_process_success_existing_recipe_revision(self):
         build_output = _setup_build_output()
 
-        with database.session_scope() as session:
+        with session_scope() as session:
             parameters = dict()
             recipe = util.create_recipe_revision(parameters)
             session.add(recipe)
@@ -93,12 +98,12 @@ class TestManager(unittest.TestCase):
             session.commit()
             build_id = build.id
 
-        manager.process_success(build_id, build_output)
+        self.manager.process_success(build_id, build_output)
 
-        with database.session_scope() as session:
-            build = session.query(database.Build).filter_by(id=build_id).first()
-            recipes = session.query(database.Recipe).all()
-            recipe_revisions = session.query(database.RecipeRevision).all()
+        with session_scope() as session:
+            build = session.query(Build).filter_by(id=build_id).first()
+            recipes = session.query(Recipe).all()
+            recipe_revisions = session.query(RecipeRevision).all()
             self.assertEqual(1, len(recipes))
             self.assertEqual(1, len(recipe_revisions))
             self.assertEqual(1, build.package.recipe_revision.id)
@@ -106,7 +111,7 @@ class TestManager(unittest.TestCase):
     def test_process_success_existing_package(self):
         build_output = _setup_build_output()
 
-        with database.session_scope() as session:
+        with session_scope() as session:
             parameters = dict()
             package = util.create_package(parameters)
             session.add(package)
@@ -115,27 +120,27 @@ class TestManager(unittest.TestCase):
             session.commit()
             build_id = build.id
 
-        manager.process_success(build_id, build_output)
+        self.manager.process_success(build_id, build_output)
 
-        with database.session_scope() as session:
-            build = session.query(database.Build).filter_by(id=build_id).first()
-            packages = session.query(database.Package).all()
+        with session_scope() as session:
+            build = session.query(Build).filter_by(id=build_id).first()
+            packages = session.query(Package).all()
             self.assertEqual(1, len(packages))
             self.assertEqual(1, build.package.id)
 
     def test_process_failure_missing_package(self):
         build_output = _setup_build_output("create_missing_package.json")
 
-        with database.session_scope() as session:
+        with session_scope() as session:
             build = util.create_build(dict())
             session.add(build)
             session.commit()
             build_id = build.id
 
-        manager.process_failure(build_id, build_output)
+        self.manager.process_failure(build_id, build_output)
 
-        with database.session_scope() as session:
-            build = session.query(database.Build).filter_by(id=build_id).first()
+        with session_scope() as session:
+            build = session.query(Build).filter_by(id=build_id).first()
             self.assertEqual(1, len(build.missing_packages))
             package = build.missing_packages[0]
             self.assertEqual("d057732059ea44a47760900cb5e4855d2bea8714", package.package_id)
@@ -154,16 +159,16 @@ class TestManager(unittest.TestCase):
     def test_process_failure_missing_package_no_revision(self):
         build_output = _setup_build_output("create_missing_package_no_revision.json")
 
-        with database.session_scope() as session:
+        with session_scope() as session:
             build = util.create_build(dict())
             session.add(build)
             session.commit()
             build_id = build.id
 
-        manager.process_failure(build_id, build_output)
+        self.manager.process_failure(build_id, build_output)
 
-        with database.session_scope() as session:
-            build = session.query(database.Build).filter_by(id=build_id).first()
+        with session_scope() as session:
+            build = session.query(Build).filter_by(id=build_id).first()
             self.assertEqual(1, len(build.missing_packages))
             recipe_revision = build.missing_packages[0].recipe_revision
             self.assertIsNotNone(recipe_revision)
@@ -173,33 +178,33 @@ class TestManager(unittest.TestCase):
         build_output_missing_package = _setup_build_output("create_missing_package.json")
         build_output_missing_recipe = _setup_build_output("create_missing_recipe.json")
 
-        with database.session_scope() as session:
+        with session_scope() as session:
             build = util.create_build(dict())
             session.add(build)
             session.commit()
             build_id = build.id
 
-        manager.process_failure(build_id, build_output_missing_package)
-        manager.process_failure(build_id, build_output_missing_recipe)
+        self.manager.process_failure(build_id, build_output_missing_package)
+        self.manager.process_failure(build_id, build_output_missing_recipe)
 
-        with database.session_scope() as session:
-            build = session.query(database.Build).filter_by(id=build_id).first()
+        with session_scope() as session:
+            build = session.query(Build).filter_by(id=build_id).first()
             self.assertEqual(0, len(build.missing_packages))
             self.assertEqual(1, len(build.missing_recipes))
 
     def test_process_failure_missing_recipe(self):
         build_output = _setup_build_output("create_missing_recipe.json")
 
-        with database.session_scope() as session:
+        with session_scope() as session:
             build = util.create_build(dict())
             session.add(build)
             session.commit()
             build_id = build.id
 
-        manager.process_failure(build_id, build_output)
+        self.manager.process_failure(build_id, build_output)
 
-        with database.session_scope() as session:
-            build = session.query(database.Build).filter_by(id=build_id).first()
+        with session_scope() as session:
+            build = session.query(Build).filter_by(id=build_id).first()
             self.assertEqual(1, len(build.missing_recipes))
             recipe = build.missing_recipes[0]
             self.assertEqual("base", recipe.name)
@@ -210,7 +215,7 @@ class TestManager(unittest.TestCase):
     def test_process_success_remove_missing_items(self):
         build_output = _setup_build_output("create.json")
 
-        with database.session_scope() as session:
+        with session_scope() as session:
             build = util.create_build(dict())
             build.missing_recipes = [util.create_recipe(dict())]
             build.missing_packages = [util.create_package(dict())]
@@ -218,49 +223,51 @@ class TestManager(unittest.TestCase):
             session.commit()
             build_id = build.id
 
-        manager.process_success(build_id, build_output)
+        self.manager.process_success(build_id, build_output)
 
-        with database.session_scope() as session:
-            build = session.query(database.Build).filter_by(id=build_id).first()
+        with session_scope() as session:
+            build = session.query(Build).filter_by(id=build_id).first()
             self.assertEqual(0, len(build.missing_recipes))
             self.assertEqual(0, len(build.missing_packages))
 
     def test_process_success_waiting_for_recipe(self):
         build_output = _setup_build_output("create.json")
 
-        with database.session_scope() as session:
+        with session_scope() as session:
             ecosystem = util.create_ecosystem(dict())
             waiting_build_id = _create_waiting_build(session, ecosystem,
                                                      missing_recipes=[util.create_recipe({"ecosystem": ecosystem})])
             build_id = _create_build(session, ecosystem)
 
-        result = manager.process_success(build_id, build_output)
+        result = self.manager.process_success(build_id, build_output)
 
         self.assertTrue(result["new_builds"])
 
-        with database.session_scope() as session:
-            waiting_build = session.query(database.Build).filter_by(id=waiting_build_id).first()
-            self.assertEqual(database.BuildStatus.new, waiting_build.status)
+        with session_scope() as session:
+            waiting_build = session.query(Build).filter_by(id=waiting_build_id).first()
+            self.assertEqual(BuildStatus.new, waiting_build.status)
 
     def test_process_success_waiting_for_package(self):
         build_output = _setup_build_output("create.json")
-        with database.session_scope() as session:
+        with session_scope() as session:
             ecosystem = util.create_ecosystem(dict())
             waiting_build_id = _create_waiting_build(session, ecosystem,
                                                      missing_packages=[util.create_package({"ecosystem": ecosystem})])
             build_id = _create_build(session, ecosystem)
 
-        result = manager.process_success(build_id, build_output)
+        result = self.manager.process_success(build_id, build_output)
 
         self.assertTrue(result["new_builds"])
 
-        with database.session_scope() as session:
-            waiting_build = session.query(database.Build).filter_by(id=waiting_build_id).first()
-            self.assertEqual(database.BuildStatus.new, waiting_build.status)
+        with session_scope() as session:
+            waiting_build = session.query(Build).filter_by(id=waiting_build_id).first()
+            self.assertEqual(BuildStatus.new, waiting_build.status)
+
+        self.assertTrue(self.redis_client.publish_build_updates.called)
 
     def test_process_success_waiting_for_package_no_revision(self):
         build_output = _setup_build_output("create.json")
-        with database.session_scope() as session:
+        with session_scope() as session:
             ecosystem = util.create_ecosystem(dict())
             waiting_build_id = _create_waiting_build(session, ecosystem, missing_packages=[util.create_package(
                 {
@@ -270,17 +277,19 @@ class TestManager(unittest.TestCase):
             ])
             build_id = _create_build(session, ecosystem)
 
-        result = manager.process_success(build_id, build_output)
+        result = self.manager.process_success(build_id, build_output)
 
         self.assertTrue(result["new_builds"])
 
-        with database.session_scope() as session:
-            waiting_build = session.query(database.Build).filter_by(id=waiting_build_id).first()
-            self.assertEqual(database.BuildStatus.new, waiting_build.status)
+        with session_scope() as session:
+            waiting_build = session.query(Build).filter_by(id=waiting_build_id).first()
+            self.assertEqual(BuildStatus.new, waiting_build.status)
+
+        self.assertTrue(self.redis_client.publish_build_updates.called)
 
     def test_process_success_waiting_for_package_different_revision(self):
         build_output = _setup_build_output("create.json")
-        with database.session_scope() as session:
+        with session_scope() as session:
             ecosystem = util.create_ecosystem(dict())
             waiting_build_id = _create_waiting_build(session, ecosystem, missing_packages=[util.create_package(
                 {
@@ -290,17 +299,19 @@ class TestManager(unittest.TestCase):
             ])
             build_id = _create_build(session, ecosystem)
 
-        result = manager.process_success(build_id, build_output)
+        result = self.manager.process_success(build_id, build_output)
 
         self.assertTrue(result["new_builds"])
 
-        with database.session_scope() as session:
-            waiting_build = session.query(database.Build).filter_by(id=waiting_build_id).first()
-            self.assertEqual(database.BuildStatus.new, waiting_build.status)
+        with session_scope() as session:
+            waiting_build = session.query(Build).filter_by(id=waiting_build_id).first()
+            self.assertEqual(BuildStatus.new, waiting_build.status)
+
+        self.assertTrue(self.redis_client.publish_build_updates.called)
 
     def test_process_success_waiting_for_package_different_package_id(self):
         build_output = _setup_build_output("create.json")
-        with database.session_scope() as session:
+        with session_scope() as session:
             ecosystem = util.create_ecosystem(dict())
             waiting_build_id = _create_waiting_build(session, ecosystem, missing_packages=[util.create_package(
                 {
@@ -310,10 +321,10 @@ class TestManager(unittest.TestCase):
             ])
             build_id = _create_build(session, ecosystem)
 
-        result = manager.process_success(build_id, build_output)
+        result = self.manager.process_success(build_id, build_output)
 
         self.assertFalse("new_builds" in result.keys())
 
-        with database.session_scope() as session:
-            waiting_build = session.query(database.Build).filter_by(id=waiting_build_id).first()
-            self.assertEqual(database.BuildStatus.error, waiting_build.status)
+        with session_scope() as session:
+            waiting_build = session.query(Build).filter_by(id=waiting_build_id).first()
+            self.assertEqual(BuildStatus.error, waiting_build.status)
