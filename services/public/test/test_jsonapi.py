@@ -77,7 +77,7 @@ class TestJsonapi(unittest.TestCase):
 
     def test_data(self):
         self.assertDictEqual({'attributes': {'user_id': '', 'name': None}, 'id': None, 'type': 'users',
-                              'relationships': {'company': {'data': {'id': '', 'type': 'companies'}},
+                              'relationships': {'company': {'data': None},
                                                 'hobbies': {'data': []},
                                                 'friends': {'links': {'related': 'friends'}}}},
                              UserData().dict())
@@ -89,7 +89,7 @@ class TestJsonapi(unittest.TestCase):
 
     def test_item(self):
         self.assertDictEqual({'data': {'id': None, 'type': 'users', 'attributes': {'user_id': '', 'name': None},
-                                       'relationships': {'company': {'data': {'id': '', 'type': 'companies'}},
+                                       'relationships': {'company': {'data': None},
                                                          'hobbies': {'data': []},
                                                          'friends': {'links': {'related': 'friends'}}}}},
                              UserItem().dict())
@@ -114,6 +114,17 @@ class TestJsonapi(unittest.TestCase):
         user_item = UserItem.from_db(user_model)
         self.assertDictEqual({'data': {'attributes': {'name': 'Joe', 'user_id': 'user'}, 'id': '2', 'type': 'users',
                                        'relationships': {'company': {'data': {'id': '1', 'type': 'companies'}},
+                                                         'friends': {'links': {'related': 'friends'}},
+                                                         'hobbies': {'data': [{'id': '3', 'type': 'hobbies'},
+                                                                              {'id': '4', 'type': 'hobbies'}]}
+                                                         }}}, user_item.dict())
+
+    def test_item_empty_relationship(self):
+        user_model = UserModel(id_ = 2, user_id = "user", name = "Joe", company = None,
+                               hobbies = [HobbyModel(3), HobbyModel(4)])
+        user_item = UserItem.from_db(user_model)
+        self.assertDictEqual({'data': {'attributes': {'name': 'Joe', 'user_id': 'user'}, 'id': '2', 'type': 'users',
+                                       'relationships': {'company': {'data': None},
                                                          'friends': {'links': {'related': 'friends'}},
                                                          'hobbies': {'data': [{'id': '3', 'type': 'hobbies'},
                                                                               {'id': '4', 'type': 'hobbies'}]}
