@@ -41,5 +41,4 @@ def patch_build_item(build_id: str, build_item: BuildWriteItem, session: Session
         if not windows_agent.process_builds():
             logger.error("Failed to trigger Windows agent")
 
-    t = BuildReadItem.from_db(patched_build)
-    return t
+    return BuildReadItem.from_db(patched_build)

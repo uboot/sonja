@@ -1,5 +1,5 @@
 from pydantic import create_model
-from typing import List, Type, Union
+from typing import List, Type, Union, Optional
 
 
 def attributes(cls: Type):
@@ -123,14 +123,14 @@ class DataItem:
             }
         })
         data_item = create_model(f"{parent_name}{self.name.capitalize()}Item", type=(str, self.type_), id=(str, ""))
-        model = create_model(f"{parent_name}{self.name.capitalize()}Data", data=(data_item, data_item()),
+        model = create_model(f"{parent_name}{self.name.capitalize()}Data", data=(Optional[data_item], None),
                              __config__=config_class)
 
         @staticmethod
         def from_db(obj: object):
             related = getattr(obj, self.name)
             if not related:
-                return {"data": {"id": "", "type": self.type_}}
+                return {"data": None}
             return {"data": {"id": related.id, "type": self.type_}}
 
         setattr(model, "from_db", from_db)
