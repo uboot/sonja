@@ -1,5 +1,4 @@
-from sonja.database import Base, engine, create_initial_user, create_initial_ecosystem, logger, session_scope
-from sonja.demo import add_demo_data_to_ecosystem
+from sonja.database import Base, engine, logger, session_scope
 import logging
 import logging.config
 import os
@@ -12,9 +11,6 @@ from alembic.config import Config
 from alembic.runtime import migration
 
 
-initial_user = os.environ.get('SONJA_INITIAL_USER', 'user')
-initial_password = os.environ.get('SONJA_INITIAL_PASSWORD', 'password')
-initial_ecosystem = os.environ.get('SONJA_INITIAL_ECOSYSTEM', 'MyEcosystem')
 log_config = os.path.join(os.path.dirname(__file__), "logging.yaml")
 
 
@@ -59,14 +55,3 @@ def connect_to_database():
     logger.error("Exit with 1")
     #os.kill(os.getpid(), signal.SIGKILL)
     exit(1)
-
-
-def setup_initial_data():
-    logger.info("Setup initial data")
-
-    create_initial_user(initial_user, initial_password)
-
-    if initial_ecosystem:
-        ecosytem_id = create_initial_ecosystem(initial_ecosystem)
-        if ecosytem_id:
-            add_demo_data_to_ecosystem(ecosytem_id)
