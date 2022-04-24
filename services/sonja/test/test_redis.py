@@ -1,5 +1,5 @@
 from sonja.redis import RedisClient
-from sonja.model import Build
+from sonja.model import Build, Ecosystem, Profile
 import unittest
 
 # Requires:
@@ -13,11 +13,17 @@ class TestRedis(unittest.TestCase):
         self.redis_client = RedisClient()
 
     def test_publish_build_update(self):
+        ecosystem = Ecosystem()
+        profile = Profile()
+        profile.ecosystem = ecosystem
         build = Build()
+        build.profile = profile
         self.redis_client.publish_build_update(build)
 
     def test_publish_build_updates(self):
+        ecosystem = Ecosystem()
+        profile = Profile()
+        profile.ecosystem = ecosystem
         build = Build()
+        build.profile = profile
         self.redis_client.publish_build_updates([build])
-
-
