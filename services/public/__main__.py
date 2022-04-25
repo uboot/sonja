@@ -14,8 +14,6 @@ initial_ecosystem = os.environ.get('SONJA_INITIAL_ECOSYSTEM', 'MyEcosystem')
 
 
 def setup_initial_data():
-    logger.info("Setup initial data")
-
     create_initial_user(initial_user, initial_password)
 
     if initial_ecosystem:

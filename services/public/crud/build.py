@@ -1,13 +1,16 @@
 from public.schemas.build import BuildWriteItem, StatusEnum
 from aioredis import Redis
 from sonja.database import Profile, Build, Session
+from sqlalchemy import desc
 from typing import List
 
 
 def read_builds(session: Session, ecosystem_id: str) -> List[Build]:
     return session.query(Build).\
         join(Build.profile).\
-        filter(Profile.ecosystem_id == ecosystem_id).all()
+        filter(Profile.ecosystem_id == ecosystem_id).\
+        order_by(desc(Build.created))\
+        .all()
 
 
 def read_build(session: Session, build_id: str) -> Build:

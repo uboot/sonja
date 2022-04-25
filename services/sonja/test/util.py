@@ -1,12 +1,11 @@
-from sonja.auth import hash_password
+from datetime import datetime
 from typing import Callable
-
-import os
-
+from sonja.auth import hash_password
 from sonja.database import session_scope
 from sonja.model import Permission, Ecosystem, PermissionLabel, Base, User, GitCredential, Repo, Option, Label, Commit, \
     CommitStatus, Channel, Profile, Platform, Log, Build, BuildStatus, Recipe, RecipeRevision, Package
 
+import os
 
 def run_create_operation(op: Callable[[dict], Base], parameter: dict, ecosystem_id: int = 0) -> int:
     with session_scope() as session:
@@ -149,6 +148,7 @@ def create_log(parameters):
 def create_build(parameters):
     build = Build()
     parameters["commit.status"] = CommitStatus.building
+    build.created = datetime(year=2000, month=1, day=2, hour=13, minute=30)
     build.commit = create_commit(parameters)
     build.profile = create_profile(parameters)
     build.status = BuildStatus.new
