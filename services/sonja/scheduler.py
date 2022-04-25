@@ -1,3 +1,4 @@
+from datetime import datetime
 from sonja.config import connect_to_database, logger
 from sonja.client import WindowsAgent, LinuxAgent
 from sonja.redis import RedisClient
@@ -53,6 +54,7 @@ class Scheduler(Worker):
                     build.profile = profile
                     build.commit = commit
                     build.status = BuildStatus.new
+                    build.created = datetime.utcnow()
                     build.log = Log()
                     build.log.logs = ''
                     session.add(build)

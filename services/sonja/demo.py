@@ -1,3 +1,4 @@
+from datetime import datetime
 from sonja.model import Ecosystem, Repo, Label, Option, Profile, Platform, Channel,\
     Commit, Build, CommitStatus, BuildStatus, Log
 from sonja.database import logger, Session, session_scope
@@ -107,6 +108,7 @@ def populate_database():
         build.commit = commit
         build.profile = linux_release
         build.status = BuildStatus.new
+        build.created = datetime(year=2000, month=1, day=2, hour=13, minute=30)
         build.log = log
         session.add(build)
 
@@ -126,12 +128,12 @@ def add_build():
         build.commit = commit
         build.profile = profile
         build.status = BuildStatus.new
+        build.created = datetime.utcnow()
         build.log = log
         session.add(build)
         session.commit()
 
         RedisClient().publish_build_update(build)
-
 
 
 class DemoDataCreator(object):

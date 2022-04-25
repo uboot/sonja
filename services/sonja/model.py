@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Enum,  ForeignKey, Integer, String, Table, Text
+from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer, String, Table, Text
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -235,6 +235,7 @@ class Build(Base):
     __tablename__ = 'build'
 
     id = Column(Integer, primary_key=True)
+    created = Column(DateTime, nullable=False)
     status = Column(Enum(BuildStatus), nullable=False)
     commit_id = Column(Integer, ForeignKey('commit.id'),
                           nullable=False)

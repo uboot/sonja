@@ -1,3 +1,4 @@
+from datetime import datetime
 from enum import Enum
 from public.jsonapi import attributes, data, item, item_list, create_relationships, DataItem, DataList
 from pydantic import BaseModel, Field
@@ -14,13 +15,26 @@ class StatusEnum(str, Enum):
 
 
 @attributes
-class Build(BaseModel):
+class BuildWrite(BaseModel):
     status: StatusEnum = Field(alias="status_value")
 
     class Config:
         schema_extra = {
             "example": {
                 "status": "new"
+            }
+        }
+
+
+@attributes
+class BuildRead(BuildWrite):
+    created: datetime
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "status": "new",
+                "created": "2000-01-02T13:30:00"
             }
         }
 
@@ -39,7 +53,7 @@ build_relationships = create_relationships("BuildRelationships", [
 @data
 class BuildWriteData(BaseModel):
     type: str = "builds"
-    attributes: Build = Field(default_factory=Build)
+    attributes: BuildWrite = Field(default_factory=BuildWrite)
 
     class Config:
         pass
@@ -57,7 +71,7 @@ class BuildWriteItem(BaseModel):
 class BuildReadData(BaseModel):
     id: Optional[str]
     type: str = "builds"
-    attributes: Build = Field(default_factory=Build)
+    attributes: BuildRead = Field(default_factory=BuildRead)
     relationships: build_relationships = Field(default_factory=build_relationships)
 
     class Config:
