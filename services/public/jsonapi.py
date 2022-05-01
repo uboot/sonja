@@ -1,4 +1,4 @@
-from pydantic import create_model
+from pydantic import create_model, BaseModel
 from typing import List, Type, Union, Optional
 
 
@@ -59,13 +59,29 @@ def item(cls: Type):
     return cls
 
 
+class PagedItemListMeta(BaseModel):
+    total_pages: int
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "total_pages": 3
+            }
+        }
+
+
 def item_list(cls: Type):
     @staticmethod
-    def from_db(objs: list):
+    def from_db(objs: list, total_pages: int = None):
 
         values = {
             "data": [_create_data_obj(cls, obj) for obj in objs]
         }
+
+        if total_pages:
+            values["meta"] = {
+                "total_pages": total_pages
+            }
 
         return cls(**values)
 
@@ -73,6 +89,8 @@ def item_list(cls: Type):
 
     example = dict()
     example["data"] = [cls.__fields__['data'].type_.Config.schema_extra["example"]]
+    if "meta" in cls.__fields__:
+        example["meta"] = cls.__fields__['meta'].type_.Config.schema_extra["example"]
     setattr(cls.Config, "schema_extra", dict())
     cls.Config.schema_extra["example"] = example
 

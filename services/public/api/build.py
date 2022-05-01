@@ -1,3 +1,5 @@
+from typing import Optional
+
 from aioredis import Channel, Redis
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi_plugins import depends_redis
@@ -14,9 +16,10 @@ linux_agent = LinuxAgent()
 windows_agent = WindowsAgent()
 
 
-@router.get("/ecosystem/{ecosystem_id}/build", response_model=BuildReadList, response_model_by_alias=False)
-def get_build_list(ecosystem_id: str, session: Session = Depends(get_session), authorized: bool = Depends(get_read)):
-    return BuildReadList.from_db(read_builds(session, ecosystem_id))
+@router.get("/build", response_model=BuildReadList, response_model_by_alias=False)
+def get_build_list(ecosystem_id: str, page: Optional[int] = None, per_page:  Optional[int] = None,
+                   session: Session = Depends(get_session), authorized: bool = Depends(get_read)):
+    return BuildReadList.from_db(**read_builds(session, ecosystem_id, page, per_page))
 
 
 @router.get("/build/{build_id}", response_model=BuildReadItem, response_model_by_alias=False)

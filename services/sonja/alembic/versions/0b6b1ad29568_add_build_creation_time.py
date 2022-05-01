@@ -19,7 +19,7 @@ depends_on = None
 def upgrade():
     op.add_column(
         'build',
-        sa.Column('created', sa.DateTime)
+        sa.Column('created', sa.DateTime, index=True)
     )
 
 

@@ -1,3 +1,5 @@
+from typing import List
+
 from sonja.builder import Builder, BuildFailed
 from sonja.config import connect_to_database, logger
 from sonja.database import session_scope
@@ -111,7 +113,8 @@ class Agent(Worker):
                 while True:
                     # wait 10 seconds
                     done, _ = await asyncio.wait({builder_task}, timeout=10)
-                    self.__update_logs(builder)
+                    log_lines = [line for line in builder.get_log_lines()]
+                    self.__append_to_logs(log_lines)
 
                     # if finished exit
                     if done:
@@ -132,7 +135,9 @@ class Agent(Worker):
 
                 self.__build_id = None
         except BuildFailed as e:
-            logger.info("Build '%d' failed with status code %d", self.__build_id, e.status_code)
+            logger.info("Build '%d' failed", self.__build_id)
+            logger.info("%s", e)
+            self.__append_to_logs([str(e)])
             self.__manager.process_failure(self.__build_id, builder.build_output)
             self.__set_build_status(BuildStatus.error)
             self.__build_id = None
@@ -168,7 +173,7 @@ class Agent(Worker):
         except OperationalError as e:
             logger.error("Failed to set build status: %s", e)
 
-    def __update_logs(self, builder):
+    def __append_to_logs(self, log_lines: List[str]):
         try:
             with session_scope() as session:
                 build = session.query(Build) \
@@ -178,7 +183,6 @@ class Agent(Worker):
                 if not build:
                     return
 
-                log_lines = [line for line in builder.get_log_lines()]
                 log_tail = '\n' + '\n'.join(log_lines)
                 statement = update(Log) \
                     .where(Log.id == build.log_id) \

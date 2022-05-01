@@ -1,6 +1,7 @@
 from datetime import datetime
 from enum import Enum
-from public.jsonapi import attributes, data, item, item_list, create_relationships, DataItem, DataList
+from public.jsonapi import attributes, data, item, item_list, create_relationships, DataItem, DataList, \
+    PagedItemListMeta
 from pydantic import BaseModel, Field
 from typing import List, Optional
 
@@ -40,7 +41,6 @@ class BuildRead(BuildWrite):
 
 
 build_relationships = create_relationships("BuildRelationships", [
-    DataItem("ecosystem", "ecosystems"),
     DataItem("commit", "commits"),
     DataItem("profile", "profiles"),
     DataItem("log", "logs"),
@@ -89,6 +89,7 @@ class BuildReadItem(BaseModel):
 @item_list
 class BuildReadList(BaseModel):
     data: List[BuildReadData] = Field(default_factory=list)
+    meta: Optional[PagedItemListMeta]
 
     class Config:
         pass
