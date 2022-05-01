@@ -19,8 +19,7 @@ build_output_dir_name = "conan_output"
 
 
 class BuildFailed(Exception):
-    def __init__(self, status_code):
-        self.status_code = status_code
+    pass
 
 
 def create_build_tar(script_template_name: str, parameters: dict):
@@ -77,7 +76,11 @@ def extract_output_tar(data: FileIO):
 
 class Builder(object):
     def __init__(self, build_os, image):
-        self.__client = docker.from_env()
+        try:
+            self.__client = docker.from_env()
+        except docker.errors.DockerException as e:
+            raise BuildFailed(f"Failed to instantiate docker client: '{e}")
+
         self.__image = image
         self.__build_os = build_os
         self.__container = None
@@ -91,59 +94,51 @@ class Builder(object):
         return self
 
     @property
-    def script_template(self):
+    def __script_template(self):
         if self.__build_os == "Linux":
             return "build.sh.in"
         else:
             return "build.ps1.in"
 
     @property
-    def build_package_dir(self):
+    def __build_package_dir(self):
         if self.__build_os == "Linux":
             return "/{0}".format(build_package_dir_name)
         else:
             return "C:\\{0}".format(build_package_dir_name)
 
     @property
-    def build_package_dir(self):
-        if self.__build_os == "Linux":
-            return "/{0}".format(build_package_dir_name)
-        else:
-            return "C:\\{0}".format(build_package_dir_name)
-
-    @property
-    def escaped_build_package_dir(self):
+    def __escaped_build_package_dir(self):
         if self.__build_os == "Linux":
             return "/{0}".format(build_package_dir_name)
         else:
             return "C:\\\\{0}".format(build_package_dir_name)
 
     @property
-    def root_dir(self):
+    def __root_dir(self):
         if self.__build_os == "Linux":
             return "/"
         else:
             return "C:\\"
 
     @property
-    def build_output_dir(self):
+    def __build_output_dir(self):
         if self.__build_os == "Linux":
             return "/tmp/{0}".format(build_output_dir_name)
         else:
             return "C:\\{0}".format(build_output_dir_name)
 
     @property
-    def build_command(self):
+    def __build_command(self):
         if self.__build_os == "Linux":
-            return "sh {0}/build.sh".format(self.build_package_dir)
+            return "sh {0}/build.sh".format(self.__build_package_dir)
         else:
-            return 'cmd /s /c "powershell -File {0}\\build.ps1"'.format(self.build_package_dir)
+            return 'cmd /s /c "powershell -File {0}\\build.ps1"'.format(self.__build_package_dir)
 
     def pull(self, parameters):
         m = re.match(docker_image_pattern, self.__image)
         if not m:
-            raise Exception("The image '{0}' is not a valid "
-                            "docker image name".format(self.__image))
+            raise BuildFailed(f"The image '{self.__image}' is not a valid docker image name")
         tag = m.group(4)
         repository = m.group(1)
         if tag == "local":
@@ -158,14 +153,21 @@ class Builder(object):
             }
 
         logger.info("Pull docker image '%s'", self.__image)
-        self.__client.images.pull(repository=repository, tag=tag, auth_config=auth_config)
+        try:
+            self.__client.images.pull(repository=repository, tag=tag, auth_config=auth_config)
+        except docker.errors.APIError as e:
+            raise BuildFailed(f"Failed to pull docker container '{self.__image}': {e}")
 
     def setup(self, parameters):
         logger.info("Setup docker container")
 
-        self.__container = self.__client.containers.create(image=self.__image,
-                                                           command=self.build_command)
-        logger.info("Created docker container '%s'", self.__container.short_id)
+        try:
+            self.__container = self.__client.containers.create(image=self.__image,
+                                                               command=self.__build_command)
+            logger.info("Created docker container '%s'", self.__container.short_id)
+        except docker.errors.APIError as e:
+            raise BuildFailed(f"Failed to create docker container from image '{self.__image}': {e}")
+
 
         config_url = "{0} --type=git".format(parameters["conan_config_url"])
         config_branch = "--args \"-b {0}\"".format(parameters["conan_config_branch"])\
@@ -176,16 +178,18 @@ class Builder(object):
         patched_parameters = {
             **parameters,
             "conan_config_args": " ".join([config_url, config_branch, config_path]),
-            "build_package_dir": self.build_package_dir,
-            "escaped_build_package_dir": self.escaped_build_package_dir,
-            "build_output_dir": self.build_output_dir
+            "build_package_dir": self.__build_package_dir,
+            "escaped_build_package_dir": self.__escaped_build_package_dir,
+            "build_output_dir": self.__build_output_dir
         }
-        build_tar = create_build_tar(self.script_template, patched_parameters)
-        result = self.__container.put_archive(self.root_dir, data=build_tar)
-        if not result:
-            raise Exception("Failed to copy build files to container '{0}'"\
-                            .format(self.__container.short_id))
-        logger.info("Copied build files to container '%s'", self.__container.short_id)
+        build_tar = create_build_tar(self.__script_template, patched_parameters)
+
+        try:
+            self.__container.put_archive(self.__root_dir, data=build_tar)
+            logger.info("Copied build files to container '%s'", self.__container.short_id)
+        except docker.errors.APIError as e:
+            raise BuildFailed("Failed to copy build files to container '{0}': {1}"\
+                              .format(self.__container.short_id, e))
 
     def run(self):
         with self.__cancel_lock:
@@ -194,8 +198,12 @@ class Builder(object):
                 return
             logger.info("Start build in container '{0}'" \
                         .format(self.__container.short_id))
-            self.__container.start()
-            self.__container_logs = self.__container.logs(stream=True, follow=True)
+            try:
+                self.__container.start()
+                self.__container_logs = self.__container.logs(stream=True, follow=True)
+            except docker.errors.APIError as e:
+                raise BuildFailed(f"Failed to start container: {e}")
+
         for byte_data in self.__container_logs:
             line = byte_data.decode("utf-8", errors="replace").strip('\n\r')
             self.__logs.put(line)
@@ -208,15 +216,14 @@ class Builder(object):
         result = self.__container.wait()
 
         try:
-            data, _ = self.__container.get_archive(self.build_output_dir)
+            data, _ = self.__container.get_archive(self.__build_output_dir)
             self.build_output = extract_output_tar(data)
         except docker.errors.APIError as e:
-            logger.error("Failed to obtain build output from container '%s': %s", self.__container.short_id, e)
+            raise BuildFailed(f"Failed to obtain build output from container '{self.__container.short_id}': e")
 
-        if result.get("StatusCode"):
-            logger.info("Build in container '%s' failed with status '%s'", self.__container.short_id,
-                        result.get("StatusCode"))
-            raise BuildFailed(result.get("StatusCode"))
+        status_code = result.get("StatusCode")
+        if status_code:
+            raise BuildFailed(f"Build in container '{self.__container.short_id}' returned status code '{status_code}'")
 
     def cancel(self):
         with self.__cancel_lock:

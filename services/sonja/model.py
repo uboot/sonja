@@ -235,7 +235,7 @@ class Build(Base):
     __tablename__ = 'build'
 
     id = Column(Integer, primary_key=True)
-    created = Column(DateTime, nullable=False)
+    created = Column(DateTime, nullable=False, index=True)
     status = Column(Enum(BuildStatus), nullable=False)
     commit_id = Column(Integer, ForeignKey('commit.id'),
                           nullable=False)

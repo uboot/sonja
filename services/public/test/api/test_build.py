@@ -38,12 +38,6 @@ class TestBuild(ApiTestCase):
         attributes = response.json()["data"]["attributes"]
         self.assertEqual("new", attributes["status"])
 
-    def test_get_builds(self):
-        response = client.get(f"{api_prefix}/ecosystem/1/build", headers=self.reader_headers)
-        self.assertEqual(200, response.status_code)
-        attributes = response.json()["data"][0]["attributes"]
-        self.assertEqual("new", attributes["status"])
-
     def test_get_sse_builds(self):
         pass
         # async def send_data():

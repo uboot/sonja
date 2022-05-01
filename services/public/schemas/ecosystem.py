@@ -80,7 +80,6 @@ class EcosystemWriteItem(BaseModel):
 
 
 ecosystem_relationships = create_relationships("EcosystemRelationships", [
-    Link("builds", "build"),
     DataList("channels", "channels"),
     DataList("profiles", "profiles"),
     Link("repos", "repo"),

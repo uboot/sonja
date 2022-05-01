@@ -1,6 +1,5 @@
-from sonja.builder import Builder
+from sonja.builder import Builder, BuildFailed
 
-import base64
 import os
 import time
 import threading
@@ -92,6 +91,12 @@ def get_build_parameters(profile, https=False, version=""):
 
 
 class TestBuilder(unittest.TestCase):
+    def test_pull_invalid_image_linux(self):
+        docker_host = os.environ.get("LINUX_DOCKER_HOST", "")
+        parameters = get_build_parameters("linux-debug")
+        with environment("DOCKER_HOST", docker_host), Builder("Linux", "uboot/invalid:1.2.3") as builder:
+            self.assertRaises(BuildFailed, builder.pull, parameters)
+
     def test_run_linux(self):
         docker_host = os.environ.get("LINUX_DOCKER_HOST", "")
         parameters = get_build_parameters("linux-debug")
@@ -115,6 +120,14 @@ class TestBuilder(unittest.TestCase):
             self.assertGreater(len(logs), 0)
             self.assertTrue("create" in builder.build_output.keys())
             self.assertTrue("info" in builder.build_output.keys())
+
+    def test_run_linux_wrong_version(self):
+        docker_host = os.environ.get("LINUX_DOCKER_HOST", "")
+        parameters = get_build_parameters("linux-debug", version="xxx")
+        with environment("DOCKER_HOST", docker_host), Builder("Linux", "uboot/gcc9:latest") as builder:
+            builder.pull(parameters)
+            builder.setup(parameters)
+            self.assertRaises(BuildFailed, builder.run)
 
     def test_run_linux_https(self):
         docker_host = os.environ.get("LINUX_DOCKER_HOST", "")
