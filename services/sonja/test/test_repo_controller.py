@@ -14,6 +14,7 @@ known_hosts = ("Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVB
                "lRKdmRzakUzSkVBdkdxM2xHSFNaWHkyOEczc2t1YTJTbVZpL3c0eUNFNmdiT0RxblRXbGc3K3dDNjA0eWRHWE"
                "E4VkppUzVhcDQzSlhpVUZGQWFRPT0K")
 
+
 class TestRepoController(unittest.TestCase):
     def setUp(self):
         self.work_dir = tempfile.mkdtemp()
@@ -35,3 +36,13 @@ class TestRepoController(unittest.TestCase):
         controller.setup_ssh(os.environ.get("SSH_KEY", ""), known_hosts)
         self.assertTrue(os.path.exists(os.path.join(self.work_dir, "id_rsa")))
         self.assertTrue(os.path.exists(os.path.join(self.work_dir, "known_hosts")))
+
+    def test_has_diff(self):
+        controller = RepoController(self.work_dir)
+        controller.create_new_repo("git@github.com:uboot/conan-packages.git")
+        controller.setup_ssh(os.environ.get("SSH_KEY", ""), known_hosts)
+        controller.fetch()
+        controller.checkout("change_base_version")
+        self.assertTrue(controller.has_diff("ef89f593ea439d8986aca1a52257e44e7b8fea29", "base/"))
+        self.assertTrue(controller.has_diff("ef89f593ea439d8986aca1a52257e44e7b8fea29", "base"))
+        self.assertFalse(controller.has_diff("ef89f593ea439d8986aca1a52257e44e7b8fea29", "app"))

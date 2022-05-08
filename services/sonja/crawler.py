@@ -40,7 +40,7 @@ class RepoController(object):
         return False
 
     def create_new_repo(self, url):
-        shutil.rmtree(self.work_dir, ignore_errors=True)
+        shutil.rmtree(self.repo_dir, ignore_errors=True)
         repo = git.Repo.init(self.repo_dir)
         repo.create_remote('origin', url=url)
 
@@ -81,7 +81,7 @@ class RepoController(object):
 
     def checkout(self, branch):
         repo = git.Repo(self.repo_dir)
-        repo.git.reset('--hard', 'origin/{}'.format(branch))
+        repo.git.reset('--hard', 'origin/{0}'.format(branch))
 
     def get_sha(self):
         repo = git.Repo(self.repo_dir)
@@ -109,6 +109,19 @@ class RepoController(object):
         if not len(email):
             return ''
         return email[:255] if len(email) > 255 else email
+
+    def has_diff(self, commit_sha: str, path: str):
+        repo = git.Repo(self.repo_dir)
+        this_commit = repo.head.commit
+        past_commit = repo.commit(commit_sha)
+        diffs = this_commit.diff(past_commit)
+        for d in diffs:
+            if os.path.commonprefix((d.a_path, path)) == path:
+                return True
+            if os.path.commonprefix((d.b_path, path)) == path:
+                return True
+
+        return False
 
 
 class Crawler(Worker):
@@ -186,12 +199,24 @@ class Crawler(Worker):
                             sha = controller.get_sha()
 
                             commits = session.query(Commit).filter_by(repo=repo,
-                                sha=sha, channel=channel)
+                                                                      sha=sha, channel=channel)
 
                             # continue if this commit has already been stored
                             if list(commits):
                                 logger.info("Commit '%s' exists", sha[:7])
                                 continue
+
+                            old_commits = session.query(Commit).filter(
+                                Commit.repo == repo,
+                                Commit.channel == channel,
+                                Commit.sha != sha,
+                                Commit.status != CommitStatus.old
+                            )
+
+                            if repo.path and any(old_commits):
+                                if not any([controller.has_diff(commit.sha, repo.path) for commit in old_commits]):
+                                    logger.info("Path '%s' was not changed since previous commits", repo.path)
+                                    continue
 
                             logger.info("Add commit '%s'", sha[:7])
                             commit = Commit()
@@ -205,12 +230,6 @@ class Crawler(Worker):
                             session.add(commit)
                             new_commits = True
 
-                            old_commits = session.query(Commit).filter(
-                                Commit.repo == repo,
-                                Commit.channel == channel,
-                                Commit.sha != sha,
-                                Commit.status != CommitStatus.old
-                            )
                             for c in old_commits:
                                 logger.info("Set status of '%s' to 'old'", c.sha[:7])
                                 c.status = CommitStatus.old
