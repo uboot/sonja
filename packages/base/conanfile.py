@@ -8,7 +8,6 @@ class BaseConan(ConanFile):
     author = "<Put your name here> <And your email here>"
     url = "<Package recipe repository url here, for issues about the package>"
     description = "<Description of Hello here>"
-    topics = ("<Put some tag here>", "<here>", "<and here>")
     settings = "os", "compiler", "build_type", "arch"
     options = {"with_tests": [True, False]}
     default_options = {"with_tests": False}
