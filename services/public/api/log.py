@@ -1,6 +1,9 @@
+from typing import Optional
+
 from fastapi import APIRouter, Depends, HTTPException
 from public.auth import get_read
 from public.schemas.log import LogReadItem
+from public.schemas.log_line import LogLineReadList
 from public.crud.log import read_log
 from sonja.database import get_session, Session
 

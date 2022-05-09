@@ -1,6 +1,6 @@
 from datetime import datetime
-from sonja.model import Ecosystem, Repo, Label, Option, Profile, Platform, Channel,\
-    Commit, Build, CommitStatus, BuildStatus, Log
+from sonja.model import Ecosystem, Repo, Label, Option, Profile, Platform, Channel, \
+    Commit, Build, CommitStatus, BuildStatus, Log, LogLine, Run
 from sonja.database import logger, Session, session_scope
 from sonja.redis import RedisClient
 from sonja.ssh import encode, generate_rsa_key
@@ -112,6 +112,11 @@ def populate_database():
         build.log = log
         session.add(build)
 
+        run = Run()
+        run.build = build
+        run.started = datetime(year=2000, month=1, day=2, hour=13, minute=40)
+        run.status = BuildStatus.new
+
         session.commit()
 
 
@@ -134,6 +139,24 @@ def add_build():
         session.commit()
 
         RedisClient().publish_build_update(build)
+
+
+def add_log_line():
+    logger.info("Add log line")
+    with session_scope() as session:
+        run = session.query(Run).first()
+        num_log_lines = session.query(LogLine).\
+            filter(LogLine.run_id == run.id).\
+            count()
+
+        log_line = LogLine()
+        log_line.time = datetime.utcnow()
+        log_line.number = num_log_lines + 1
+        log_line.run = run
+        log_line.content = "some logs..."
+        session.commit()
+
+        RedisClient().publish_log_line_update(log_line)
 
 
 class DemoDataCreator(object):
