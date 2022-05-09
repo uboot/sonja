@@ -1,5 +1,5 @@
-from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer, String, Table, Text
-from sqlalchemy.dialects.mysql import LONGTEXT
+from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer, String, Table, Text, BigInteger
+from sqlalchemy.dialects.mysql import LONGTEXT, TEXT
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sonja.auth import hash_password
@@ -221,6 +221,23 @@ class BuildStatus(enum.Enum):
     stopped = 6
 
 
+class Run(Base):
+    __tablename__ = 'run'
+    id = Column(Integer, primary_key=True)
+    started = Column(DateTime, nullable=False, index=True)
+    status = Column(Enum(BuildStatus), nullable=False)
+    build_id = Column(Integer, ForeignKey('build.id'), index=True)
+    build = relationship("Build", backref="runs")
+
+    @property
+    def status_value(self):
+        return self.status.name
+
+    @status_value.setter
+    def status_value(self, value):
+        self.status = BuildStatus[value.name]
+
+
 missing_package = Table('missing_package', Base.metadata,
     Column('build_id', Integer, ForeignKey('build.id'), primary_key=True),
     Column('package_id', Integer, ForeignKey('package.id'), primary_key=True))
@@ -267,6 +284,17 @@ class Log(Base):
 
     id = Column(Integer, primary_key=True)
     logs = Column(LONGTEXT, nullable=False)
+
+
+class LogLine(Base):
+    __tablename__ = 'log_line'
+
+    id = Column(BigInteger, primary_key=True)
+    number = Column(Integer, nullable=False, index=True)
+    time = Column(DateTime, nullable=False)
+    content = Column(TEXT)
+    run_id = Column(Integer, ForeignKey('run.id'), index=True)
+    run = relationship("Run", backref="log_lines")
 
 
 class Recipe(Base):

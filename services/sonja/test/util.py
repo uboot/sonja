@@ -3,7 +3,7 @@ from typing import Callable
 from sonja.auth import hash_password
 from sonja.database import session_scope
 from sonja.model import Permission, Ecosystem, PermissionLabel, Base, User, GitCredential, Repo, Option, Label, Commit, \
-    CommitStatus, Channel, Profile, Platform, Log, Build, BuildStatus, Recipe, RecipeRevision, Package
+    CommitStatus, Channel, Profile, Platform, Log, Build, BuildStatus, Recipe, RecipeRevision, Package, Run, LogLine
 
 import os
 
@@ -145,13 +145,21 @@ def create_log(parameters):
     return log
 
 
+def create_log_line(parameters):
+    log_line = LogLine()
+    log_line.number = 1
+    log_line.time = datetime(year=2000, month=1, day=2, hour=13, minute=50)
+    log_line.content = "Start build..."
+    return log_line
+
+
 def create_build(parameters):
     build = Build()
     parameters["commit.status"] = CommitStatus.building
     build.created = datetime(year=2000, month=1, day=2, hour=13, minute=30)
     build.commit = create_commit(parameters)
     build.profile = create_profile(parameters)
-    build.status = BuildStatus.new
+    build.status = parameters.get("build.status", BuildStatus.new)
     build.log = create_log(parameters)
     if parameters.get("build.with_dependencies", False):
         build.package = create_package(parameters)
@@ -159,6 +167,14 @@ def create_build(parameters):
         build.missing_recipes = [create_recipe(parameters)]
         build.missing_packages = [create_package(parameters)]
     return build
+
+
+def create_run(parameters):
+    run = Run()
+    run.build = create_build(parameters)
+    run.started = datetime(year=2000, month=1, day=2, hour=13, minute=40)
+    run.status = BuildStatus.new
+    return run
 
 
 def create_recipe(parameters):
