@@ -9,7 +9,7 @@ router = APIRouter()
 
 @router.post("/channel", response_model=ChannelReadItem, response_model_by_alias=False, status_code=status.HTTP_201_CREATED)
 def post_channel_item(channel: ChannelWriteItem, session: Session = Depends(get_session),
-                   authorized: bool = Depends(get_write)):
+                      authorized: bool = Depends(get_write)):
     new_channel = create_channel(session, channel)
     return ChannelReadItem.from_db(new_channel)
 

@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 
 from sonja.builder import Builder, BuildFailed
@@ -6,7 +7,7 @@ from sonja.database import session_scope
 from sonja.redis import RedisClient
 from sonja.client import Scheduler
 from sonja.manager import Manager
-from sonja.model import BuildStatus, Build, Log, Profile, Platform
+from sonja.model import BuildStatus, Build, Log, Profile, Platform, Run, LogLine
 from sonja.worker import Worker
 from sqlalchemy import func, update
 from sqlalchemy.exc import OperationalError
@@ -31,6 +32,8 @@ class Agent(Worker):
         super().__init__()
         connect_to_database()
         self.__build_id = None
+        self.__run_id = None
+        self.__log_line_counter = None
         self.__scheduler = scheduler
         self.__redis_client = redis_client
         self.__manager = Manager(redis_client)
@@ -66,9 +69,14 @@ class Agent(Worker):
                 logger.info("Set status of build '%d' to 'active'", build.id)
                 self.__build_id = build.id
                 build.status = BuildStatus.active
+                run = Run()
+                run.build = build
+                run.status = BuildStatus.active
+                run.started = datetime.utcnow()
                 session.commit()
+                self.__run_id = run.id
+                self.__log_line_counter = 1
                 self.__redis_client.publish_build_update(build)
-                build.log.logs = ''
 
                 container = build.profile.container
                 parameters = {
@@ -132,62 +140,63 @@ class Agent(Worker):
                     self.__trigger_scheduler()
 
                 self.__set_build_status(BuildStatus.success)
-
-                self.__build_id = None
         except BuildFailed as e:
             logger.info("Build '%d' failed", self.__build_id)
             logger.info("%s", e)
             self.__append_to_logs([str(e)])
             self.__manager.process_failure(self.__build_id, builder.build_output)
             self.__set_build_status(BuildStatus.error)
-            self.__build_id = None
+        except asyncio.CancelledError:
+            logger.info("Agent was cancelled")
+            self.__set_build_status(BuildStatus.new, BuildStatus.stopped)
+            raise
         except Exception as e:
             logger.error("Unexpected error while building: ", e)
             logger.info(e)
+        finally:
+            self.__build_id = None
+            self.__run_id = None
+            self.__log_line_counter = None
             
         return True
 
-    def cleanup(self):
-        if not self.__build_id:
-            return
-
-        self.__set_build_status(BuildStatus.new)
-
-    def __set_build_status(self, status):
+    def __set_build_status(self, status: BuildStatus, run_status: BuildStatus = None):
         logger.info("Set status of build '%d' to '%s'", self.__build_id, status)
 
         if not self.__build_id:
             return
+
+        if run_status is None:
+            run_status = status
+
         try:
             with session_scope() as session:
-                build = session.query(Build) \
-                    .filter_by(id=self.__build_id) \
+                run = session.query(Run) \
+                    .filter_by(id=self.__run_id) \
                     .first()
-                if build:
-                    build.status = status
-                    self.__build_id = None
+                if run and run.build:
+                    run.status = run_status
+                    run.build.status = status
                     session.commit()
-                    self.__redis_client.publish_build_update(build)
+                    self.__redis_client.publish_build_update(run.build)
                 else:
-                    logger.error("Failed to find build '%d' in database", self.__build_id)
+                    logger.error("Failed to find run '%d' and/or its build in database", self.__run_id)
         except OperationalError as e:
             logger.error("Failed to set build status: %s", e)
 
     def __append_to_logs(self, log_lines: List[str]):
         try:
             with session_scope() as session:
-                build = session.query(Build) \
-                    .filter_by(id=self.__build_id) \
-                    .first()
-
-                if not build:
-                    return
-
-                log_tail = '\n' + '\n'.join(log_lines)
-                statement = update(Log) \
-                    .where(Log.id == build.log_id) \
-                    .values(logs=func.concat(Log.logs, log_tail.encode("cp1252", errors="replace")))
-                session.execute(statement)
+                for line in log_lines:
+                    log_line = LogLine()
+                    log_line.content = line.encode("cp1252", errors="replace")
+                    log_line.time = datetime.utcnow()
+                    log_line.run_id = self.__run_id
+                    log_line.number = self.__log_line_counter
+                    self.__log_line_counter += 1
+                    session.add(log_line)
+                    session.commit()
+                    self.__redis_client.publish_log_line_update(log_line)
         except OperationalError as e:
             logger.error("Failed to update logs: %s", e)
 
@@ -200,10 +209,15 @@ class Agent(Worker):
                 if not build:
                     return False
 
+                run = session.query(Run) \
+                    .filter_by(id=self.__run_id) \
+                    .first()
+
                 logger.info("Cancel build '%d'", self.__build_id)
                 builder.cancel()
                 logger.info("Set status of build '%d' to 'stopped'", self.__build_id)
                 build.status = BuildStatus.stopped
+                run.status = BuildStatus.stopped
                 session.commit()
                 self.__redis_client.publish_build_update(build)
                 self.__build_id = None

@@ -4,6 +4,8 @@ from sonja.database import Profile, Build, Session
 from sqlalchemy import desc
 from typing import Optional
 
+from sonja.model import BuildStatus
+
 
 def read_builds(session: Session, ecosystem_id: str, page: Optional[int] = None, per_page:  Optional[int] = None)\
         -> dict:
@@ -41,15 +43,24 @@ def read_build(session: Session, build_id: str) -> Build:
     return session.query(Build).filter(Build.id == build_id).first()
 
 
-async def update_build(session: Session, redis: Redis, build: Build, build_item: BuildWriteItem) -> Build:
-    data = build_item.data.attributes.dict(exclude_unset=True, by_alias=True)
-    for attribute in data:
-        setattr(build, attribute, data[attribute])
+async def update_build(session: Session, redis: Redis, build_id: str, build_item: BuildWriteItem) -> Build:
+    build = session.query(Build).filter(Build.id == build_id).with_for_update().first()
 
-    if build_item.data.attributes.status == StatusEnum.new:
-        build.log.logs = ''
-        build.missing_recipes = []
-        build.missing_packages = []
+    if build_item.data.attributes.status == StatusEnum.stopping:
+        if build.status == BuildStatus.new:
+            build.status = BuildStatus.stopped
+        elif build.status == BuildStatus.active:
+            build.status = BuildStatus.stopping
+    elif build_item.data.attributes.status == StatusEnum.new:
+        if build.status == BuildStatus.active:
+            pass
+        elif build.status == BuildStatus.stopping:
+            pass
+        else:
+            build.status = BuildStatus.new
+            build.log.logs = ''
+            build.missing_recipes = []
+            build.missing_packages = []
 
     session.commit()
     await redis.publish_json(f"ecosystem:{build.ecosystem.id}:build", {"id": build.id})

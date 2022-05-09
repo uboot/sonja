@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 from public.jsonapi import attributes, data, item, item_list, create_relationships, DataItem, DataList, \
-    PagedItemListMeta
+    PagedItemListMeta, Link
 from pydantic import BaseModel, Field
 from typing import List, Optional
 
@@ -46,7 +46,8 @@ build_relationships = create_relationships("BuildRelationships", [
     DataItem("log", "logs"),
     DataItem("package", "packages"),
     DataList("missing_packages", "packages"),
-    DataList("missing_recipes", "recipes")
+    DataList("missing_recipes", "recipes"),
+    Link("runs", "run")
 ])
 
 

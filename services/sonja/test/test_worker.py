@@ -60,6 +60,7 @@ class TestAgent(unittest.TestCase):
         self.agent.start()
         self.assertEquals(self.__wait_for_build_status(BuildStatus.success, 15), BuildStatus.success)
         self.assertEqual(self.redis_client.publish_build_update.call_count, 2)
+        self.assertGreater(self.redis_client.publish_log_line_update.call_count, 100)
 
     def test_complete_build_with_dependency(self):
         with session_scope() as session:
@@ -80,6 +81,7 @@ class TestAgent(unittest.TestCase):
         self.agent.start()
         self.assertEquals(self.__wait_for_build_status(BuildStatus.success, 15), BuildStatus.success)
         self.assertEqual(self.redis_client.publish_build_update.call_count, 2)
+        self.assertGreater(self.redis_client.publish_log_line_update.call_count, 100)
 
     def test_stop_build(self):
         with session_scope() as session:

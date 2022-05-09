@@ -3,8 +3,8 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker
 from sonja.auth import hash_password
 from sonja.model import User, Permission, PermissionLabel, Ecosystem, Base, Build, missing_package, missing_recipe, \
-    Log, package_requirement, Package, RecipeRevision, Recipe, Commit, Channel, GitCredential, profile_label, Profile,\
-    Label, Repo, Option, repo_label
+    Log, package_requirement, Package, RecipeRevision, Recipe, Commit, Channel, GitCredential, profile_label, Profile, \
+    Label, Repo, Option, repo_label, Run, LogLine
 
 from contextlib import contextmanager
 import logging
@@ -126,6 +126,8 @@ def _drop_table(table):
 def _drop_data_tables():
     _drop_table(missing_package)
     _drop_table(missing_recipe)
+    _drop_table(Run.__table__)
+    _drop_table(LogLine.__table__)
     _drop_table(Build.__table__)
     _drop_table(Log.__table__)
     _drop_table(package_requirement)
