@@ -261,8 +261,6 @@ class Build(Base):
     package = relationship("Package", backref="builds")
     profile_id = Column(Integer, ForeignKey('profile.id'), nullable=False)
     profile = relationship("Profile")
-    log_id = Column(Integer, ForeignKey('log.id'), nullable=False)
-    log = relationship("Log")
     missing_packages = relationship("Package", secondary=missing_package)
     missing_recipes = relationship("Recipe", secondary=missing_recipe)
 
@@ -277,13 +275,6 @@ class Build(Base):
     @status_value.setter
     def status_value(self, value):
         self.status = BuildStatus[value.name]
-
-
-class Log(Base):
-    __tablename__ = 'log'
-
-    id = Column(Integer, primary_key=True)
-    logs = Column(LONGTEXT, nullable=False)
 
 
 class LogLine(Base):

@@ -3,7 +3,7 @@ from typing import Callable
 from sonja.auth import hash_password
 from sonja.database import session_scope
 from sonja.model import Permission, Ecosystem, PermissionLabel, Base, User, GitCredential, Repo, Option, Label, Commit, \
-    CommitStatus, Channel, Profile, Platform, Log, Build, BuildStatus, Recipe, RecipeRevision, Package, Run, LogLine
+    CommitStatus, Channel, Profile, Platform, Build, BuildStatus, Recipe, RecipeRevision, Package, Run, LogLine
 
 import os
 
@@ -139,12 +139,6 @@ def create_profile(parameters):
     return profile
 
 
-def create_log(parameters):
-    log = Log()
-    log.logs = "Start build\nRun Build\nUpload..."
-    return log
-
-
 def create_log_line(parameters):
     log_line = LogLine()
     log_line.number = 1
@@ -160,7 +154,6 @@ def create_build(parameters):
     build.commit = create_commit(parameters)
     build.profile = create_profile(parameters)
     build.status = parameters.get("build.status", BuildStatus.new)
-    build.log = create_log(parameters)
     if parameters.get("build.with_dependencies", False):
         build.package = create_package(parameters)
     if parameters.get("build.with_missing", False):

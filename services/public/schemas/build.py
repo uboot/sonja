@@ -43,7 +43,6 @@ class BuildRead(BuildWrite):
 build_relationships = create_relationships("BuildRelationships", [
     DataItem("commit", "commits"),
     DataItem("profile", "profiles"),
-    DataItem("log", "logs"),
     DataItem("package", "packages"),
     DataList("missing_packages", "packages"),
     DataList("missing_recipes", "recipes"),
