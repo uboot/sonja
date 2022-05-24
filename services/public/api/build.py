@@ -49,7 +49,7 @@ async def patch_build_item(build_id: str, build_item: BuildWriteItem, session: S
 
 
 @router.get("/event/ecosystem/{ecosystem_id}/build", response_model=BuildReadItem, response_model_by_alias=False)
-async def get(ecosystem_id: str, redis: Redis = Depends(depends_redis)):
+async def get_build_events(ecosystem_id: str, redis: Redis = Depends(depends_redis)):
     return EventSourceResponse(subscribe(f"ecosystem:{ecosystem_id}:build", redis))
 
 

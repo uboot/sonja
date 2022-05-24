@@ -27,7 +27,7 @@ def get_log_line_item(log_line_id: str, session: Session = Depends(get_session),
 
 
 @router.get("/event/run/{run_id}/log_line", response_model=LogLineReadItem, response_model_by_alias=False)
-async def get(run_id: str, redis: Redis = Depends(depends_redis)):
+async def get_line_events(run_id: str, redis: Redis = Depends(depends_redis)):
     return EventSourceResponse(subscribe(f"run:{run_id}:log_line", redis))
 
 
