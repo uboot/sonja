@@ -27,8 +27,13 @@ class TestEcosystem(ApiTestCase):
                 "type": "ecosystems",
                 "attributes": {
                     "name": "test_post_ecosystem",
-                    "credentials": [{
+                    "git_credentials": [{
                         "url": "https://url",
+                        "username": "user",
+                        "password": "password"
+                    }],
+                    "docker_credentials": [{
+                        "server": "server",
                         "username": "user",
                         "password": "password"
                     }]
@@ -39,7 +44,7 @@ class TestEcosystem(ApiTestCase):
         self.assertEqual("test_post_ecosystem", response.json()["data"]["attributes"]["name"])
         attributes = response.json()["data"]["attributes"]
         self.assertDictEqual({"url": "https://url", "username": "user", "password": "password"},
-                             attributes["credentials"][0])
+                             attributes["git_credentials"][0])
 
     def test_patch_ecosystem(self):
         ecosystem_id = run_create_operation(create_ecosystem, dict())

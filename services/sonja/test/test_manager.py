@@ -7,17 +7,19 @@ import sonja.test.util as util
 import os
 import unittest
 
-# Requires:
-#
-# 1. MySQL database
-# docker run --rm -d --name mysql -p 3306:3306 -e MYSQL_DATABASE=sonja -e MYSQL_ROOT_PASSWORD=secret mysql:8.0.21
 
-
-def _setup_build_output(create_file="create.json"):
+def _setup_build_output(create_file="create.json", info_file="info.json"):
     build_output = dict()
-    create_output_file = os.path.join(os.path.dirname(__file__), "data/{0}".format(create_file))
-    with open(create_output_file) as f:
-        build_output["create"] = f.read()
+    output_files = {
+        "create": create_file,
+        "info": info_file
+    }
+
+    for output in output_files:
+        output_file = os.path.join(os.path.dirname(__file__), "data/{0}".format(output_files[output]))
+        with open(output_file) as f:
+            build_output[output] = f.read()
+
     return build_output
 
 
@@ -63,6 +65,7 @@ class TestManager(unittest.TestCase):
             self.assertEqual("227220812d7ea3aa060187bae41abbc9911dfdfd", build.package.package_id)
             self.assertEqual("app", build.package.recipe_revision.recipe.name)
             self.assertEqual("2b44d2dde63878dd279ebe5d38c60dfaa97153fb", build.package.recipe_revision.revision)
+            self.assertEqual(0, len(build.package.requires))
 
     def test_process_success_existing_recipe(self):
         build_output = _setup_build_output()

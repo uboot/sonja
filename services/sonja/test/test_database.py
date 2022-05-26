@@ -93,3 +93,11 @@ class TestDatabase(unittest.TestCase):
         with database.session_scope() as session:
             num_recipes = session.query(database.Recipe).count()
             self.assertEqual(1, num_recipes)
+
+    def test_create_package_with_requirement(self):
+        with database.session_scope() as session:
+            package_1 = util.create_package(dict())
+            package_2 = util.create_package(dict())
+            package_1.requires = [package_2]
+            self.assertEqual(1, len(package_2.required_by))
+

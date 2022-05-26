@@ -17,8 +17,6 @@ class Label(BaseModel):
 class Profile(BaseModel):
     name: str = ""
     container: Optional[str]
-    docker_user: Optional[str]
-    docker_password: Optional[str]
     platform: Optional[PlatformEnum] = Field(alias="platform_value")
     conan_profile: Optional[str]
     labels: List[Label] = Field(default_factory=list, alias="labels_value")
@@ -28,8 +26,6 @@ class Profile(BaseModel):
             "example": {
                 "name": "GCC 9",
                 "container": "uboot/gcc9:latest",
-                "docker_user": "user",
-                "docker_password": "paSSw0rd",
                 "platform": "linux",
                 "conan_profile": "linux-debug",
                 "labels": [{

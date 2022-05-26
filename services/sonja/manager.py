@@ -86,11 +86,11 @@ class Manager(object):
                      recipe.user, recipe.channel)
 
         # get all failed builds which are waiting for this recipe
-        builds = session.query(Build).filter(Build.status==BuildStatus.error).\
-            filter(missing_recipe.columns['build_id']==Build.id).\
-            filter(missing_recipe.columns['recipe_id']==recipe.id).\
-            filter(Build.commit_id==Commit.id).\
-            filter(Commit.status==CommitStatus.building).\
+        builds = session.query(Build).filter(Build.status == BuildStatus.error).\
+            filter(missing_recipe.columns['build_id'] == Build.id).\
+            filter(missing_recipe.columns['recipe_id'] == recipe.id).\
+            filter(Build.commit_id == Commit.id).\
+            filter(Commit.status == CommitStatus.building).\
             all()
 
         # re-trigger these builds
@@ -116,9 +116,9 @@ class Manager(object):
             filter(Commit.status == CommitStatus.building).\
             all()
 
-        # Get all failed builds which are waiting for a package of the same recipe but a different recipe revision. In these
-        # cases a build is triggered regardless of the exact package ID (because the package ID might be computed
-        # differently for a different recipe revision).
+        # Get all failed builds which are waiting for a package of the same recipe but a different recipe revision.
+        # In these cases a build is triggered regardless of the exact package ID (because the package ID might be
+        # computed differently for a different recipe revision).
         different_recipe_revision = session.query(Build).\
             filter(Build.status == BuildStatus.error).\
             filter(missing_package.columns['build_id'] == Build.id).\

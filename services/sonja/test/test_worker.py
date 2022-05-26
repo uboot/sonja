@@ -9,11 +9,6 @@ from sonja.test import util
 import time
 import unittest
 
-# Requires:
-#
-# 1. MySQL database
-# docker run --rm -d --name mysql -p 3306:3306 -e MYSQL_DATABASE=sonja -e MYSQL_ROOT_PASSWORD=secret mysql:8.0.21
-
 
 class TestAgent(unittest.TestCase):
     def setUp(self):
@@ -62,7 +57,7 @@ class TestAgent(unittest.TestCase):
         self.assertEqual(self.redis_client.publish_build_update.call_count, 2)
         self.assertGreater(self.redis_client.publish_log_line_update.call_count, 100)
 
-    def test_complete_build_with_dependency(self):
+    def test_complete_build_with_missing_recipe(self):
         with session_scope() as session:
             session.add(util.create_build({
                 "repo.dependent": True,
