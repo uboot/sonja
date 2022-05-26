@@ -58,7 +58,6 @@ async def update_build(session: Session, redis: Redis, build_id: str, build_item
             pass
         else:
             build.status = BuildStatus.new
-            build.log.logs = ''
             build.missing_recipes = []
             build.missing_packages = []
 

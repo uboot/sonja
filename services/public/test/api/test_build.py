@@ -1,7 +1,4 @@
 from fastapi.testclient import TestClient
-from json import loads
-from asyncio import run
-from aioredis import create_redis
 
 from public.config import api_prefix
 from public.main import app

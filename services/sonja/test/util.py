@@ -57,7 +57,7 @@ def create_ecosystem(parameters):
     ecosystem.conan_password = os.environ.get("CONAN_PASSWORD", "")
     git_credential = GitCredential(url="https://uboot@github.com", username="",
                                             password=os.environ.get("GIT_PAT", ""))
-    ecosystem.credentials = [git_credential]
+    ecosystem.git_credentials = [git_credential]
     parameters["ecosystem"] = ecosystem
     return ecosystem
 

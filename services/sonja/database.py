@@ -3,8 +3,8 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker
 from sonja.auth import hash_password
 from sonja.model import User, Permission, PermissionLabel, Ecosystem, Base, Build, missing_package, missing_recipe, \
-    package_requirement, Package, RecipeRevision, Recipe, Commit, Channel, GitCredential, profile_label, Profile, \
-    Label, Repo, Option, repo_label, Run, LogLine
+    package_requirement, Package, RecipeRevision, Recipe, Commit, Channel, DockerCredential, GitCredential, \
+    profile_label, Profile, Label, Repo, Option, repo_label, Run, LogLine
 
 from contextlib import contextmanager
 import logging
@@ -147,6 +147,7 @@ def clear_database():
     _drop_data_tables()
 
     _drop_table(GitCredential.__table__)
+    _drop_table(DockerCredential.__table__)
     _drop_table(Ecosystem.__table__)
     _drop_table(Permission.__table__)
     _drop_table(User.__table__)

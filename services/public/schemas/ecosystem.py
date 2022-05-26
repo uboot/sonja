@@ -9,6 +9,12 @@ class GitCredential(BaseModel):
     password: Optional[str]
 
 
+class DockerCredential(BaseModel):
+    server: str = ""
+    username: Optional[str]
+    password: Optional[str]
+
+
 @attributes
 class EcosystemWrite(BaseModel):
     name: str = ""
@@ -19,7 +25,8 @@ class EcosystemWrite(BaseModel):
     conan_config_branch: Optional[str]
     conan_user: Optional[str]
     conan_password: Optional[str]
-    credentials: List[GitCredential] = Field(default_factory=list, alias="credential_values")
+    git_credentials: List[GitCredential] = Field(default_factory=list, alias="git_credential_values")
+    docker_credentials: List[DockerCredential] = Field(default_factory=list, alias="docker_credential_values")
     known_hosts: Optional[str]
 
     class Config:
@@ -33,9 +40,18 @@ class EcosystemWrite(BaseModel):
                 "conan_config_branch": "master",
                 "conan_user": "agent",
                 "conan_password": "Passw0rd",
-                "credentials": [{
+                "git_credentials": [{
                     "url": "https://user@github.com",
                     "username": "user",
+                    "password": "Passw0rd"
+                }],
+                "docker_credentials": [{
+                    "url": "",
+                    "username": "user",
+                    "password": "Passw0rd"
+                }, {
+                    "url": "myregistry.azurecr.io",
+                    "username": "myregistry",
                     "password": "Passw0rd"
                 }],
                 "known_hosts": "Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN2h"

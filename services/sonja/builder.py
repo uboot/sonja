@@ -12,7 +12,7 @@ from io import BytesIO, FileIO
 from queue import Empty, SimpleQueue
 
 
-docker_image_pattern = ("(([a-z0-9\\.-]+(:[0-9]+)?/)?"
+docker_image_pattern = ("(([a-z0-9-]+\\.[a-z0-9\\.-]+(:[0-9]+)?/)?"
                         "[a-z0-9\\.-/]+)[:@]([a-z0-9\\.-]+)$")
 build_package_dir_name = "conan_build_package"
 build_output_dir_name = "conan_output"
@@ -59,8 +59,8 @@ def create_build_tar(script_template_name: str, parameters: dict):
 
 def extract_output_tar(data: FileIO):
     f = BytesIO()
-    for bytes in data:
-        f.write(bytes)
+    for chunk in data:
+        f.write(chunk)
     f.seek(0)
     tar = tarfile.open(fileobj=f)
     output_files = ["create", "info"]
@@ -141,15 +141,17 @@ class Builder(object):
             raise BuildFailed(f"The image '{self.__image}' is not a valid docker image name")
         tag = m.group(4)
         repository = m.group(1)
+        server = m.group(2).strip("/") if m.group(2) else ""
         if tag == "local":
             logger.info("Do not pull local image '%s'", self.__image)
             return
 
         auth_config = None
-        if parameters['docker_user']:
+        credentials = next((c for c in parameters['docker_credentials'] if c["server"] == server), None)
+        if credentials is not None:
             auth_config = {
-                "username": parameters['docker_user'],
-                "password": parameters['docker_password']
+                "username": credentials['username'],
+                "password": credentials['password']
             }
 
         logger.info("Pull docker image '%s'", self.__image)
@@ -167,7 +169,6 @@ class Builder(object):
             logger.info("Created docker container '%s'", self.__container.short_id)
         except docker.errors.APIError as e:
             raise BuildFailed(f"Failed to create docker container from image '{self.__image}': {e}")
-
 
         config_url = "{0} --type=git".format(parameters["conan_config_url"])
         config_branch = "--args \"-b {0}\"".format(parameters["conan_config_branch"])\

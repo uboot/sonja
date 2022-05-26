@@ -3,7 +3,7 @@ from sonja.config import connect_to_database, logger
 from sonja.client import WindowsAgent, LinuxAgent
 from sonja.redis import RedisClient
 from sonja.database import session_scope
-from sonja.model import Build, BuildStatus, CommitStatus, Log, Profile, Commit
+from sonja.model import Build, BuildStatus, CommitStatus, Profile, Commit
 from sonja.worker import Worker
 import time
 
@@ -55,8 +55,6 @@ class Scheduler(Worker):
                     build.commit = commit
                     build.status = BuildStatus.new
                     build.created = datetime.utcnow()
-                    build.log = Log()
-                    build.log.logs = ''
                     session.add(build)
                     new_builds.append(build)
                 logger.info("Set commit '%s' to 'building'", commit.sha[:7])

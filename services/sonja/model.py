@@ -59,7 +59,18 @@ class GitCredential(Base):
     username = Column(String(255))
     password = Column(String(255))
     ecosystem_id = Column(Integer, ForeignKey('ecosystem.id'))
-    ecosystem = relationship("Ecosystem", backref="credentials")
+    ecosystem = relationship("Ecosystem", backref="git_credentials")
+
+
+class DockerCredential(Base):
+    __tablename__ = 'docker_credential'
+
+    id = Column(Integer, primary_key=True)
+    server = Column(String(255), nullable=False)
+    username = Column(String(255))
+    password = Column(String(255))
+    ecosystem_id = Column(Integer, ForeignKey('ecosystem.id'))
+    ecosystem = relationship("Ecosystem", backref="docker_credentials")
 
 
 class Ecosystem(Base):
@@ -79,12 +90,20 @@ class Ecosystem(Base):
     conan_password = Column(String(255))
 
     @property
-    def credential_values(self):
-        return [{"url": c.url, "username": c.username, "password": c.password} for c in self.credentials]
+    def git_credential_values(self):
+        return [{"url": c.url, "username": c.username, "password": c.password} for c in self.git_credentials]
 
-    @credential_values.setter
-    def credential_values(self, value):
-        self.credentials = [GitCredential(**v) for v in value]
+    @git_credential_values.setter
+    def git_credential_values(self, value):
+        self.git_credentials = [GitCredential(**v) for v in value]
+
+    @property
+    def docker_credential_values(self):
+        return [{"server": c.server, "username": c.username, "password": c.password} for c in self.docker_credentials]
+
+    @docker_credential_values.setter
+    def docker_credential_values(self, value):
+        self.docker_credentials = [DockerCredential(**v) for v in value]
 
 
 class Label(Base):
@@ -170,8 +189,6 @@ class Profile(Base):
     platform = Column(Enum(Platform))
     conan_profile = Column(String(255))
     container = Column(String(255))
-    docker_user = Column(String(255))
-    docker_password = Column(String(255))
     labels = relationship("Label", secondary=profile_label)
 
     @property

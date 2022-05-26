@@ -57,8 +57,8 @@ class RepoController(object):
             config.set_value("core", "sshCommand", "ssh -i {0} -o UserKnownHostsFile={1}".format(ssh_key_path,
                                                                                                  known_hosts_path))
 
-    def setup_http(self, credentials):
-        credential_helper = build_credential_helper(credentials)
+    def setup_http(self, git_credentials):
+        credential_helper = build_credential_helper(git_credentials)
         credential_helper_path = os.path.abspath(os.path.join(self.work_dir, "credential_helper.sh"))
         with open(credential_helper_path, "w") as f:
             f.write(credential_helper)
@@ -181,7 +181,7 @@ class Crawler(Worker):
                             "url": c.url,
                             "username": c.username,
                             "password": c.password
-                        } for c in repo.ecosystem.credentials
+                        } for c in repo.ecosystem.git_credentials
                     ]
                     await loop.run_in_executor(None, controller.setup_http, credentials)
                     logger.info("Fetch repo '%s' for URL '%s'", work_dir, repo.url)

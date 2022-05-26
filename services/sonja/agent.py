@@ -7,9 +7,8 @@ from sonja.database import session_scope
 from sonja.redis import RedisClient
 from sonja.client import Scheduler
 from sonja.manager import Manager
-from sonja.model import BuildStatus, Build, Log, Profile, Platform, Run, LogLine
+from sonja.model import BuildStatus, Build, Profile, Platform, Run, LogLine
 from sonja.worker import Worker
-from sqlalchemy import func, update
 from sqlalchemy.exc import OperationalError
 import asyncio
 import os
@@ -96,7 +95,7 @@ class Agent(Worker):
                             "url": c.url,
                             "username": c.username,
                             "password": c.password
-                        } for c in build.profile.ecosystem.credentials
+                        } for c in build.profile.ecosystem.git_credentials
                     ],
                     "sonja_user": build.profile.ecosystem.user,
                     "channel": build.commit.channel.conan_channel,
@@ -105,8 +104,13 @@ class Agent(Worker):
                             if build.commit.repo.path != "" else "./conanfile.py",
                     "ssh_key": build.profile.ecosystem.ssh_key,
                     "known_hosts": build.profile.ecosystem.known_hosts,
-                    "docker_user": build.profile.docker_user,
-                    "docker_password": build.profile.docker_password,
+                    "docker_credentials": [
+                        {
+                            "server": c.server,
+                            "username": c.username,
+                            "password": c.password
+                        } for c in build.profile.ecosystem.docker_credentials
+                    ],
                     "mtu": os.environ.get("SONJA_MTU", "1500")
                 }
         except OperationalError as e:
@@ -117,42 +121,43 @@ class Agent(Worker):
 
         try:
             with Builder(sonja_os, container) as builder:
-                builder_task = asyncio.create_task(_run_build(builder, parameters))
-                while True:
-                    # wait 10 seconds
-                    done, _ = await asyncio.wait({builder_task}, timeout=10)
-                    log_lines = [line for line in builder.get_log_lines()]
-                    self.__append_to_logs(log_lines)
+                try:
+                    builder_task = asyncio.create_task(_run_build(builder, parameters))
+                    while True:
+                        # wait 10 seconds
+                        done, _ = await asyncio.wait({builder_task}, timeout=10)
+                        log_lines = [line for line in builder.get_log_lines()]
+                        self.__append_to_logs(log_lines)
 
-                    # if finished exit
-                    if done:
-                        builder_task.result()
-                        break
+                        # if finished exit
+                        if done:
+                            builder_task.result()
+                            break
 
-                    # check if the build was stopped and cancel it
-                    # if necessary
-                    if self.__cancel_stopping_build(builder):
-                        return True
+                        # check if the build was stopped and cancel it
+                        # if necessary
+                        if self.__cancel_stopping_build(builder):
+                            return True
 
-                logger.info("Process build output")
-                result = self.__manager.process_success(self.__build_id, builder.build_output)
-                if result.get("new_builds", False):
-                    self.__trigger_scheduler()
+                    logger.info("Process build output")
+                    result = self.__manager.process_success(self.__build_id, builder.build_output)
+                    if result.get("new_builds", False):
+                        self.__trigger_scheduler()
 
-                self.__set_build_status(BuildStatus.success)
-        except BuildFailed as e:
-            logger.info("Build '%d' failed", self.__build_id)
-            logger.info("%s", e)
-            self.__append_to_logs([str(e)])
-            self.__manager.process_failure(self.__build_id, builder.build_output)
-            self.__set_build_status(BuildStatus.error)
+                    self.__set_build_status(BuildStatus.success)
+                except BuildFailed as e:
+                    logger.info("Build '%d' failed", self.__build_id)
+                    logger.info("%s", e)
+                    self.__append_to_logs([str(e)])
+                    self.__manager.process_failure(self.__build_id, builder.build_output)
+                    self.__set_build_status(BuildStatus.error)
         except asyncio.CancelledError:
             logger.info("Agent was cancelled")
             self.__set_build_status(BuildStatus.new, BuildStatus.stopped)
             raise
         except Exception as e:
             logger.error("Unexpected error while building: ", e)
-            logger.info(e)
+            self.__set_build_status(BuildStatus.new, BuildStatus.error)
         finally:
             self.__build_id = None
             self.__run_id = None

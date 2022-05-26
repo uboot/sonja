@@ -71,21 +71,22 @@ def get_build_parameters(profile, https=False, version=""):
         "conan_options": "-o base:with_tests=False",
         "git_url": "https://uboot@github.com/uboot/conan-packages.git" if https else "git@github.com:uboot/sonja-backend.git",
         "git_sha": "ef89f593ea439d8986aca1a52257e44e7b8fea29" if https else "47c5d1dfa67726af1e67530d4f47bf2eb77b0b41",
-        "git_credentials": [
-            {
-                "url": "https://uboot@github.com",
-                "username": "",
-                "password": os.environ.get("GIT_PAT", "")
-            }
-        ],
+        "git_credentials": [{
+            "url": "https://uboot@github.com",
+            "username": "",
+            "password": os.environ.get("GIT_PAT", "")
+        }],
         "sonja_user": "sonja",
         "channel": "latest",
         "path": path,
         "version": version,
         "ssh_key": os.environ.get("SSH_KEY", ""),
         "known_hosts": known_hosts,
-        "docker_user": "",
-        "docker_password": "",
+        "docker_credentials": [{
+            "server": "",
+            "username": os.environ.get("DOCKER_USER", ""),
+            "password": os.environ.get("DOCKER_PASSWORD", "")
+        }],
         "mtu": "1450"
     }
 
@@ -101,6 +102,18 @@ class TestBuilder(unittest.TestCase):
         docker_host = os.environ.get("LINUX_DOCKER_HOST", "")
         parameters = get_build_parameters("linux-debug")
         with environment("DOCKER_HOST", docker_host), Builder("Linux", "uboot/gcc9:latest") as builder:
+            builder.pull(parameters)
+            builder.setup(parameters)
+            builder.run()
+            logs = [line for line in builder.get_log_lines()]
+            self.assertGreater(len(logs), 0)
+            self.assertTrue("create" in builder.build_output.keys())
+            self.assertTrue("info" in builder.build_output.keys())
+
+    def test_run_linux_private_registry(self):
+        docker_host = os.environ.get("LINUX_DOCKER_HOST", "")
+        parameters = get_build_parameters("linux-debug")
+        with environment("DOCKER_HOST", docker_host), Builder("Linux", "uboot/private:latest") as builder:
             builder.pull(parameters)
             builder.setup(parameters)
             builder.run()
