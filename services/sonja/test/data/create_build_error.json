@@ -1,0 +1,146 @@
+{
+  "error": true,
+  "installed": [
+    {
+      "recipe": {
+        "id": "app/1.2.3",
+        "downloaded": false,
+        "exported": true,
+        "error": null,
+        "remote": null,
+        "time": "2022-07-19T15:14:09.437455",
+        "dependency": false,
+        "name": "app",
+        "version": "1.2.3",
+        "user": null,
+        "channel": null
+      },
+      "packages": [
+        {
+          "id": "227220812d7ea3aa060187bae41abbc9911dfdfd",
+          "downloaded": false,
+          "exported": false,
+          "error": {
+            "type": "building",
+            "description": "app/1.2.3: Error in build() method, line 36\n\t% (self.source_folder, cmake.command_line))\n\tNameError: name 'cmake' is not defined",
+            "remote": null
+          },
+          "remote": null,
+          "time": "2022-07-19T15:14:09.849705",
+          "built": false
+        }
+      ]
+    },
+    {
+      "recipe": {
+        "id": "hello/1.2.3@mycompany/stable",
+        "downloaded": false,
+        "exported": false,
+        "error": null,
+        "remote": null,
+        "time": "2022-07-19T15:14:09.446287",
+        "dependency": true,
+        "name": "hello",
+        "version": "1.2.3",
+        "user": "mycompany",
+        "channel": "stable"
+      },
+      "packages": [
+        {
+          "id": "05b9eeef9ae43a8780565a51d60b777370566d07",
+          "downloaded": false,
+          "exported": false,
+          "error": null,
+          "remote": null,
+          "time": "2022-07-19T15:14:09.458274",
+          "built": false,
+          "cpp_info": {
+            "includedirs": [
+              "include"
+            ],
+            "libdirs": [
+              "lib"
+            ],
+            "resdirs": [
+              "res"
+            ],
+            "bindirs": [
+              "bin"
+            ],
+            "builddirs": [
+              ""
+            ],
+            "frameworkdirs": [
+              "Frameworks"
+            ],
+            "libs": [
+              "hello"
+            ],
+            "rootpath": "/home/conan/.conan/data/hello/1.2.3/mycompany/stable/package/05b9eeef9ae43a8780565a51d60b777370566d07",
+            "version": "1.2.3",
+            "description": "<Description of Hello here>",
+            "filter_empty": true,
+            "public_deps": [
+              "base"
+            ],
+            "configs": {}
+          }
+        }
+      ]
+    },
+    {
+      "recipe": {
+        "id": "base/1.2.3@mycompany/stable",
+        "downloaded": false,
+        "exported": false,
+        "error": null,
+        "remote": null,
+        "time": "2022-07-19T15:14:09.447960",
+        "dependency": true,
+        "name": "base",
+        "version": "1.2.3",
+        "user": "mycompany",
+        "channel": "stable"
+      },
+      "packages": [
+        {
+          "id": "2a30b7d6ea2202e5393ebda51c8729dd2162b9f8",
+          "downloaded": false,
+          "exported": false,
+          "error": null,
+          "remote": null,
+          "time": "2022-07-19T15:14:09.457253",
+          "built": false,
+          "cpp_info": {
+            "includedirs": [
+              "include"
+            ],
+            "libdirs": [
+              "lib"
+            ],
+            "resdirs": [
+              "res"
+            ],
+            "bindirs": [
+              "bin"
+            ],
+            "builddirs": [
+              ""
+            ],
+            "frameworkdirs": [
+              "Frameworks"
+            ],
+            "libs": [
+              "hello"
+            ],
+            "rootpath": "/home/conan/.conan/data/base/1.2.3/mycompany/stable/package/2a30b7d6ea2202e5393ebda51c8729dd2162b9f8",
+            "version": "1.2.3",
+            "description": "<Description of Hello here>",
+            "filter_empty": true,
+            "configs": {}
+          }
+        }
+      ]
+    }
+  ]
+}
