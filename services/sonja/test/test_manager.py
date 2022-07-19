@@ -65,7 +65,48 @@ class TestManager(unittest.TestCase):
             self.assertEqual("227220812d7ea3aa060187bae41abbc9911dfdfd", build.package.package_id)
             self.assertEqual("app", build.package.recipe_revision.recipe.name)
             self.assertEqual("2b44d2dde63878dd279ebe5d38c60dfaa97153fb", build.package.recipe_revision.revision)
-            self.assertEqual(0, len(build.package.requires))
+            self.assertEqual(1, len(build.package.requires))
+
+    def test_process_success_required_by(self):
+        build_output = _setup_build_output()
+
+        with session_scope() as session:
+            ecosystem = util.create_ecosystem(dict())
+            dependency = util.create_build({
+                "ecosystem": ecosystem,
+            })
+            package = util.create_package({
+                "ecosystem": ecosystem,
+                "package.package_id": "05b9eeef9ae43a8780565a51d60b777370566d07",
+                "recipe_revision.revision": "2b44d2dde63878dd279ebe5d38c60dfaa97153fb",
+                "recipe.name": "hello"
+            })
+            dependency.package = package
+            session.add(dependency)
+            build = util.create_build({
+                "ecosystem": ecosystem,
+                "repo.dependent": True
+            })
+            session.add(build)
+            session.commit()
+            dependency_id = dependency.id
+            build_id = build.id
+
+        result = self.manager.process_success(build_id, build_output)
+
+        self.assertFalse("new_builds" in result.keys())
+
+        with session_scope() as session:
+            build = session.query(Build).filter_by(id=build_id).first()
+            dependency = session.query(Build).filter_by(id=dependency_id).first()
+            self.assertIsNotNone(build.package)
+            self.assertEqual("227220812d7ea3aa060187bae41abbc9911dfdfd", build.package.package_id)
+            self.assertEqual("app", build.package.recipe_revision.recipe.name)
+            self.assertEqual("2b44d2dde63878dd279ebe5d38c60dfaa97153fb", build.package.recipe_revision.revision)
+            self.assertEqual(1, len(build.package.requires))
+            self.assertEqual(1, len(dependency.package.required_by))
+            self.assertEqual(dependency.package.id, build.package.requires[0].id)
+            self.assertEqual(build.package.id, dependency.package.required_by[0].id)
 
     def test_process_success_existing_recipe(self):
         build_output = _setup_build_output()
@@ -85,8 +126,8 @@ class TestManager(unittest.TestCase):
             build = session.query(Build).filter_by(id=build_id).first()
             recipes = session.query(Recipe).all()
             recipe_revisions = session.query(RecipeRevision).all()
-            self.assertEqual(1, len(recipes))
-            self.assertEqual(1, len(recipe_revisions))
+            self.assertEqual(2, len(recipes))
+            self.assertEqual(2, len(recipe_revisions))
             self.assertEqual(1, build.package.recipe_revision.id)
 
     def test_process_success_existing_recipe_revision(self):
@@ -107,8 +148,8 @@ class TestManager(unittest.TestCase):
             build = session.query(Build).filter_by(id=build_id).first()
             recipes = session.query(Recipe).all()
             recipe_revisions = session.query(RecipeRevision).all()
-            self.assertEqual(1, len(recipes))
-            self.assertEqual(1, len(recipe_revisions))
+            self.assertEqual(2, len(recipes))
+            self.assertEqual(2, len(recipe_revisions))
             self.assertEqual(1, build.package.recipe_revision.id)
 
     def test_process_success_existing_package(self):
@@ -128,7 +169,7 @@ class TestManager(unittest.TestCase):
         with session_scope() as session:
             build = session.query(Build).filter_by(id=build_id).first()
             packages = session.query(Package).all()
-            self.assertEqual(1, len(packages))
+            self.assertEqual(2, len(packages))
             self.assertEqual(1, build.package.id)
 
     def test_process_failure_missing_package(self):
@@ -143,6 +184,14 @@ class TestManager(unittest.TestCase):
         self.manager.process_failure(build_id, build_output)
 
         with session_scope() as session:
+            # a recipe for the failed build should exist
+            recipe = session.query(Recipe).filter_by(name="hello").first()
+            self.assertIsNotNone(recipe)
+            recipe_revision = session.query(RecipeRevision).\
+                filter_by(recipe_id=recipe.id, revision="f5c1ba6f1af634f500f7e0255619fecf4777965f")
+            self.assertIsNotNone(recipe_revision)
+
+            # the build should now have a missing package
             build = session.query(Build).filter_by(id=build_id).first()
             self.assertEqual(1, len(build.missing_packages))
             package = build.missing_packages[0]
@@ -207,6 +256,14 @@ class TestManager(unittest.TestCase):
         self.manager.process_failure(build_id, build_output)
 
         with session_scope() as session:
+            # a recipe for the failed build should exist
+            recipe = session.query(Recipe).filter_by(name="hello").first()
+            self.assertIsNotNone(recipe)
+            recipe_revision = session.query(RecipeRevision).\
+                filter_by(recipe_id=recipe.id, revision="f5c1ba6f1af634f500f7e0255619fecf4777965f")
+            self.assertIsNotNone(recipe_revision)
+
+            # the build should now have a missing recipe
             build = session.query(Build).filter_by(id=build_id).first()
             self.assertEqual(1, len(build.missing_recipes))
             recipe = build.missing_recipes[0]

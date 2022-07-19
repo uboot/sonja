@@ -12,13 +12,17 @@ class Manager(object):
     def __init__(self, redis_client: RedisClient):
         self.__redis_client = redis_client
 
-    def __process_recipe(self, session: Session, recipe_data: dict, ecosystem: Ecosystem) -> Recipe:
-        ecosystem_id = ecosystem.id
-        name = recipe_data["name"]
-        version = recipe_data["version"]
-        user = recipe_data.get("user", None)
-        channel = recipe_data.get("channel", None)
+    def __revision_from_recipe_id(self, recipe_id):
+        m = re.match("[\\w\\+\\.-]+/[\\w\\+\\.-]+(?:@\\w+/\\w+)?(#(\\w+))?", recipe_id)
+        if m:
+            return m.group(2) if m.group(2) else ""
+        else:
+            logger.error("Invalid recipe ID '%s'", recipe_id)
+            return None
 
+    def __process_recipe(self, session: Session, name: str, version: str, user: str, channel: str,
+                         ecosystem: Ecosystem) -> Recipe:
+        ecosystem_id = ecosystem.id
         recipe = session.query(Recipe).filter_by(
             ecosystem_id=ecosystem_id,
             name=name,
@@ -34,21 +38,16 @@ class Manager(object):
             recipe.version = version
             recipe.user = user
             recipe.channel = channel
+            session.add(recipe)
 
         logger.debug("Process recipe '%s' ('%s/%s@%s/%s')", recipe.id, recipe.name, recipe.version,
                      recipe.user, recipe.channel)
         return recipe
 
-    def __process_recipe_revision(self, session: Session, recipe_data: dict, ecosystem: Ecosystem) -> RecipeRevision:
-        recipe = self.__process_recipe(session, recipe_data, ecosystem)
+    def __process_recipe_revision(self, session: Session, name: str, version: str, user: str, channel: str,
+                                  revision: str, ecosystem: Ecosystem) -> RecipeRevision:
+        recipe = self.__process_recipe(session, name, version, user, channel, ecosystem)
         if not recipe:
-            return None
-
-        m = re.match("[\\w\\+\\.-]+/[\\w\\+\\.-]+(?:@\\w+/\\w+)?(#(\\w+))?", recipe_data["id"])
-        if m:
-            revision = m.group(2) if m.group(2) else ""
-        else:
-            logger.error("Invalid recipe ID '%s'", recipe_data["id"])
             return None
 
         recipe_revision = session.query(RecipeRevision).filter_by(
@@ -60,13 +59,13 @@ class Manager(object):
             recipe_revision = RecipeRevision()
             recipe_revision.recipe = recipe
             recipe_revision.revision = revision
+            session.add(recipe_revision)
 
         logger.debug("Process recipe revision '%s' (revision: '%s')", recipe_revision.id, recipe_revision.revision)
         return recipe_revision
 
-    def __process_package(self, session: Session, package_data: dict, recipe_revision: RecipeRevision)\
+    def __process_package(self, session: Session, package_id: str, recipe_revision: RecipeRevision)\
             -> Package:
-        package_id = package_data["id"]
         package = session.query(Package).filter_by(
             package_id=package_id,
             recipe_revision_id=recipe_revision.id
@@ -151,6 +150,13 @@ class Manager(object):
             logger.error("Failed to obtain JSON output of the Conan create stage for build '%d'", build_id)
             return result
 
+        try:
+            info_data = json.loads(build_output["info"])
+            info_map = {reference["reference"]: reference for reference in info_data}
+        except KeyError:
+            logger.error("Failed to obtain JSON output of the Conan info stage for build '%d'", build_id)
+            return result
+
         with session_scope() as session:
             build = session.query(Build).filter_by(id=build_id).first()
             build.package = None
@@ -161,12 +167,19 @@ class Manager(object):
                 if recipe_data["dependency"]:
                     continue
 
-                recipe_revision = self.__process_recipe_revision(session, recipe_data, build.profile.ecosystem)
+                name = recipe_data["name"]
+                version = recipe_data["version"]
+                user = recipe_data.get("user", None)
+                channel = recipe_data.get("channel", None)
+                revision = self.__revision_from_recipe_id(recipe_data["id"])
+                recipe_revision = self.__process_recipe_revision(session, name, version, user, channel, revision,
+                                                                 build.profile.ecosystem)
                 if not recipe_revision:
                     continue
 
                 for package_data in recipe_compound["packages"]:
-                    package = self.__process_package(session, package_data, recipe_revision)
+                    package_id = package_data["id"]
+                    package = self.__process_package(session, package_id, recipe_revision)
                     if not package:
                         continue
                     build.package = package
@@ -176,6 +189,28 @@ class Manager(object):
 
                 if self.__trigger_builds_for_recipe(session, recipe_revision.recipe):
                     result['new_builds'] = True
+
+            for reference_data in info_data:
+                if reference_data["is_ref"]:
+                    continue
+
+                for requirement in reference_data["requires"]:
+                    recipe_id = info_map[requirement]["reference"]
+                    m = re.match("([\\w\\+\\.-]+)/([\\w\\+\\.-]+)(?:@(\\w+)/(\\w+))?(#\\w+)?", recipe_id)
+                    if m:
+                        name = m.group(1)
+                        version = m.group(2)
+                        user = m.group(3)
+                        channel = m.group(4)
+                    else:
+                        logger.error("Invalid recipe ID '%s'", recipe_id)
+                        return None
+                    recipe_revision = info_map[requirement]["revision"]
+                    package_id = info_map[requirement]["id"]
+                    recipe_revision = self.__process_recipe_revision(session, name, version, user, channel,
+                                                                     recipe_revision, build.profile.ecosystem)
+                    package = self.__process_package(session, package_id, recipe_revision)
+                    build.package.requires.append(package)
 
             logger.info("Updated database for the successful build '%d'", build_id)
             return result
@@ -198,21 +233,39 @@ class Manager(object):
             build.missing_packages = []
             for recipe_compound in data["installed"]:
                 recipe_data = recipe_compound["recipe"]
+                name = recipe_data["name"]
+                version = recipe_data["version"]
+                user = recipe_data.get("user", None)
+                channel = recipe_data.get("channel", None)
+                revision = self.__revision_from_recipe_id(recipe_data["id"])
                 if not recipe_data["dependency"]:
+                    recipe_revision = self.__process_recipe_revision(session, name, version, user, channel, revision,
+                                                                     build.profile.ecosystem)
+
+                    for package_data in recipe_compound["packages"]:
+                        package_id = package_data["id"]
+                        package = self.__process_package(session, package_id, recipe_revision)
+                        build.package = package
                     continue
 
                 if recipe_data["error"] and recipe_data["error"]["type"] == "missing":
-                    recipe = self.__process_recipe(session, recipe_data, build.profile.ecosystem)
+                    name = recipe_data["name"]
+                    version = recipe_data["version"]
+                    user = recipe_data.get("user", None)
+                    channel = recipe_data.get("channel", None)
+                    recipe = self.__process_recipe(session, name, version, user, channel, build.profile.ecosystem)
                     build.missing_recipes.append(recipe)
                     continue
 
-                recipe_revision = self.__process_recipe_revision(session, recipe_data, build.profile.ecosystem)
+                recipe_revision = self.__process_recipe_revision(session, name, version, user, channel, revision,
+                                                                 build.profile.ecosystem)
                 if not recipe_revision:
                     continue
 
                 for package_data in recipe_compound["packages"]:
                     if package_data["error"] and package_data["error"]["type"] == "missing":
-                        package = self.__process_package(session, package_data, recipe_revision)
+                        package_id = package_data["id"]
+                        package = self.__process_package(session, package_id, recipe_revision)
                         build.missing_packages.append(package)
 
             logger.info("Updated database for the failed build '%d'", build_id)

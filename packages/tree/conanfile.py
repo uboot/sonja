@@ -13,6 +13,7 @@ class TreeConan(ConanFile):
     options = {"shared": [True, False]}
     default_options = {"shared": False}
     requires = ("base/1.2.3@mycompany/stable", "core/1.2.3@mycompany/stable")
+    build_requires = ("app/1.2.3@mycompany/stable",)
     generators = "cmake"
     revision_mode = "scm"
 
