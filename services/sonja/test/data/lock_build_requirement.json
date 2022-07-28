@@ -1,0 +1,56 @@
+{
+ "graph_lock": {
+  "nodes": {
+   "0": {
+    "ref": "tree/1.2.3@mycompany/stable",
+    "options": "shared=False\nbase:with_tests=False\ncore:with_tests=False",
+    "requires": [
+     "1",
+     "2"
+    ],
+    "build_requires": [
+     "3"
+    ],
+    "path": "tree/conanfile.py",
+    "context": "host"
+   },
+   "1": {
+    "ref": "base/1.2.3@mycompany/stable",
+    "options": "with_tests=False",
+    "package_id": "2a30b7d6ea2202e5393ebda51c8729dd2162b9f8",
+    "prev": "0",
+    "context": "host"
+   },
+   "2": {
+    "ref": "core/1.2.3@mycompany/stable",
+    "options": "with_tests=False",
+    "package_id": "2a30b7d6ea2202e5393ebda51c8729dd2162b9f8",
+    "prev": "0",
+    "context": "host"
+   },
+   "3": {
+    "ref": "app/1.2.3@mycompany/stable",
+    "options": "shared=False\nbase:with_tests=False\nhello:shared=False",
+    "package_id": "227220812d7ea3aa060187bae41abbc9911dfdfd",
+    "prev": "0",
+    "requires": [
+     "4"
+    ],
+    "context": "host"
+   },
+   "4": {
+    "ref": "hello/1.2.3@mycompany/stable",
+    "options": "shared=False\nbase:with_tests=False",
+    "package_id": "05b9eeef9ae43a8780565a51d60b777370566d07",
+    "prev": "0",
+    "requires": [
+     "1"
+    ],
+    "context": "host"
+   }
+  },
+  "revisions_enabled": false
+ },
+ "version": "0.4",
+ "profile_host": "[settings]\narch=x86_64\narch_build=x86_64\nbuild_type=Release\ncompiler=gcc\ncompiler.libcxx=libstdc++\ncompiler.version=9\nos=Linux\nos_build=Linux\n[options]\n[build_requires]\n[env]\n"
+}

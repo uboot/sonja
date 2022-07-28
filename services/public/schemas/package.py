@@ -17,6 +17,7 @@ class Package(BaseModel):
 
 package_relationships = create_relationships("PackageRelationships", [
     DataItem("recipe_revision", "recipe-revisions"),
+    DataList("builds", "builds"),
     DataList("requires", "packages"),
     DataList("required_by", "packages"),
 ])

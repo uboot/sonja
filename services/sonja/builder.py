@@ -63,7 +63,7 @@ def extract_output_tar(data: FileIO):
         f.write(chunk)
     f.seek(0)
     tar = tarfile.open(fileobj=f)
-    output_files = ["create", "info"]
+    output_files = ["create", "info", "lock"]
     result = dict()
     for output_file in output_files:
         try:
@@ -176,12 +176,17 @@ class Builder(object):
         config_path = "-sf {0}".format(parameters["conan_config_path"])\
             if parameters["conan_config_path"] else ""
 
+        lock_file_version_arg = "--version {0}".format(parameters["version"]) if parameters["version"] else ""
+        lock_file_user_arg = "--user {0} --channel {1}".format(parameters["sonja_user"], parameters["channel"]) if \
+            parameters["sonja_user"] else ""
+
         patched_parameters = {
             **parameters,
             "conan_config_args": " ".join([config_url, config_branch, config_path]),
             "build_package_dir": self.__build_package_dir,
             "escaped_build_package_dir": self.__escaped_build_package_dir,
-            "build_output_dir": self.__build_output_dir
+            "build_output_dir": self.__build_output_dir,
+            "lock_file_args": " ".join([lock_file_version_arg, lock_file_user_arg])
         }
         build_tar = create_build_tar(self.__script_template, patched_parameters)
 

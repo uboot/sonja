@@ -18,3 +18,8 @@ class TestPackage(ApiTestCase):
         package_id = run_create_operation(create_package, dict())
         response = client.get(f"{api_prefix}/package/{package_id}", headers=self.reader_headers)
         self.assertEqual(200, response.status_code)
+
+    def test_get_package_with_build(self):
+        package_id = run_create_operation(create_package, {"build.with_dependencies": True})
+        response = client.get(f"{api_prefix}/package/{package_id}", headers=self.reader_headers)
+        self.assertEqual(200, response.status_code)
