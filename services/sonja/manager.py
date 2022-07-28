@@ -151,8 +151,8 @@ class Manager(object):
             return result
 
         try:
-            info_data = json.loads(build_output["info"])
-            info_map = {reference["reference"]: reference for reference in info_data}
+            lock_data = json.loads(build_output["lock"])
+            nodes = lock_data["graph_lock"]["nodes"]
         except KeyError:
             logger.error("Failed to obtain JSON output of the Conan info stage for build '%d'", build_id)
             return result
@@ -190,27 +190,24 @@ class Manager(object):
                 if self.__trigger_builds_for_recipe(session, recipe_revision.recipe):
                     result['new_builds'] = True
 
-            for reference_data in info_data:
-                if reference_data["is_ref"]:
-                    continue
-
-                for requirement in reference_data["requires"]:
-                    recipe_id = info_map[requirement]["reference"]
-                    m = re.match("([\\w\\+\\.-]+)/([\\w\\+\\.-]+)(?:@(\\w+)/(\\w+))?(#\\w+)?", recipe_id)
-                    if m:
-                        name = m.group(1)
-                        version = m.group(2)
-                        user = m.group(3)
-                        channel = m.group(4)
-                    else:
-                        logger.error("Invalid recipe ID '%s'", recipe_id)
-                        return None
-                    recipe_revision = info_map[requirement]["revision"]
-                    package_id = info_map[requirement]["id"]
-                    recipe_revision = self.__process_recipe_revision(session, name, version, user, channel,
-                                                                     recipe_revision, build.profile.ecosystem)
-                    package = self.__process_package(session, package_id, recipe_revision)
-                    build.package.requires.append(package)
+            root = nodes["0"]
+            for requirement in root.get("requires", []) + root.get("build_requires", []):
+                recipe_id = nodes[requirement]["ref"]
+                m = re.match("([\\w\\+\\.-]+)/([\\w\\+\\.-]+)(?:@(\\w+)/(\\w+))?(#(\\w+))?", recipe_id)
+                if m:
+                    name = m.group(1)
+                    version = m.group(2)
+                    user = m.group(3)
+                    channel = m.group(4)
+                    recipe_revision = m.group(6)
+                else:
+                    logger.error("Invalid recipe ID '%s'", recipe_id)
+                    return None
+                package_id = nodes[requirement]["package_id"]
+                recipe_revision = self.__process_recipe_revision(session, name, version, user, channel,
+                                                                 recipe_revision, build.profile.ecosystem)
+                package = self.__process_package(session, package_id, recipe_revision)
+                build.package.requires.append(package)
 
             logger.info("Updated database for the successful build '%d'", build_id)
             return result

@@ -8,11 +8,12 @@ import os
 import unittest
 
 
-def _setup_build_output(create_file="create.json", info_file="info.json"):
+def _setup_build_output(create_file="create.json", info_file="info.json", lock_file="lock.json"):
     build_output = dict()
     output_files = {
         "create": create_file,
-        "info": info_file
+        "info": info_file,
+        "lock": lock_file
     }
 
     for output in output_files:
@@ -273,7 +274,7 @@ class TestManager(unittest.TestCase):
             self.assertEqual("stable", recipe.channel)
 
     def test_process_success_remove_missing_items(self):
-        build_output = _setup_build_output("create.json")
+        build_output = _setup_build_output()
 
         with session_scope() as session:
             build = util.create_build(dict())
@@ -291,7 +292,7 @@ class TestManager(unittest.TestCase):
             self.assertEqual(0, len(build.missing_packages))
 
     def test_process_success_waiting_for_recipe(self):
-        build_output = _setup_build_output("create.json")
+        build_output = _setup_build_output()
 
         with session_scope() as session:
             ecosystem = util.create_ecosystem(dict())
@@ -308,7 +309,7 @@ class TestManager(unittest.TestCase):
             self.assertEqual(BuildStatus.new, waiting_build.status)
 
     def test_process_success_waiting_for_package(self):
-        build_output = _setup_build_output("create.json")
+        build_output = _setup_build_output()
         with session_scope() as session:
             ecosystem = util.create_ecosystem(dict())
             waiting_build_id = _create_waiting_build(session, ecosystem,
@@ -326,7 +327,7 @@ class TestManager(unittest.TestCase):
         self.assertTrue(self.redis_client.publish_build_updates.called)
 
     def test_process_success_waiting_for_package_no_revision(self):
-        build_output = _setup_build_output("create.json")
+        build_output = _setup_build_output()
         with session_scope() as session:
             ecosystem = util.create_ecosystem(dict())
             waiting_build_id = _create_waiting_build(session, ecosystem, missing_packages=[util.create_package(
@@ -348,7 +349,7 @@ class TestManager(unittest.TestCase):
         self.assertTrue(self.redis_client.publish_build_updates.called)
 
     def test_process_success_waiting_for_package_different_revision(self):
-        build_output = _setup_build_output("create.json")
+        build_output = _setup_build_output()
         with session_scope() as session:
             ecosystem = util.create_ecosystem(dict())
             waiting_build_id = _create_waiting_build(session, ecosystem, missing_packages=[util.create_package(
@@ -370,7 +371,7 @@ class TestManager(unittest.TestCase):
         self.assertTrue(self.redis_client.publish_build_updates.called)
 
     def test_process_success_waiting_for_package_different_package_id(self):
-        build_output = _setup_build_output("create.json")
+        build_output = _setup_build_output()
         with session_scope() as session:
             ecosystem = util.create_ecosystem(dict())
             waiting_build_id = _create_waiting_build(session, ecosystem, missing_packages=[util.create_package(
@@ -388,3 +389,31 @@ class TestManager(unittest.TestCase):
         with session_scope() as session:
             waiting_build = session.query(Build).filter_by(id=waiting_build_id).first()
             self.assertEqual(BuildStatus.error, waiting_build.status)
+
+    def test_process_success_build_requirement(self):
+        build_output = _setup_build_output(lock_file="lock_build_requirement.json")
+        with session_scope() as session:
+            ecosystem = util.create_ecosystem(dict())
+            build_id = _create_build(session, ecosystem)
+
+        result = self.manager.process_success(build_id, build_output)
+
+        with session_scope() as session:
+            build = session.query(Build).filter_by(id=build_id).first()
+
+            # depends on base, core, app
+            self.assertEqual(3, len(build.package.requires))
+
+    def test_process_success_no_requirement(self):
+        build_output = _setup_build_output(lock_file="lock_no_requirement.json")
+        with session_scope() as session:
+            ecosystem = util.create_ecosystem(dict())
+            build_id = _create_build(session, ecosystem)
+
+        result = self.manager.process_success(build_id, build_output)
+
+        with session_scope() as session:
+            build = session.query(Build).filter_by(id=build_id).first()
+
+            # depends on base, core, app
+            self.assertEqual(0, len(build.package.requires))

@@ -44,6 +44,7 @@ conan create -pr $conan_profile $conan_options --json $build_output_dir/create.j
 
 echo '### Collect package data ###'
 conan info -pr $conan_profile $conan_options --json $build_output_dir/info.json $$package_name/$$package_version@$sonja_user/$channel; ThrowOnNonZero
+conan lock create -pr $conan_profile $conan_options --lockfile-out $build_output_dir/lock.json $path $lock_file_args; ThrowOnNonZero
 
 echo '### Upload package ###'
 conan upload $$package_name/$$package_version@$sonja_user/$channel --all --confirm -r $conan_remote; ThrowOnNonZero

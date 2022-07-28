@@ -2,50 +2,30 @@
  "graph_lock": {
   "nodes": {
    "0": {
-    "ref": "tree/1.2.3",
-    "options": "shared=False\nbase:with_tests=False\ncore:with_tests=False",
-    "requires": [
-     "1",
-     "2"
-    ],
-    "build_requires": [
-     "3"
-    ],
-    "path": "packages\\tree\\conanfile.py",
-    "context": "host"
-   },
-   "1": {
-    "ref": "base/1.2.3@mycompany/stable#eeef582a1da44b5d5675cb6614c2b7192d4340bf",
-    "options": "with_tests=False",
-    "package_id": "3fb49604f9c2f729b85ba3115852006824e72cab",
-    "prev": "02dde4841420440a4f5dbfc25c174a27",
-    "context": "host"
-   },
-   "2": {
-    "ref": "core/1.2.3@mycompany/stable#eeef582a1da44b5d5675cb6614c2b7192d4340bf",
-    "options": "with_tests=False",
-    "package_id": "3fb49604f9c2f729b85ba3115852006824e72cab",
-    "prev": "a2a4b8a3b6e8aa45c10f42e8512d9a3f",
-    "context": "host"
-   },
-   "3": {
-    "ref": "app/1.2.3@mycompany/stable#eeef582a1da44b5d5675cb6614c2b7192d4340bf",
+    "ref": "app/1.2.3#eeef582a1da44b5d5675cb6614c2b7192d4340bf",
     "options": "shared=False\nbase:with_tests=False\nhello:shared=False",
     "package_id": "7f82b9d4bb5ef6655cebe5692c0353a2f5dc4f09",
     "prev": "73e144188e5f8d8041a57c785ce01cae",
     "requires": [
-     "4"
+     "1"
     ],
     "context": "host"
    },
-   "4": {
-    "ref": "hello/1.2.3@mycompany/stable#eeef582a1da44b5d5675cb6614c2b7192d4340bf",
+   "1": {
+    "ref": "hello/1.2.3#2b44d2dde63878dd279ebe5d38c60dfaa97153fb",
     "options": "shared=False\nbase:with_tests=False",
-    "package_id": "9f6db4b4a0947958c642878c9e2a5433c1d6cac3",
+    "package_id": "05b9eeef9ae43a8780565a51d60b777370566d07",
     "prev": "015e4d4c8cb051cff4306d77107d7b78",
     "requires": [
-     "1"
+     "2"
     ],
+    "context": "host"
+   },
+   "3": {
+    "ref": "base/1.2.3#eeef582a1da44b5d5675cb6614c2b7192d4340bf",
+    "options": "with_tests=False",
+    "package_id": "3fb49604f9c2f729b85ba3115852006824e72cab",
+    "prev": "02dde4841420440a4f5dbfc25c174a27",
     "context": "host"
    }
   },
