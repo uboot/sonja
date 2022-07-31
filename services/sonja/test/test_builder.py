@@ -179,7 +179,7 @@ class TestBuilder(unittest.TestCase):
     def test_run_windows(self):
         docker_host = os.environ.get("WINDOWS_DOCKER_HOST", "127.0.0.1:2375")
         parameters = get_build_parameters("windows-debug")
-        with environment("DOCKER_HOST", docker_host), Builder("Windows", "uboot/msvc15:latest") as builder:
+        with environment("DOCKER_HOST", docker_host), Builder("Windows", "msvc15:local") as builder:
             builder.pull(parameters)
             builder.setup(parameters)
             builder.run()
@@ -191,7 +191,7 @@ class TestBuilder(unittest.TestCase):
     def test_run_windows_version(self):
         docker_host = os.environ.get("WINDOWS_DOCKER_HOST", "127.0.0.1:2375")
         parameters = get_build_parameters("windows-debug", version="1.2.3")
-        with environment("DOCKER_HOST", docker_host), Builder("Windows", "uboot/msvc15:latest") as builder:
+        with environment("DOCKER_HOST", docker_host), Builder("Windows", "msvc15:local") as builder:
             builder.pull(parameters)
             builder.setup(parameters)
             builder.run()
@@ -203,7 +203,7 @@ class TestBuilder(unittest.TestCase):
     def test_run_windows_https(self):
         docker_host = os.environ.get("WINDOWS_DOCKER_HOST", "127.0.0.1:2375")
         parameters = get_build_parameters("windows-debug", https=True)
-        with environment("DOCKER_HOST", docker_host), Builder("Windows", "uboot/msvc15:latest") as builder:
+        with environment("DOCKER_HOST", docker_host), Builder("Windows", "msvc15:local") as builder:
             builder.pull(parameters)
             builder.setup(parameters)
             builder.run()
@@ -216,7 +216,7 @@ class TestBuilder(unittest.TestCase):
         docker_host = os.environ.get("WINDOWS_DOCKER_HOST", "127.0.0.1:2375")
         parameters = get_build_parameters("windows-debug")
         parameters["path"] = "packages/deadlock/conanfile.py"
-        with environment("DOCKER_HOST", docker_host), Builder("Windows", "uboot/msvc15:latest") as builder:
+        with environment("DOCKER_HOST", docker_host), Builder("Windows", "msvc15:local") as builder:
             canceller = cancel_build(builder, 3)
             builder.pull(parameters)
             builder.setup(parameters)
