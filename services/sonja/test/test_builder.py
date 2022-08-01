@@ -52,7 +52,7 @@ def cancel_build(builder, seconds):
     return canceller
 
 
-def get_build_parameters(profile, https=False, version=""):
+def get_build_parameters(profile, https=False, version="", no_user=False):
     if https:
         path = "./base/conanfile.py"
     elif version:
@@ -76,8 +76,8 @@ def get_build_parameters(profile, https=False, version=""):
             "username": "",
             "password": os.environ.get("GIT_PAT", "")
         }],
-        "sonja_user": "sonja",
-        "channel": "latest",
+        "sonja_user": "sonja" if not no_user else "",
+        "channel": "latest" if not no_user else "",
         "path": path,
         "version": version,
         "ssh_key": os.environ.get("SSH_KEY", ""),
@@ -109,6 +109,7 @@ class TestBuilder(unittest.TestCase):
             self.assertGreater(len(logs), 0)
             self.assertTrue("create" in builder.build_output.keys())
             self.assertTrue("info" in builder.build_output.keys())
+            self.assertTrue("lock" in builder.build_output.keys())
 
     def test_run_linux_private_registry(self):
         docker_host = os.environ.get("LINUX_DOCKER_HOST", "")
@@ -121,6 +122,7 @@ class TestBuilder(unittest.TestCase):
             self.assertGreater(len(logs), 0)
             self.assertTrue("create" in builder.build_output.keys())
             self.assertTrue("info" in builder.build_output.keys())
+            self.assertTrue("lock" in builder.build_output.keys())
 
     def test_run_linux_version(self):
         docker_host = os.environ.get("LINUX_DOCKER_HOST", "")
@@ -133,6 +135,33 @@ class TestBuilder(unittest.TestCase):
             self.assertGreater(len(logs), 0)
             self.assertTrue("create" in builder.build_output.keys())
             self.assertTrue("info" in builder.build_output.keys())
+            self.assertTrue("lock" in builder.build_output.keys())
+
+    def test_run_linux_no_user(self):
+        docker_host = os.environ.get("LINUX_DOCKER_HOST", "")
+        parameters = get_build_parameters("linux-debug", no_user=True)
+        with environment("DOCKER_HOST", docker_host), Builder("Linux", "uboot/gcc9:latest") as builder:
+            builder.pull(parameters)
+            builder.setup(parameters)
+            builder.run()
+            logs = [line for line in builder.get_log_lines()]
+            self.assertGreater(len(logs), 0)
+            self.assertTrue("create" in builder.build_output.keys())
+            self.assertTrue("info" in builder.build_output.keys())
+            self.assertTrue("lock" in builder.build_output.keys())
+
+    def test_run_linux_version_no_user(self):
+        docker_host = os.environ.get("LINUX_DOCKER_HOST", "")
+        parameters = get_build_parameters("linux-debug", version="1.2.3", no_user=True)
+        with environment("DOCKER_HOST", docker_host), Builder("Linux", "uboot/gcc9:latest") as builder:
+            builder.pull(parameters)
+            builder.setup(parameters)
+            builder.run()
+            logs = [line for line in builder.get_log_lines()]
+            self.assertGreater(len(logs), 0)
+            self.assertTrue("create" in builder.build_output.keys())
+            self.assertTrue("info" in builder.build_output.keys())
+            self.assertTrue("lock" in builder.build_output.keys())
 
     def test_run_linux_wrong_version(self):
         docker_host = os.environ.get("LINUX_DOCKER_HOST", "")
@@ -153,6 +182,7 @@ class TestBuilder(unittest.TestCase):
             self.assertGreater(len(logs), 0)
             self.assertTrue("create" in builder.build_output.keys())
             self.assertTrue("info" in builder.build_output.keys())
+            self.assertTrue("lock" in builder.build_output.keys())
 
     def test_cancel_linux_immediately(self):
         docker_host = os.environ.get("LINUX_DOCKER_HOST", "")
@@ -187,6 +217,33 @@ class TestBuilder(unittest.TestCase):
             self.assertGreater(len(logs), 0)
             self.assertTrue("create" in builder.build_output.keys())
             self.assertTrue("info" in builder.build_output.keys())
+            self.assertTrue("lock" in builder.build_output.keys())
+
+    def test_run_windows_no_user(self):
+        docker_host = os.environ.get("WINDOWS_DOCKER_HOST", "127.0.0.1:2375")
+        parameters = get_build_parameters("windows-debug", no_user=True)
+        with environment("DOCKER_HOST", docker_host), Builder("Windows", "msvc15:local") as builder:
+            builder.pull(parameters)
+            builder.setup(parameters)
+            builder.run()
+            logs = [line for line in builder.get_log_lines()]
+            self.assertGreater(len(logs), 0)
+            self.assertTrue("create" in builder.build_output.keys())
+            self.assertTrue("info" in builder.build_output.keys())
+            self.assertTrue("lock" in builder.build_output.keys())
+
+    def test_run_windows_version_no_user(self):
+        docker_host = os.environ.get("WINDOWS_DOCKER_HOST", "127.0.0.1:2375")
+        parameters = get_build_parameters("windows-debug", version="1.2.3", no_user=True)
+        with environment("DOCKER_HOST", docker_host), Builder("Windows", "msvc15:local") as builder:
+            builder.pull(parameters)
+            builder.setup(parameters)
+            builder.run()
+            logs = [line for line in builder.get_log_lines()]
+            self.assertGreater(len(logs), 0)
+            self.assertTrue("create" in builder.build_output.keys())
+            self.assertTrue("info" in builder.build_output.keys())
+            self.assertTrue("lock" in builder.build_output.keys())
 
     def test_run_windows_version(self):
         docker_host = os.environ.get("WINDOWS_DOCKER_HOST", "127.0.0.1:2375")
@@ -199,6 +256,7 @@ class TestBuilder(unittest.TestCase):
             self.assertGreater(len(logs), 0)
             self.assertTrue("create" in builder.build_output.keys())
             self.assertTrue("info" in builder.build_output.keys())
+            self.assertTrue("lock" in builder.build_output.keys())
 
     def test_run_windows_https(self):
         docker_host = os.environ.get("WINDOWS_DOCKER_HOST", "127.0.0.1:2375")
@@ -211,6 +269,7 @@ class TestBuilder(unittest.TestCase):
             self.assertGreater(len(logs), 0)
             self.assertTrue("create" in builder.build_output.keys())
             self.assertTrue("info" in builder.build_output.keys())
+            self.assertTrue("lock" in builder.build_output.keys())
 
     def test_cancel_windows(self):
         docker_host = os.environ.get("WINDOWS_DOCKER_HOST", "127.0.0.1:2375")

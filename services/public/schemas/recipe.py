@@ -23,6 +23,7 @@ class Recipe(BaseModel):
 
 recipe_relationships = create_relationships("RecipeRelationships", [
     DataItem("ecosystem", "ecosystems"),
+    DataList("required_by", "builds"),
     Link("revisions", "revision")
 ])
 

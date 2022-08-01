@@ -186,7 +186,7 @@ class DemoDataCreator(object):
         windows_release.name = "MSVC 15 Release"
         windows_release.container = "uboot/msvc15:latest"
         windows_release.conan_profile = "windows-release"
-        linux_release.labels = [Label(value="windows")]
+        windows_release.labels = [Label(value="windows")]
         self.__session.add(windows_release)
 
         channel = Channel()

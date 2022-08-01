@@ -175,10 +175,13 @@ class Builder(object):
             if parameters["conan_config_branch"] else ""
         config_path = "-sf {0}".format(parameters["conan_config_path"])\
             if parameters["conan_config_path"] else ""
-
+        user_channel = "{0}/{1}".format(parameters["sonja_user"], parameters["channel"]) \
+            if parameters["sonja_user"] else ""
+        version_user_channel = "{0}@{1}".format(parameters["version"], user_channel) \
+            if parameters["version"] or user_channel else ""
         lock_file_version_arg = "--version {0}".format(parameters["version"]) if parameters["version"] else ""
-        lock_file_user_arg = "--user {0} --channel {1}".format(parameters["sonja_user"], parameters["channel"]) if \
-            parameters["sonja_user"] else ""
+        lock_file_user_arg = "--user {0} --channel {1}".format(parameters["sonja_user"], parameters["channel"]) \
+            if parameters["sonja_user"] else ""
 
         patched_parameters = {
             **parameters,
@@ -186,7 +189,9 @@ class Builder(object):
             "build_package_dir": self.__build_package_dir,
             "escaped_build_package_dir": self.__escaped_build_package_dir,
             "build_output_dir": self.__build_output_dir,
-            "lock_file_args": " ".join([lock_file_version_arg, lock_file_user_arg])
+            "create_reference": version_user_channel,
+            "info_reference": user_channel,
+            "lock_args": " ".join([lock_file_version_arg, lock_file_user_arg])
         }
         build_tar = create_build_tar(self.__script_template, patched_parameters)
 
