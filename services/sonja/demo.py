@@ -177,6 +177,7 @@ class DemoDataCreator(object):
         linux_release.name = "GCC 9 Release"
         linux_release.container = "uboot/gcc9:latest"
         linux_release.conan_profile = "linux-release"
+        linux_release.labels = [Label(value="linux")]
         self.__session.add(linux_release)
 
         windows_release = Profile()
@@ -185,6 +186,7 @@ class DemoDataCreator(object):
         windows_release.name = "MSVC 15 Release"
         windows_release.container = "uboot/msvc15:latest"
         windows_release.conan_profile = "windows-release"
+        linux_release.labels = [Label(value="windows")]
         self.__session.add(windows_release)
 
         channel = Channel()
@@ -194,15 +196,10 @@ class DemoDataCreator(object):
         channel.conan_channel = ""
         self.__session.add(channel)
 
-        repo = self.__create_repo("glib",
+        self.__create_repo("glib",
                            "https://github.com/conan-io/conan-center-index.git",
                            "recipes/glib/all",
-                           "2.70.4",
-                           {
-                               "glib:with_elf": "False",
-                               "glib:with_selinux": "False",
-                               "glib:with_mount": "False"
-                           })
+                           "2.72.1")
 
         self.__create_repo("zlib",
                            "https://github.com/conan-io/conan-center-index.git",
@@ -217,7 +214,7 @@ class DemoDataCreator(object):
         self.__create_repo("gnu-config",
                            "https://github.com/conan-io/conan-center-index.git",
                            "recipes/gnu-config/all",
-                           "cci.20201022")
+                           "cci.20210814")
 
         self.__create_repo("pcre",
                            "https://github.com/conan-io/conan-center-index.git",
@@ -232,7 +229,7 @@ class DemoDataCreator(object):
         self.__create_repo("meson",
                            "https://github.com/conan-io/conan-center-index.git",
                            "recipes/meson/all",
-                           "0.60.2")
+                           "0.62.1")
 
         self.__create_repo("ninja",
                            "https://github.com/conan-io/conan-center-index.git",
@@ -247,7 +244,7 @@ class DemoDataCreator(object):
         self.__create_repo("automake",
                            "https://github.com/conan-io/conan-center-index.git",
                            "recipes/automake/all",
-                           "1.16.3")
+                           "1.16.4")
 
         self.__create_repo("autoconf",
                            "https://github.com/conan-io/conan-center-index.git",
@@ -259,7 +256,50 @@ class DemoDataCreator(object):
                            "recipes/m4/all",
                            "1.4.19")
 
-    def __create_repo(self, name: str, url: str, path: str, version: str, options: Dict = dict()):
+        self.__create_repo("libgettext",
+                           "https://github.com/conan-io/conan-center-index.git",
+                           "recipes/libgettext/all",
+                           "0.21")
+
+        self.__create_repo("libiconv",
+                           "https://github.com/conan-io/conan-center-index.git",
+                           "recipes/libiconv/all",
+                           "1.16")
+
+        self.__create_repo("msys2",
+                           "https://github.com/conan-io/conan-center-index.git",
+                           "recipes/msys2/all",
+                           "cci.latest",
+                           exclude=["linux"])
+
+        self.__create_repo("libelf",
+                           "https://github.com/conan-io/conan-center-index.git",
+                           "recipes/libelf/all",
+                           "0.8.13")
+
+        self.__create_repo("libmount",
+                           "https://github.com/conan-io/conan-center-index.git",
+                           "recipes/libmount/all",
+                           "2.36.2")
+
+        self.__create_repo("libselinux",
+                           "https://github.com/conan-io/conan-center-index.git",
+                           "recipes/libselinux/all",
+                           "3.3",
+                           exclude=["windows"])
+
+        self.__create_repo("pcre2",
+                           "https://github.com/conan-io/conan-center-index.git",
+                           "recipes/pcre/all",
+                           "10.37")
+
+        self.__create_repo("flex",
+                           "https://github.com/conan-io/conan-center-index.git",
+                           "recipes/flex/all",
+                           "2.6.4",
+                           exclude=["windows"])
+
+    def __create_repo(self, name: str, url: str, path: str, version: str, options: Dict = dict(), exclude: list = []):
         repo = Repo()
         repo.name = name
         repo.ecosystem = self.__ecosystem
@@ -267,6 +307,7 @@ class DemoDataCreator(object):
         repo.path = path
         repo.version = version
         repo.options = [Option(key=key, value=options[key]) for key in options]
+        repo.exclude = [Label(value=value) for value in exclude]
         self.__session.add(repo)
         return repo
 
