@@ -279,7 +279,7 @@ class Build(Base):
     profile_id = Column(Integer, ForeignKey('profile.id'), nullable=False)
     profile = relationship("Profile")
     missing_packages = relationship("Package", secondary=missing_package)
-    missing_recipes = relationship("Recipe", secondary=missing_recipe)
+    missing_recipes = relationship("Recipe", secondary=missing_recipe, backref="required_by")
 
     @property
     def ecosystem(self):

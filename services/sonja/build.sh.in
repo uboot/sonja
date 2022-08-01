@@ -28,11 +28,11 @@ echo '### Build package ###'
 package_name=$$(conan inspect --raw name $path)
 package_version="$version"
 package_version=$${package_version:-$$(conan inspect --raw version $path)}
-conan create -pr $conan_profile $conan_options --json $build_output_dir/create.json $path $version@$sonja_user/$channel
+conan create -pr $conan_profile $conan_options --json $build_output_dir/create.json $path $create_reference
 
 echo '### Collect package data ###'
-conan info -pr $conan_profile $conan_options --json $build_output_dir/info.json $$package_name/$$package_version@$sonja_user/$channel
-conan lock create -pr $conan_profile $conan_options --lockfile-out $build_output_dir/lock.json $path $lock_file_args
+conan info -pr $conan_profile $conan_options --json $build_output_dir/info.json $$package_name/$$package_version@$info_reference
+conan lock create -pr $conan_profile $conan_options --lockfile-out $build_output_dir/lock.json $path $lock_args
 
 echo '### Upload package ###'
 conan upload $$package_name/$$package_version@$sonja_user/$channel --all --confirm -r $conan_remote
