@@ -305,6 +305,14 @@ class LogLine(Base):
     run = relationship("Run", backref="log_lines")
 
 
+class RecipeRevision(Base):
+    __tablename__ = 'recipe_revision'
+
+    id = Column(Integer, primary_key=True)
+    recipe_id = Column(Integer, ForeignKey('recipe.id'))
+    revision = Column(String(255))
+
+
 class Recipe(Base):
     __tablename__ = 'recipe'
 
@@ -315,15 +323,10 @@ class Recipe(Base):
     version = Column(String(255))
     user = Column(String(255))
     channel = Column(String(255))
-
-
-class RecipeRevision(Base):
-    __tablename__ = 'recipe_revision'
-
-    id = Column(Integer, primary_key=True)
-    recipe_id = Column(Integer, ForeignKey('recipe.id'))
-    recipe = relationship("Recipe", backref="revisions")
-    revision = Column(String(255))
+    current_revision_id = Column(Integer, ForeignKey('recipe_revision.id'))
+    current_revision = relationship("RecipeRevision",
+                                    primaryjoin=current_revision_id==RecipeRevision.id, post_update=True)
+    revisions = relationship("RecipeRevision", primaryjoin=id == RecipeRevision.recipe_id, backref="recipe")
 
 
 package_requirement = Table('package_requirement', Base.metadata,

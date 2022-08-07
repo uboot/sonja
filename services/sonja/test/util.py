@@ -187,6 +187,7 @@ def create_recipe_revision(parameters):
     recipe = create_recipe(parameters)
     recipe_revision = RecipeRevision()
     recipe_revision.recipe = recipe
+    recipe.current_revision = recipe_revision
     recipe_revision.revision = parameters.get("recipe_revision.revision", "2b44d2dde63878dd279ebe5d38c60dfaa97153fb")
     return recipe_revision
 
