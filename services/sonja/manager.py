@@ -177,6 +177,9 @@ class Manager(object):
                 if not recipe_revision:
                     continue
 
+                if build.commit.status == CommitStatus.building:
+                    recipe_revision.recipe.current_revision = recipe_revision
+
                 for package_data in recipe_compound["packages"]:
                     package_id = package_data["id"]
                     package = self.__process_package(session, package_id, recipe_revision)
@@ -258,6 +261,9 @@ class Manager(object):
                                                                  build.profile.ecosystem)
                 if not recipe_revision:
                     continue
+                    
+                if build.commit.status == CommitStatus.building:
+                    recipe_revision.recipe.current_revision = recipe_revision
 
                 for package_data in recipe_compound["packages"]:
                     if package_data["error"] and package_data["error"]["type"] == "missing":

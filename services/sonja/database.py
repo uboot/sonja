@@ -108,12 +108,17 @@ def remove_but_last_user(session: Session, user_id: str):
 
 
 def reset_database():
-        try:
-            Base.metadata.drop_all(engine)
-            Base.metadata.create_all(engine)
-        except OperationalError:
-            logger.warning("Failed to connect to database")
-            raise
+    clear_database()
+
+
+def _activate_foreign_key_check():
+    with session_scope() as session:
+        session.execute("SET FOREIGN_KEY_CHECKS=0")
+
+
+def _deactivate_foreign_key_check():
+    with session_scope() as session:
+        session.execute("SET FOREIGN_KEY_CHECKS=1")
 
 
 def _drop_table(table):
@@ -124,10 +129,11 @@ def _drop_table(table):
             
             
 def _drop_data_tables():
+    _activate_foreign_key_check()
     _drop_table(missing_package)
     _drop_table(missing_recipe)
-    _drop_table(Run.__table__)
     _drop_table(LogLine.__table__)
+    _drop_table(Run.__table__)
     _drop_table(Build.__table__)
     _drop_table(package_requirement)
     _drop_table(Package.__table__)
@@ -141,6 +147,7 @@ def _drop_data_tables():
     _drop_table(Label.__table__)
     _drop_table(Option.__table__)
     _drop_table(Repo.__table__)
+    _activate_foreign_key_check()
     
             
 def clear_database():

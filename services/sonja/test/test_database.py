@@ -93,3 +93,42 @@ class TestDatabase(unittest.TestCase):
             package_1.requires = [package_2]
             self.assertEqual(1, len(package_2.required_by))
 
+    def test_create_recipe_revision(self):
+        with database.session_scope() as session:
+            recipe_revision = util.create_recipe_revision(dict())
+            self.assertIsNotNone(recipe_revision.recipe)
+            self.assertEqual(1, len(recipe_revision.recipe.revisions))
+
+    def test_create_recipe_with_current_revision(self):
+        with database.session_scope() as session:
+            recipe = util.create_recipe(dict())
+            recipe_revision = database.RecipeRevision()
+            recipe_revision.recipe = recipe
+            recipe.current_revision = recipe_revision
+            session.commit()
+
+            self.assertIsNotNone(recipe_revision.recipe)
+            self.assertEqual(1, len(recipe_revision.recipe.revisions))
+
+    def test_delete_recipe_with_current_revision(self):
+        with database.session_scope() as session:
+            recipe = util.create_recipe(dict())
+            recipe_revision = database.RecipeRevision()
+            recipe_revision.recipe = recipe
+            recipe.current_revision = recipe_revision
+            session.add(recipe)
+            session.commit()
+            session.delete(recipe)
+
+    def test_update_recipe_with_current_revision(self):
+        with database.session_scope() as session:
+            recipe = util.create_recipe(dict())
+            recipe_revision = database.RecipeRevision()
+            recipe_revision.recipe = recipe
+            recipe.current_revision = recipe_revision
+            session.add(recipe)
+            session.commit()
+            recipe_revision = database.RecipeRevision()
+            recipe_revision.recipe = recipe
+            recipe.current_revision = recipe_revision
+            session.commit()
