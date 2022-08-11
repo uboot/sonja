@@ -153,7 +153,6 @@ class Crawler(Worker):
         logger.info("Start crawling")
         loop = asyncio.get_running_loop()
 
-        new_commits = False
         with session_scope() as session:
             if datetime.datetime.now() >= self.__next_crawl:
                 logger.info("Crawl all repos")
@@ -166,6 +165,7 @@ class Crawler(Worker):
                 repos = session.query(Repo).filter(Repo.id.in_(repo_ids)).all()
             channels = session.query(Channel).all()
             for repo in repos:
+                new_commits = False
                 try:
                     work_dir = os.path.join(self.__data_dir, str(repo.id))
                     controller = RepoController(work_dir)
@@ -236,13 +236,14 @@ class Crawler(Worker):
                 except git.exc.GitError as e:
                     logger.error("Failed to process repo '%s' with message '%s'", repo.url, e)
 
-        if new_commits:
-            logger.info("Finish crawling with *new* commits")
-            logger.info('Trigger scheduler: process commits')
-            if not self.__scheduler.process_commits():
-                logger.error("Failed to trigger scheduler")
-        else:
-            logger.info("Finish crawling with *no* new commits")
+                if new_commits:
+                    logger.info("Finish crawling '%s'", repo.name)
+                    session.commit()
+                    logger.info('Trigger scheduler: process commits')
+                    if not self.__scheduler.process_commits():
+                        logger.error("Failed to trigger scheduler")
+
+        logger.info("Finish crawling")
 
     def __get_repos(self):
         try:
