@@ -16,7 +16,7 @@ def _setup_build_output(create_file="create.json", info_file="info.json", lock_f
         "lock": lock_file
     }
 
-    for output in output_files:
+    for output in [f for f in output_files if output_files[f]]:
         output_file = os.path.join(os.path.dirname(__file__), "data/{0}".format(output_files[output]))
         with open(output_file) as f:
             build_output[output] = f.read()
@@ -246,7 +246,7 @@ class TestManager(unittest.TestCase):
             self.assertEqual(1, len(build.missing_recipes))
 
     def test_process_failure_missing_recipe(self):
-        build_output = _setup_build_output("create_missing_recipe.json")
+        build_output = _setup_build_output("create_missing_recipe.json", lock_file="")
 
         with session_scope() as session:
             build = util.create_build(dict())
