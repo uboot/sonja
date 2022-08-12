@@ -6,6 +6,7 @@ from sonja.database import session_scope, Session
 from sonja.model import Build, CommitStatus, Commit, Package, RecipeRevision, missing_package, BuildStatus, \
     missing_recipe, Recipe, Ecosystem
 from sonja.redis import RedisClient
+from typing import List
 
 
 class Manager(object):
@@ -141,20 +142,42 @@ class Manager(object):
 
         return builds
 
+    def __extract_required_packages(self, session: Session, lock_data: dict, ecosystem: Ecosystem) -> List[Package]:
+        packages = []
+        root = lock_data["0"]
+        for requirement in root.get("requires", []) + root.get("build_requires", []):
+            recipe_id = lock_data[requirement]["ref"]
+            m = re.match("([\\w\\+\\.-]+)/([\\w\\+\\.-]+)(?:@(\\w+)/(\\w+))?(#(\\w+))?", recipe_id)
+            if m:
+                name = m.group(1)
+                version = m.group(2)
+                user = m.group(3)
+                channel = m.group(4)
+                recipe_revision = m.group(6)
+            else:
+                logger.error("Invalid recipe ID '%s'", recipe_id)
+                return None
+            package_id = lock_data[requirement]["package_id"]
+            recipe_revision = self.__process_recipe_revision(session, name, version, user, channel,
+                                                             recipe_revision, ecosystem)
+            package = self.__process_package(session, package_id, recipe_revision)
+            packages.append(package)
+
+        return packages
+
     def process_success(self, build_id, build_output) -> dict:
         result = dict()
 
         try:
-            data = json.loads(build_output["create"])
+            create_data = json.loads(build_output["create"])
         except KeyError:
             logger.error("Failed to obtain JSON output of the Conan create stage for build '%d'", build_id)
             return result
 
         try:
-            lock_data = json.loads(build_output["lock"])
-            nodes = lock_data["graph_lock"]["nodes"]
+            lock_data = json.loads(build_output["lock"])["graph_lock"]["nodes"]
         except KeyError:
-            logger.error("Failed to obtain JSON output of the Conan info stage for build '%d'", build_id)
+            logger.error("Failed to obtain JSON output of the Conan lock for build '%d'", build_id)
             return result
 
         with session_scope() as session:
@@ -162,7 +185,7 @@ class Manager(object):
             build.package = None
             build.missing_recipes = []
             build.missing_packages = []
-            for recipe_compound in data["installed"]:
+            for recipe_compound in create_data["installed"]:
                 recipe_data = recipe_compound["recipe"]
                 if recipe_data["dependency"]:
                     continue
@@ -193,24 +216,7 @@ class Manager(object):
                 if self.__trigger_builds_for_recipe(session, recipe_revision.recipe):
                     result['new_builds'] = True
 
-            root = nodes["0"]
-            for requirement in root.get("requires", []) + root.get("build_requires", []):
-                recipe_id = nodes[requirement]["ref"]
-                m = re.match("([\\w\\+\\.-]+)/([\\w\\+\\.-]+)(?:@(\\w+)/(\\w+))?(#(\\w+))?", recipe_id)
-                if m:
-                    name = m.group(1)
-                    version = m.group(2)
-                    user = m.group(3)
-                    channel = m.group(4)
-                    recipe_revision = m.group(6)
-                else:
-                    logger.error("Invalid recipe ID '%s'", recipe_id)
-                    return None
-                package_id = nodes[requirement]["package_id"]
-                recipe_revision = self.__process_recipe_revision(session, name, version, user, channel,
-                                                                 recipe_revision, build.profile.ecosystem)
-                package = self.__process_package(session, package_id, recipe_revision)
-                build.package.requires.append(package)
+            build.package.requires = self.__extract_required_packages(session, lock_data, build.profile.ecosystem)
 
             logger.info("Updated database for the successful build '%d'", build_id)
             return result
@@ -218,12 +224,17 @@ class Manager(object):
     def process_failure(self, build_id, build_output) -> dict:
         result = dict()
         try:
-            data = json.loads(build_output["create"])
+            create_data = json.loads(build_output["create"])
         except KeyError:
-            logger.info("Failed build contains no JSON output of the Conan create stage")
+            logger.info("Failed build '%d' contains no JSON output of the Conan create stage", build_id)
             return result
 
-        if not data["error"]:
+        try:
+            lock_data = json.loads(build_output["lock"])["graph_lock"]["nodes"]
+        except KeyError:
+            logger.info("Failed build '%d' contains no JSON output of the Conan lock", build_id)
+
+        if not create_data["error"]:
             logger.info("Conan create for failed build '%d' was successful, no missing dependencies", build_id)
 
         with session_scope() as session:
@@ -231,23 +242,32 @@ class Manager(object):
             build.package = None
             build.missing_recipes = []
             build.missing_packages = []
-            for recipe_compound in data["installed"]:
+            for recipe_compound in create_data["installed"]:
                 recipe_data = recipe_compound["recipe"]
                 name = recipe_data["name"]
                 version = recipe_data["version"]
                 user = recipe_data.get("user", None)
                 channel = recipe_data.get("channel", None)
                 revision = self.__revision_from_recipe_id(recipe_data["id"])
+
+                # This is the reference data for the build. Get the data and continue
                 if not recipe_data["dependency"]:
                     recipe_revision = self.__process_recipe_revision(session, name, version, user, channel, revision,
                                                                      build.profile.ecosystem)
 
+                    if build.commit.status == CommitStatus.building:
+                        recipe_revision.recipe.current_revision = recipe_revision
+
                     for package_data in recipe_compound["packages"]:
                         package_id = package_data["id"]
                         package = self.__process_package(session, package_id, recipe_revision)
+                        if lock_data:
+                            package.requires = self.__extract_required_packages(session, lock_data,
+                                                                                build.profile.ecosystem)
                         build.package = package
                     continue
 
+                # This is a dependency with missing recipe. Add the missing recipe to the current build and continue
                 if recipe_data["error"] and recipe_data["error"]["type"] == "missing":
                     name = recipe_data["name"]
                     version = recipe_data["version"]
@@ -257,13 +277,11 @@ class Manager(object):
                     build.missing_recipes.append(recipe)
                     continue
 
+                # dependencies with missing packages remain
                 recipe_revision = self.__process_recipe_revision(session, name, version, user, channel, revision,
                                                                  build.profile.ecosystem)
                 if not recipe_revision:
                     continue
-                    
-                if build.commit.status == CommitStatus.building:
-                    recipe_revision.recipe.current_revision = recipe_revision
 
                 for package_data in recipe_compound["packages"]:
                     if package_data["error"] and package_data["error"]["type"] == "missing":
