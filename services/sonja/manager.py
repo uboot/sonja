@@ -187,6 +187,7 @@ class Manager(object):
         with session_scope() as session:
             build = session.query(Build).filter_by(id=build_id).first()
             build.package = None
+            build.recipe_revision = None
             build.missing_recipes = []
             build.missing_packages = []
             for recipe_compound in create_data["installed"]:
@@ -248,6 +249,7 @@ class Manager(object):
         with session_scope() as session:
             build = session.query(Build).filter_by(id=build_id).first()
             build.package = None
+            build.recipe_revision = None
             build.missing_recipes = []
             build.missing_packages = []
             for recipe_compound in create_data["installed"]:
@@ -273,6 +275,10 @@ class Manager(object):
                             package.requires = self.__extract_required_packages(session, lock_data,
                                                                                 build.profile.ecosystem)
                         build.package = package
+
+                    if not build.package:
+                        build.recipe_revision = recipe_revision
+
                     continue
 
                 # This is a dependency with missing recipe. Add the missing recipe to the current build and continue

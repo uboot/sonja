@@ -274,6 +274,8 @@ class Build(Base):
     commit_id = Column(Integer, ForeignKey('commit.id'),
                           nullable=False)
     commit = relationship('Commit', backref='builds')
+    recipe_revision_id = Column(Integer, ForeignKey('recipe_revision.id'))
+    recipe_revision = relationship("RecipeRevision", backref="builds")
     package_id = Column(Integer, ForeignKey('package.id'))
     package = relationship("Package", backref="builds")
     profile_id = Column(Integer, ForeignKey('profile.id'), nullable=False)
