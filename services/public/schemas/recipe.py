@@ -70,6 +70,7 @@ class RecipeRevision(BaseModel):
 
 recipe_revision_relationships = create_relationships("RecipeRevisionRelationships", [
     DataItem("recipe", "recipes"),
+    DataList("builds", "builds"),
     DataList("packages", "packages")
 ])
 

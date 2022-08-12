@@ -44,6 +44,7 @@ build_relationships = create_relationships("BuildRelationships", [
     DataItem("commit", "commits"),
     DataItem("profile", "profiles"),
     DataItem("package", "packages"),
+    DataItem("recipe_revision", "recipe-revisions"),
     DataList("missing_packages", "packages"),
     DataList("missing_recipes", "recipes"),
     Link("runs", "run")

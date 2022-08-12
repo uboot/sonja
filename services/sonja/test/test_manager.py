@@ -267,6 +267,9 @@ class TestManager(unittest.TestCase):
             # the build should now have a missing recipe
             build = session.query(Build).filter_by(id=build_id).first()
             self.assertEqual(1, len(build.missing_recipes))
+            self.assertIsNotNone(build.recipe_revision)
+            self.assertEqual("hello", build.recipe_revision.recipe.name)
+            self.assertEqual("1.2.3", build.recipe_revision.recipe.version)
             recipe = build.missing_recipes[0]
             self.assertEqual("base", recipe.name)
             self.assertEqual("1.2.3", recipe.version)
@@ -396,13 +399,14 @@ class TestManager(unittest.TestCase):
             ecosystem = util.create_ecosystem(dict())
             build_id = _create_build(session, ecosystem)
 
-        result = self.manager.process_success(build_id, build_output)
+        self.manager.process_success(build_id, build_output)
 
         with session_scope() as session:
             build = session.query(Build).filter_by(id=build_id).first()
 
             # depends on base, core, app
             self.assertEqual(3, len(build.package.requires))
+            self.assertIsNone(build.recipe_revision)
 
     def test_process_success_no_requirement(self):
         build_output = _setup_build_output(lock_file="lock_no_requirement.json")
@@ -410,7 +414,7 @@ class TestManager(unittest.TestCase):
             ecosystem = util.create_ecosystem(dict())
             build_id = _create_build(session, ecosystem)
 
-        result = self.manager.process_success(build_id, build_output)
+        self.manager.process_success(build_id, build_output)
 
         with session_scope() as session:
             build = session.query(Build).filter_by(id=build_id).first()

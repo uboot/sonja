@@ -99,6 +99,15 @@ class TestDatabase(unittest.TestCase):
             self.assertIsNotNone(recipe_revision.recipe)
             self.assertEqual(1, len(recipe_revision.recipe.revisions))
 
+    def test_create_recipe_revision_with_build(self):
+        with database.session_scope() as session:
+            recipe_revision = util.create_recipe_revision(dict())
+            build = util.create_build(dict())
+            build.recipe_revision = recipe_revision
+            session.commit()
+            self.assertIsNotNone(recipe_revision.builds)
+            self.assertEqual(1, len(recipe_revision.builds))
+
     def test_create_recipe_with_current_revision(self):
         with database.session_scope() as session:
             recipe = util.create_recipe(dict())
