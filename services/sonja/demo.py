@@ -290,8 +290,8 @@ class DemoDataCreator(object):
 
         self.__create_repo("pcre2",
                            "https://github.com/conan-io/conan-center-index.git",
-                           "recipes/pcre/all",
-                           "10.37")
+                           "recipes/pcre2/all",
+                           "10.40")
 
         self.__create_repo("flex",
                            "https://github.com/conan-io/conan-center-index.git",
