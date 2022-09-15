@@ -4,7 +4,7 @@ from public.config import api_prefix
 from public.main import app
 from sonja.model import BuildStatus
 from sonja.test.api import ApiTestCase
-from sonja.test.util import create_build, run_create_operation
+from sonja.test.util import create_build, create_ecosystem, run_create_operation
 
 client = TestClient(app)
 
@@ -13,7 +13,9 @@ class TestBuild(ApiTestCase):
     @classmethod
     def setUpClass(cls):
         ApiTestCase.setUpClass()
-        run_create_operation(create_build, dict())
+        ecosystem = create_ecosystem(dict());
+        run_create_operation(create_build, {"ecosystem": ecosystem})
+        run_create_operation(create_build, {"ecosystem": ecosystem})
 
     def test_patch_stop_active_build(self):
         build_id = run_create_operation(create_build, {"build.status": BuildStatus.active})
@@ -79,10 +81,48 @@ class TestBuild(ApiTestCase):
         self.assertEqual("new", attributes["status"])
 
     def test_get_build_list(self):
-        response = client.get(f"{api_prefix}/build?ecosystem_id=1&page=1&per_page=5", headers=self.reader_headers)
+        response = client.get(f"{api_prefix}/build?ecosystem_id=1", headers=self.reader_headers)
         self.assertEqual(200, response.status_code)
+        self.assertGreater(len(response.json()["data"]), 1)
         attributes = response.json()["data"][0]["attributes"]
         self.assertEqual("new", attributes["status"])
+
+    def test_get_build_list_paged(self):
+        response = client.get(f"{api_prefix}/build?ecosystem_id=1&page=2&per_page=1", headers=self.reader_headers)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, len(response.json()["data"]))
+        attributes = response.json()["data"][0]["attributes"]
+        self.assertEqual("new", attributes["status"])
+
+    def test_get_build_list_with_profile_and_channel(self):
+        response = client.get(f"{api_prefix}/build?ecosystem_id=1&channel_id=1&profile_id=1&page=1&per_page=5",
+                              headers=self.reader_headers)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, len(response.json()["data"]))
+        attributes = response.json()["data"][0]["attributes"]
+        self.assertEqual("new", attributes["status"])
+
+    def test_get_build_list_with_profile(self):
+        response = client.get(f"{api_prefix}/build?ecosystem_id=1&profile_id=1",
+                              headers=self.reader_headers)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, len(response.json()["data"]))
+        attributes = response.json()["data"][0]["attributes"]
+        self.assertEqual("new", attributes["status"])
+
+    def test_get_build_list_with_channel(self):
+        response = client.get(f"{api_prefix}/build?ecosystem_id=1&channel_id=1",
+                              headers=self.reader_headers)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, len(response.json()["data"]))
+        attributes = response.json()["data"][0]["attributes"]
+        self.assertEqual("new", attributes["status"])
+
+    def test_get_build_list_with_unknown_profile_and_channel(self):
+        response = client.get(f"{api_prefix}/build?ecosystem_id=1&channel_id=-1&profile_id=-1&page=1&per_page=5",
+                              headers=self.reader_headers)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(0, len(response.json()["data"]))
 
     def test_get_sse_builds(self):
         pass
