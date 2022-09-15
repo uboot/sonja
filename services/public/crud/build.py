@@ -1,25 +1,35 @@
 from public.schemas.build import BuildWriteItem, StatusEnum
 from aioredis import Redis
-from sonja.database import Profile, Build, Session
+from sonja.database import Channel, Commit, Profile, Build, Session
 from sqlalchemy import desc
 from typing import Optional
 
 from sonja.model import BuildStatus
 
 
-def read_builds(session: Session, ecosystem_id: str, page: Optional[int] = None, per_page:  Optional[int] = None)\
+def read_builds(session: Session, ecosystem_id: str, channel_id: Optional[str] = None, profile_id: Optional[str] = None,
+                page: Optional[int] = None, per_page:  Optional[int] = None)\
         -> dict:
+    objs = session.query(Build)\
+        .join(Build.profile)\
+        .join(Build.commit)\
+        .join(Commit.channel)\
+        .filter(Profile.ecosystem_id == ecosystem_id)
+
+    if profile_id:
+        objs = objs.filter(Profile.id == profile_id)
+
+    if channel_id:
+        objs = objs.filter(Channel.id == channel_id)
+
+    objs = objs.order_by(desc(Build.created), Build.id)
+
     if page is not None and per_page is not None:
-        objs = session.query(Build).\
-            join(Build.profile).\
-            filter(Profile.ecosystem_id == ecosystem_id).\
-            order_by(desc(Build.created), Build.id)\
+        count = objs.count()
+
+        objs = objs\
             .limit(per_page)\
             .offset(per_page * (page - 1))
-        count = session.query(Build).\
-            join(Build.profile).\
-            filter(Profile.ecosystem_id == ecosystem_id).\
-            count()
 
         total_pages = count // per_page
         if count % per_page:
@@ -30,12 +40,9 @@ def read_builds(session: Session, ecosystem_id: str, page: Optional[int] = None,
             "total_pages": total_pages
         }
     else:
+
         return {
-            "objs": session.query(Build).
-                join(Build.profile).
-                filter(Profile.ecosystem_id == ecosystem_id).
-                order_by(desc(Build.created), Build.id)
-                .all()
+            "objs": objs.all()
         }
 
 
