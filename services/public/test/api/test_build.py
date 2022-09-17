@@ -102,6 +102,14 @@ class TestBuild(ApiTestCase):
         attributes = response.json()["data"][0]["attributes"]
         self.assertEqual("new", attributes["status"])
 
+    def test_get_build_list_with_repo(self):
+        response = client.get(f"{api_prefix}/build?ecosystem_id=1&repo_id=1",
+                              headers=self.reader_headers)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, len(response.json()["data"]))
+        attributes = response.json()["data"][0]["attributes"]
+        self.assertEqual("new", attributes["status"])
+
     def test_get_build_list_with_profile(self):
         response = client.get(f"{api_prefix}/build?ecosystem_id=1&profile_id=1",
                               headers=self.reader_headers)

@@ -16,10 +16,10 @@ windows_agent = WindowsAgent()
 
 
 @router.get("/build", response_model=BuildReadList, response_model_by_alias=False)
-def get_build_list(ecosystem_id: str, channel_id: Optional[str] = None, profile_id: Optional[str] = None,
-                   page: Optional[int] = None, per_page: Optional[int] = None,
+def get_build_list(ecosystem_id: str, repo_id: Optional[str] = None, channel_id: Optional[str] = None,
+                   profile_id: Optional[str] = None, page: Optional[int] = None, per_page: Optional[int] = None,
                    session: Session = Depends(get_session), authorized: bool = Depends(get_read)):
-    return BuildReadList.from_db(**read_builds(session, ecosystem_id, channel_id, profile_id, page, per_page))
+    return BuildReadList.from_db(**read_builds(session, ecosystem_id, repo_id, channel_id, profile_id, page, per_page))
 
 
 @router.get("/build/{build_id}", response_model=BuildReadItem, response_model_by_alias=False)
