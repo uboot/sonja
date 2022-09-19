@@ -33,7 +33,7 @@ def get_add_build(authorized: bool = Depends(get_admin)):
 
 
 @router.get("/add_log_line")
-def get_add_build(authorized: bool = Depends(get_admin)):
+def get_add_log_line(authorized: bool = Depends(get_admin)):
     add_log_line()
 
 
