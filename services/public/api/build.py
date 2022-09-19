@@ -58,11 +58,15 @@ async def subscribe(channel: str, redis: Redis):
     (channel_subscription,) = await redis.subscribe(channel=Channel(channel, False))
     while await channel_subscription.wait_message():
         message = await channel_subscription.get_json()
+        item_json = None
         with session_scope() as session:
-            build_id = str(message["id"])
-            build = read_build(session, build_id)
-            if build:
-                logger.debug("Send build event '%s' received on '%s'", BuildReadItem.from_db(build).json(), channel)
-                yield { "event": "update", "data": BuildReadItem.from_db(build).json() }
-            else:
-                logger.warning("Could not read updated build '%s'", build_id)
+            item_id = str(message["id"])
+            item = read_build(session, item_id)
+            if item:
+                item_json = BuildReadItem.from_db(item).json()
+
+        if item_json:
+            logger.debug("Send build event '%s' received on '%s'", item_json, channel)
+            yield { "event": "update", "data": item_json }
+        else:
+            logger.warning("Could not read updated build '%s'", item_id)
