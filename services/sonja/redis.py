@@ -25,7 +25,7 @@ class RedisClient(object):
             with get_redis() as redis:
                 for build in builds:
                     logger.debug("Publish update for build '%s' on channel '%s'", build.id, f"ecosystem:{build.ecosystem.id}:build")
-                    redis.publish(f"ecosystem:{build.ecosystem.id}:build", dumps({"id": build.id}))
+                    redis.publish(f"ecosystem:{build.ecosystem.id}:{build.commit.repo.id}:build", dumps({"id": build.id}))
         except ConnectionError as e:
             logger.error("Failed to publish builds: %s", e)
 
