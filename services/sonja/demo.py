@@ -184,7 +184,7 @@ class DemoDataCreator(object):
         windows_release.ecosystem = self.__ecosystem
         windows_release.platform = Platform.windows
         windows_release.name = "MSVC 15 Release"
-        windows_release.container = "uboot/msvc15:latest"
+        windows_release.container = "ubootsregistry.azurecr.io/msvc15:latest"
         windows_release.conan_profile = "windows-release"
         windows_release.labels = [Label(value="windows")]
         self.__session.add(windows_release)
