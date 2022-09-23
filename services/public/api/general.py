@@ -51,7 +51,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), session: Session = D
     if not test_password(form_data.password, record.password):
         raise HTTPException(status_code=400, detail="Incorrect username or password")
 
-    access_token_expires = timedelta(minutes=30)
+    access_token_expires = timedelta(minutes=240)
     access_token = create_access_token(str(record.id), expires_delta=access_token_expires)
 
     return {"access_token": access_token, "token_type": "bearer"}
