@@ -170,16 +170,12 @@ class Manager(object):
 
         try:
             create_data = json.loads(build_output["create"])
-            logger.info("create.json")
-            logger.info(build_output["create"])
         except KeyError:
             logger.error("Failed to obtain JSON output of the Conan create stage for build '%d'", build_id)
             return result
 
         try:
             lock_data = json.loads(build_output["lock"])["graph_lock"]["nodes"]
-            logger.info("lock.json")
-            logger.info(build_output["lock"])
         except KeyError:
             logger.error("Failed to obtain JSON output of the Conan lock for build '%d'", build_id)
             return result
@@ -230,16 +226,12 @@ class Manager(object):
         result = dict()
         try:
             create_data = json.loads(build_output["create"])
-            logger.info("create.json")
-            logger.info(build_output["create"])
         except KeyError:
             logger.info("Failed build '%d' contains no JSON output of the Conan create stage", build_id)
             return result
 
         try:
             lock_data = json.loads(build_output["lock"])["graph_lock"]["nodes"]
-            logger.info("lock.json")
-            logger.info(build_output["lock"])
         except KeyError:
             logger.info("Failed build '%d' contains no JSON output of the Conan lock", build_id)
 
