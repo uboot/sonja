@@ -238,11 +238,20 @@ class BuildStatus(enum.Enum):
     stopped = 6
 
 
+class RunStatus(enum.Enum):
+    active = 2
+    error = 3
+    success = 4
+    stopped = 6
+    stalled = 7
+
+
 class Run(Base):
     __tablename__ = 'run'
     id = Column(Integer, primary_key=True)
     started = Column(DateTime, nullable=False, index=True)
-    status = Column(Enum(BuildStatus), nullable=False)
+    updated = Column(DateTime, nullable=False, index=True)
+    status = Column(Enum(RunStatus), nullable=False)
     build_id = Column(Integer, ForeignKey('build.id'), index=True)
     build = relationship("Build", backref="runs")
 
@@ -252,7 +261,7 @@ class Run(Base):
 
     @status_value.setter
     def status_value(self, value):
-        self.status = BuildStatus[value.name]
+        self.status = RunStatus[value.name]
 
 
 missing_package = Table('missing_package', Base.metadata,
