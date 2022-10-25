@@ -8,10 +8,9 @@ from typing import Optional, List
 class StatusEnum(str, Enum):
     active = "active"
     error = "error"
-    new = "new"
     stopped = "stopped"
-    stopping = "stopping"
     success = "success"
+    stalled = "stalled"
 
 
 @attributes
