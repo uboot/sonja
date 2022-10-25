@@ -1,6 +1,6 @@
 from datetime import datetime
 from sonja.model import Ecosystem, Repo, Label, Option, Profile, Platform, Channel, \
-    Commit, Build, CommitStatus, BuildStatus, LogLine, Run
+    Commit, Build, CommitStatus, BuildStatus, LogLine, Run, RunStatus
 from sonja.database import logger, Session, session_scope
 from sonja.redis import RedisClient
 from sonja.ssh import encode, generate_rsa_key
@@ -111,7 +111,8 @@ def populate_database():
         run = Run()
         run.build = build
         run.started = datetime(year=2000, month=1, day=2, hour=13, minute=40)
-        run.status = BuildStatus.new
+        run.updated = datetime(year=2000, month=1, day=2, hour=13, minute=50)
+        run.status = RunStatus.active
 
         session.commit()
 

@@ -2,8 +2,9 @@ from datetime import datetime
 from typing import Callable
 from sonja.auth import hash_password
 from sonja.database import session_scope
-from sonja.model import Permission, Ecosystem, PermissionLabel, Base, User, GitCredential, Repo, Option, Label, Commit, \
-    CommitStatus, Channel, Profile, Platform, Build, BuildStatus, Recipe, RecipeRevision, Package, Run, LogLine
+from sonja.model import Permission, Ecosystem, PermissionLabel, Base, User, GitCredential, Repo, Option, Label, \
+    Commit, CommitStatus, Channel, Profile, Platform, Build, BuildStatus, Recipe, RecipeRevision, Package, Run, \
+    RunStatus, LogLine
 
 import os
 
@@ -166,7 +167,8 @@ def create_run(parameters):
     run = Run()
     run.build = create_build(parameters)
     run.started = datetime(year=2000, month=1, day=2, hour=13, minute=40)
-    run.status = BuildStatus.new
+    run.updated = parameters.get("run.updated", datetime(year=2000, month=1, day=2, hour=13, minute=45))
+    run.status = parameters.get("run.status", RunStatus.active)
     return run
 
 
