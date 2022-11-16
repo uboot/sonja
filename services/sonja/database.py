@@ -4,9 +4,10 @@ from sqlalchemy.orm import sessionmaker
 from sonja.auth import hash_password
 from sonja.model import User, Permission, PermissionLabel, Ecosystem, Base, Build, missing_package, missing_recipe, \
     package_requirement, Package, RecipeRevision, Recipe, Commit, Channel, DockerCredential, GitCredential, \
-    profile_label, Profile, Label, Repo, Option, repo_label, Run, LogLine
+    profile_label, Profile, Label, Repo, Option, repo_label, Run, LogLine, Configuration
 
 from contextlib import contextmanager
+from secrets import token_hex
 import logging
 import os
 
@@ -78,6 +79,21 @@ def create_initial_user(name: str, password: str):
                 Permission(label=PermissionLabel.admin)
             ]
             logger.info("Created initial user with ID %d", user.id)
+
+
+def create_initial_configuration():
+    secret = token_hex(20)
+    with session_scope() as session:
+        statement = \
+            Configuration.__table__.insert(). \
+            from_select([Configuration.github_secret],
+                        select([literal(secret)]).
+                        where(~exists().where(Configuration.id)))
+        result = session.execute(statement)
+
+        if result.lastrowid:
+            configuration = session.query(Configuration).filter_by(id=result.lastrowid).first()
+            logger.info("Created initial configuration with ID %d", configuration.id)
 
 
 def create_initial_ecosystem(name: str) -> int:
@@ -158,6 +174,7 @@ def clear_database():
     _drop_table(Ecosystem.__table__)
     _drop_table(Permission.__table__)
     _drop_table(User.__table__)
+    _drop_table(Configuration.__table__)
 
     try:
         Base.metadata.create_all(engine)

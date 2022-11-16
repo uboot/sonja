@@ -1,10 +1,13 @@
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, Request
 from fastapi.security import OAuth2PasswordBearer
 from public.crud.user import read_user_by_id
+from public.crud.configuration import read_configuration
 from public.schemas.user import PermissionEnum
 from sonja.auth import decode_access_token, ExpiredSignatureError
 from sonja.database import get_session, Session, User
 from typing import List
+from hmac import HMAC, compare_digest
+from hashlib import sha256
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -38,3 +41,12 @@ def get_admin(permissions: List[PermissionEnum] = Depends(get_permissions)) -> b
     if PermissionEnum.admin not in permissions:
         raise HTTPException(status_code=403, detail="Operation not allowed")
     return True
+
+
+async def get_github(request: Request, session: Session = Depends(get_session)):
+    configuration = read_configuration(session)
+    provided_signature = request.headers["X-Hub-Signature-256"].split('sha256=')[-1].strip()
+    body = await request.body()
+    data_signature = HMAC(key=configuration.github_secret.encode(), msg=body, digestmod=sha256).hexdigest()
+    if not compare_digest(provided_signature, data_signature):
+        raise HTTPException(status_code=403, detail="Signature is not valid")

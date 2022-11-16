@@ -57,13 +57,13 @@ class TestCrawler(unittest.TestCase):
             commit = session.query(Commit).first()
             self.assertEqual(CommitStatus.new, commit.status)
 
-    def test_post_repo(self):
+    def test_process_repo(self):
         self.crawler.start()
         time.sleep(1)
         with session_scope() as session:
             session.add(util.create_repo(dict()))
             session.add(util.create_channel(dict()))
-        self.crawler.post_repo("1")
+        self.crawler.process_repo("1")
         self.crawler.trigger()
         time.sleep(5)
         called = self.crawler.query(lambda: self.scheduler.process_commits.called)

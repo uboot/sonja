@@ -21,6 +21,20 @@ class TestDatabase(unittest.TestCase):
             users = session.query(database.User).all()
             self.assertEqual(len(users), 1)
 
+    def test_create_initial_configuration(self):
+        database.create_initial_configuration()
+        with database.session_scope() as session:
+            configurations = session.query(database.Configuration).all()
+            self.assertEqual(len(configurations), 1)
+            self.assertEqual(len(configurations[0].github_secret), 40)
+
+    def test_create_initial_configuration_twice(self):
+        database.create_initial_configuration()
+        database.create_initial_configuration()
+        with database.session_scope() as session:
+            configurations = session.query(database.Configuration).all()
+            self.assertEqual(len(configurations), 1)
+
     def test_create_initial_ecosystem(self):
         self.assertEqual(database.create_initial_ecosystem("Ecosystem"), 1)
         with database.session_scope() as session:

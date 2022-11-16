@@ -53,5 +53,4 @@ def connect_to_database():
 
     logger.error("Failed to connect to database after %i attempts", NUM_RETRIES)
     logger.error("Exit with 1")
-    #os.kill(os.getpid(), signal.SIGKILL)
     exit(1)

@@ -63,7 +63,6 @@ class TestRepo(ApiTestCase):
         self.assertEqual(200, response.status_code)
         attributes = response.json()["data"]["attributes"]
         self.assertEqual("test_patch_repo", attributes["name"])
-        self.assertEqual("test_patch_repo", attributes["name"])
 
     def test_get_repo(self):
         repo_id = run_create_operation(create_repo, dict())

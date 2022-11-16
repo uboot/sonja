@@ -31,7 +31,7 @@ def get_repo_item(repo_id: str, session: Session = Depends(get_session), authori
 
 
 @router.patch("/repo/{repo_id}", response_model=RepoReadItem, response_model_by_alias=False)
-def get_repo_item(repo_id: str, repo_item: RepoWriteItem, session: Session = Depends(get_session),
+def patch_repo_item(repo_id: str, repo_item: RepoWriteItem, session: Session = Depends(get_session),
                   authorized: bool = Depends(get_write)):
     repo = read_repo(session, repo_id)
     if repo is None:

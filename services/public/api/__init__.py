@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from public.api import build, channel, ecosystem, general, profile, repo, user, recipe, commit, package, run,\
-    log_line
+    log_line, github, configuration
 
 router = APIRouter()
 router.include_router(ecosystem.router, tags=["Ecosystem"])
@@ -16,3 +16,5 @@ router.include_router(recipe.router, tags=["Recipe"])
 router.include_router(commit.router, tags=["Commit"])
 router.include_router(log_line.router, tags=["Log"])
 router.include_router(package.router, tags=["Package"])
+router.include_router(github.router, tags=["Github"])
+router.include_router(configuration.router, tags=["Configuration"])

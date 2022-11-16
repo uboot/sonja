@@ -128,6 +128,13 @@ def add_build():
         build.profile = profile
         build.status = BuildStatus.new
         build.created = datetime.utcnow()
+
+        run = Run()
+        run.started = datetime.utcnow()
+        run.updated = datetime.utcnow()
+        run.status = RunStatus.active
+        run.build = build
+
         session.add(build)
         session.commit()
 
