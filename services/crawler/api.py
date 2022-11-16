@@ -12,5 +12,5 @@ def get_ping():
 
 @router.get("/process_repo/{repo_id}")
 def get_process_repo(repo_id: str):
-    crawler.post_repo(repo_id)
+    crawler.process_repo(repo_id)
     crawler.trigger()

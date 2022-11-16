@@ -71,7 +71,7 @@ class TestAgent(unittest.TestCase):
             build = session.query(Build).first()
             self.assertEqual(1, len(build.missing_recipes))
         self.assertEqual(self.redis_client.publish_build_update.call_count, 2)
-        self.assertEqual(self.redis_client.publish_run_update.call_count, 0)
+        self.assertEqual(self.redis_client.publish_run_update.call_count, 2)
 
     def test_complete_build_https(self):
         with session_scope() as session:

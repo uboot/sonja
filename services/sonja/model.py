@@ -9,6 +9,13 @@ import enum
 Base = declarative_base()
 
 
+class Configuration(Base):
+    __tablename__ = 'configuration'
+
+    id = Column(Integer, primary_key=True)
+    github_secret = Column(String(255))
+
+
 class User(Base):
     __tablename__ = 'user'
 

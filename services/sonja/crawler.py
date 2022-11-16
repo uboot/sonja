@@ -134,8 +134,12 @@ class Crawler(Worker):
         self.__next_crawl = datetime.datetime.now()
         logger.info("Created data directory '%s'", self.__data_dir)
 
-    def post_repo(self, repo_id):
+    def process_repo(self, repo_id: str):
         self.__repos.put(repo_id)
+
+
+    def process_push(self, repo_id: str, sha: str, branch: str):
+        pass
 
     async def work(self):
         try:

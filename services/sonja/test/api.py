@@ -4,13 +4,15 @@ from starlette.datastructures import FormData
 
 from public.main import app
 from public.config import api_prefix
-from sonja.database import reset_database, get_session, session_scope
+from sonja.database import reset_database, session_scope
+from sonja.model import Configuration
 from sonja.test import util
 
 import asyncio
 import unittest
 
 
+SECRET = "0123467890abcdef0123467890abcdef"
 client = TestClient(app)
 
 
@@ -38,6 +40,10 @@ class ApiTestCase(unittest.TestCase):
             asyncio.run(redis_plugin.init())
 
         reset_database()
+        with session_scope() as session:
+            configuration = Configuration()
+            configuration.github_secret = SECRET
+            session.add(configuration)
 
         cls.admin_headers = _header_for_user({
             "user.user_name": "admin"
