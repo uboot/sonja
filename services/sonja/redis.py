@@ -1,4 +1,4 @@
-from sonja.model import Build, LogLine
+from sonja.model import Build, LogLine, Run
 from sonja.config import logger
 from typing import List
 from os import environ
@@ -24,8 +24,9 @@ class RedisClient(object):
         try:
             with get_redis() as redis:
                 for build in builds:
-                    logger.debug("Publish update for build '%s' on channel '%s'", build.id, f"ecosystem:{build.ecosystem.id}:build")
-                    redis.publish(f"ecosystem:{build.ecosystem.id}:{build.commit.repo.id}:build", dumps({"id": build.id}))
+                    channel = f"repo:{build.commit.repo.id}:build"
+                    logger.debug("Publish update for build '%s' on channel '%s'", build.id, channel)
+                    redis.publish(channel, dumps({"id": build.id}))
         except ConnectionError as e:
             logger.error("Failed to publish builds: %s", e)
 
@@ -35,7 +36,17 @@ class RedisClient(object):
     def publish_log_line_update(self, log_line: LogLine):
         try:
             with get_redis() as redis:
-                logger.debug("Publish update for log line '%s' on channel '%s'", log_line.id, f"run:{log_line.run.id}:log_line")
-                redis.publish(f"run:{log_line.run.id}:log_line", dumps({"id": log_line.id}))
+                channel = f"run:{log_line.run.id}:log_line"
+                logger.debug("Publish update for log line '%s' on channel '%s'", log_line.id, channel)
+                redis.publish(channel, dumps({"id": log_line.id}))
         except ConnectionError as e:
-            logger.error("Failed to publish log lines: %s", e)
+            logger.error("Failed to publish log line: %s", e)
+
+    def publish_run_update(self, run: Run):
+        try:
+            with get_redis() as redis:
+                channel = f"build:{run.build.id}:run"
+                logger.debug("Publish update for run '%s' on channel '%s'", run.id, channel)
+                redis.publish(channel, dumps({"id": run.id}))
+        except ConnectionError as e:
+            logger.error("Failed to publish run: %s", e)

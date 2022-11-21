@@ -33,12 +33,14 @@ class TestAgent(unittest.TestCase):
     def test_start(self):
         self.agent.start()
         self.assertEqual(self.redis_client.publish_build_update.call_count, 0)
+        self.assertEqual(self.redis_client.publish_run_update.call_count, 0)
 
     def test_cancel_and_join(self):
         self.agent.start()
         self.agent.cancel()
         self.agent.join()
         self.assertEqual(self.redis_client.publish_build_update.call_count, 0)
+        self.assertEqual(self.redis_client.publish_run_update.call_count, 0)
 
     def test_start_build(self):
         with session_scope() as session:
@@ -46,6 +48,7 @@ class TestAgent(unittest.TestCase):
         self.agent.start()
         self.assertEqual(self.__wait_for_build_status(BuildStatus.active, 15), BuildStatus.active)
         self.assertEqual(self.redis_client.publish_build_update.call_count, 1)
+        self.assertEqual(self.redis_client.publish_run_update.call_count, 1)
 
     def test_complete_build(self):
         with session_scope() as session:
@@ -53,6 +56,7 @@ class TestAgent(unittest.TestCase):
         self.agent.start()
         self.assertEqual(self.__wait_for_build_status(BuildStatus.success, 15), BuildStatus.success)
         self.assertEqual(self.redis_client.publish_build_update.call_count, 2)
+        self.assertEqual(self.redis_client.publish_run_update.call_count, 2)
         self.assertGreater(self.redis_client.publish_log_line_update.call_count, 100)
 
     def test_complete_build_with_missing_recipe(self):
@@ -67,6 +71,7 @@ class TestAgent(unittest.TestCase):
             build = session.query(Build).first()
             self.assertEqual(1, len(build.missing_recipes))
         self.assertEqual(self.redis_client.publish_build_update.call_count, 2)
+        self.assertEqual(self.redis_client.publish_run_update.call_count, 0)
 
     def test_complete_build_https(self):
         with session_scope() as session:
@@ -74,6 +79,7 @@ class TestAgent(unittest.TestCase):
         self.agent.start()
         self.assertEqual(self.__wait_for_build_status(BuildStatus.success, 15), BuildStatus.success)
         self.assertEqual(self.redis_client.publish_build_update.call_count, 2)
+        self.assertEqual(self.redis_client.publish_run_update.call_count, 2)
         self.assertGreater(self.redis_client.publish_log_line_update.call_count, 100)
 
     def test_stop_build(self):
@@ -87,6 +93,7 @@ class TestAgent(unittest.TestCase):
             build.status = BuildStatus.stopping
         self.assertEqual(self.__wait_for_build_status(BuildStatus.stopped, 15), BuildStatus.stopped)
         self.assertEqual(self.redis_client.publish_build_update.call_count, 2)
+        self.assertEqual(self.redis_client.publish_run_update.call_count, 2)
 
     def test_cancel_build(self):
         with session_scope() as session:
@@ -97,3 +104,4 @@ class TestAgent(unittest.TestCase):
         self.agent.join()
         self.assertEqual(self.__wait_for_build_status(BuildStatus.new, 15), BuildStatus.new)
         self.assertEqual(self.redis_client.publish_build_update.call_count, 2)
+        self.assertEqual(self.redis_client.publish_run_update.call_count, 2)

@@ -73,6 +73,6 @@ async def update_build(session: Session, redis: Redis, build_id: str, build_item
             build.missing_packages = []
 
     session.commit()
-    await redis.publish_json(f"ecosystem:{build.ecosystem.id}:build", {"id": build.id})
+    await redis.publish_json(f"repo:{build.commit.repo_id}:build", {"id": build.id})
 
     return build

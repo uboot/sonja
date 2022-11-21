@@ -134,6 +134,22 @@ def add_build():
         RedisClient().publish_build_update(build)
 
 
+def add_run():
+    logger.info("Add run")
+    with session_scope() as session:
+        build = session.query(Build).first()
+
+        run = Run()
+        run.started = datetime.utcnow()
+        run.updated = datetime.utcnow()
+        run.status = RunStatus.stalled
+        run.build = build
+        session.add(run)
+        session.commit()
+
+        RedisClient().publish_run_update(run)
+
+
 def add_log_line():
     logger.info("Add log line")
     with session_scope() as session:
