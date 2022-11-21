@@ -77,6 +77,7 @@ class Agent(Worker):
                 self.__run_id = run.id
                 self.__log_line_counter = 1
                 self.__redis_client.publish_build_update(build)
+                self.__redis_client.publish_run_update(run)
 
                 container = build.profile.container
                 parameters = {
@@ -184,6 +185,7 @@ class Agent(Worker):
                     run.build.status = status
                     session.commit()
                     self.__redis_client.publish_build_update(run.build)
+                    self.__redis_client.publish_run_update(run)
                 else:
                     logger.error("Failed to find run '%d' and/or its build in database", self.__run_id)
         except OperationalError as e:
@@ -240,6 +242,7 @@ class Agent(Worker):
                 run.status = RunStatus.stopped
                 session.commit()
                 self.__redis_client.publish_build_update(build)
+                self.__redis_client.publish_run_update(run)
                 self.__build_id = None
                 return True
         except OperationalError as e:
