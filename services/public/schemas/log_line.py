@@ -1,5 +1,5 @@
 from datetime import datetime
-from public.jsonapi import attributes, data, item, item_list, create_relationships, DataItem, PagedItemListMeta
+from public.jsonapi import attributes, data, item, item_list, PagedItemListMeta
 from pydantic import BaseModel, Field
 from typing import Optional, List
 

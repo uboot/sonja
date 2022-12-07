@@ -28,7 +28,7 @@ def get_log_line_item(log_line_id: str, session: Session = Depends(get_session),
 
 @router.get("/event/run/{run_id}/log_line", response_model=LogLineReadItem, response_model_by_alias=False)
 async def get_line_events(run_id: str, redis: Redis = Depends(depends_redis)):
-    return EventSourceResponse(subscribe(f"run:{run_id}:log_line", redis))
+    return EventSourceResponse(subscribe(f"run:{run_id}", redis))
 
 
 async def subscribe(channel: str, redis: Redis):
@@ -38,6 +38,11 @@ async def subscribe(channel: str, redis: Redis):
         item_json = None
         with session_scope() as session:
             item_id = str(message["id"])
+            item_type = message["type"]
+
+            if item_type != "log_line":
+                logger.warning("Did not send event for unsupported type '%s'", item_type)
+
             item = read_log_line(session, item_id)
             if item:
                 item_json = LogLineReadItem.from_db(item).json()

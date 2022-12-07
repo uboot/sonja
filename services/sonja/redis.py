@@ -24,9 +24,9 @@ class RedisClient(object):
         try:
             with get_redis() as redis:
                 for build in builds:
-                    channel = f"repo:{build.commit.repo.id}:build"
+                    channel = f"general"
                     logger.debug("Publish update for build '%s' on channel '%s'", build.id, channel)
-                    redis.publish(channel, dumps({"id": build.id}))
+                    redis.publish(channel, dumps({"id": build.id, "type": "build"}))
         except ConnectionError as e:
             logger.error("Failed to publish builds: %s", e)
 
@@ -36,17 +36,17 @@ class RedisClient(object):
     def publish_log_line_update(self, log_line: LogLine):
         try:
             with get_redis() as redis:
-                channel = f"run:{log_line.run.id}:log_line"
+                channel = f"run:{log_line.run.id}"
                 logger.debug("Publish update for log line '%s' on channel '%s'", log_line.id, channel)
-                redis.publish(channel, dumps({"id": log_line.id}))
+                redis.publish(channel, dumps({"id": log_line.id, "type": "log_line"}))
         except ConnectionError as e:
             logger.error("Failed to publish log line: %s", e)
 
     def publish_run_update(self, run: Run):
         try:
             with get_redis() as redis:
-                channel = f"build:{run.build.id}:run"
+                channel = f"general"
                 logger.debug("Publish update for run '%s' on channel '%s'", run.id, channel)
-                redis.publish(channel, dumps({"id": run.id}))
+                redis.publish(channel, dumps({"id": run.id, "type": "run"}))
         except ConnectionError as e:
             logger.error("Failed to publish run: %s", e)

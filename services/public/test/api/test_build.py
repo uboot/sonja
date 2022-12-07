@@ -131,19 +131,3 @@ class TestBuild(ApiTestCase):
                               headers=self.reader_headers)
         self.assertEqual(200, response.status_code)
         self.assertEqual(0, len(response.json()["data"]))
-
-    def test_get_sse_builds(self):
-        pass
-        # async def send_data():
-        #     redis = await create_redis("redis://127.0.0.1")
-        #     await redis.publish_json("default", {"test": "Hello"})
-        # run(send_data())
-
-        # response = client.get(f"{api_prefix}/sse/ecosystem/1/build", headers=self.reader_headers, stream=True)
-        #
-        #
-        # for line in response.iter_lines():
-        #     if line:
-        #         decoded_line = line.decode('utf-8')
-        #         print(loads(decoded_line))
-        # self.assertEqual(200, response.status_code)
