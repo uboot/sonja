@@ -1,10 +1,13 @@
 from public.schemas.build import BuildWriteItem, StatusEnum
-from aioredis import Redis
 from sonja.database import Build, Channel, Commit, Profile, Repo, Session
 from sqlalchemy import desc
 from typing import Optional
 
 from sonja.model import BuildStatus
+from sonja.redis import RedisClient
+
+
+redis = RedisClient()
 
 
 def read_builds(session: Session, ecosystem_id: str, repo_id: Optional[str] = None, channel_id: Optional[str] = None,
@@ -54,7 +57,7 @@ def read_build(session: Session, build_id: str) -> Build:
     return session.query(Build).filter(Build.id == build_id).first()
 
 
-async def update_build(session: Session, redis: Redis, build_id: str, build_item: BuildWriteItem) -> Build:
+def update_build(session: Session, build_id: str, build_item: BuildWriteItem) -> Build:
     build = session.query(Build).filter(Build.id == build_id).with_for_update().first()
 
     if build_item.data.attributes.status == StatusEnum.stopping:
@@ -73,6 +76,6 @@ async def update_build(session: Session, redis: Redis, build_id: str, build_item
             build.missing_packages = []
 
     session.commit()
-    await redis.publish_json(f"repo:{build.commit.repo_id}:build", {"id": build.id})
+    redis.publish_build_update(build)
 
     return build

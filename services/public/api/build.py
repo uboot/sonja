@@ -1,11 +1,8 @@
-from aioredis import Channel, Redis
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi_plugins import depends_redis
-from sse_starlette.sse import EventSourceResponse
 from public.auth import get_read, get_write
 from public.schemas.build import BuildReadItem, BuildReadList, BuildWriteItem, StatusEnum
 from public.crud.build import read_builds, read_build, update_build
-from sonja.database import get_session, Session, session_scope
+from sonja.database import get_session, Session
 from sonja.client import LinuxAgent, WindowsAgent
 from sonja.config import logger
 from typing import Optional
@@ -31,9 +28,9 @@ def get_build_item(build_id: str, session: Session = Depends(get_session), autho
 
 
 @router.patch("/build/{build_id}", response_model=BuildReadItem, response_model_by_alias=False)
-async def patch_build_item(build_id: str, build_item: BuildWriteItem, session: Session = Depends(get_session),
-                  redis: Redis = Depends(depends_redis), authorized: bool = Depends(get_write)):
-    patched_build = await update_build(session, redis, build_id, build_item)
+def patch_build_item(build_id: str, build_item: BuildWriteItem, session: Session = Depends(get_session),
+                           authorized: bool = Depends(get_write)):
+    patched_build = update_build(session, build_id, build_item)
     if patched_build is None:
         raise HTTPException(status_code=404, detail="Build not found")
 
@@ -47,26 +44,3 @@ async def patch_build_item(build_id: str, build_item: BuildWriteItem, session: S
             logger.error("Failed to trigger Windows agent")
 
     return BuildReadItem.from_db(patched_build)
-
-
-@router.get("/event/repo/{repo_id}/build", response_model=BuildReadItem, response_model_by_alias=False)
-async def get_build_events(repo_id: str, redis: Redis = Depends(depends_redis)):
-    return EventSourceResponse(subscribe(f"repo:{repo_id}:build", redis))
-
-
-async def subscribe(channel: str, redis: Redis):
-    (channel_subscription,) = await redis.subscribe(channel=Channel(channel, False))
-    while await channel_subscription.wait_message():
-        message = await channel_subscription.get_json()
-        item_json = None
-        with session_scope() as session:
-            item_id = str(message["id"])
-            item = read_build(session, item_id)
-            if item:
-                item_json = BuildReadItem.from_db(item).json()
-
-        if item_json:
-            logger.debug("Send build event '%s' received on '%s'", item_json, channel)
-            yield { "event": "update", "data": item_json }
-        else:
-            logger.warning("Could not read updated build '%s'", item_id)
