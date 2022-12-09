@@ -19,10 +19,10 @@ class TestConfiguration(ApiTestCase):
             "data": {
                 "type": "configurations",
                 "attributes": {
-                    "github_secret": "123"
+                    "github_secret": ""
                 }
             }
         }, headers=self.admin_headers)
         self.assertEqual(200, response.status_code)
         attributes = response.json()["data"]["attributes"]
-        self.assertEqual("123", attributes["github_secret"])
+        self.assertEqual(len(attributes["github_secret"]), 40)

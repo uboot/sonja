@@ -10,13 +10,13 @@ class GitCredential(BaseModel):
 
 
 class DockerCredential(BaseModel):
-    server: str = ""
+    server: Optional[str]
     username: Optional[str]
     password: Optional[str]
 
 
 @attributes
-class EcosystemWrite(BaseModel):
+class Ecosystem(BaseModel):
     name: str = ""
     user: Optional[str]
     conan_remote: Optional[str]
@@ -25,6 +25,7 @@ class EcosystemWrite(BaseModel):
     conan_config_branch: Optional[str]
     conan_user: Optional[str]
     conan_password: Optional[str]
+    public_ssh_key: Optional[str]
     git_credentials: List[GitCredential] = Field(default_factory=list, alias="git_credential_values")
     docker_credentials: List[DockerCredential] = Field(default_factory=list, alias="docker_credential_values")
     known_hosts: Optional[str]
@@ -40,6 +41,18 @@ class EcosystemWrite(BaseModel):
                 "conan_config_branch": "master",
                 "conan_user": "agent",
                 "conan_password": "Passw0rd",
+                "public_ssh_key": "c3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBREFRQUJBQUFDQVFDdzJzUzRTb2FrRVNOMk11M3krc0htQy9I"
+                                  "Q3lZOGF6TXhBanNEbjZtSVdvTUFtUHFiMkpDWUFGajRwT09aRllSUm5BaVdWZWtYVTFpR1NJNm9lblZKMTdk"
+                                  "YlBtSHEyTDhuZ0NSZy96dDR3L29sMkxuQjFmVkc3YjZEYXdWc05YREljWFhPRHRGT0pEYlo5ZWNiSWlXVERP"
+                                  "QlVqTm9VSkNsUFU0N2o2MGNuT2pOTnQxSGhSTis0QVAzUE9JWWRXSE5QVVAxbTA0MktUWlNCRDBBYm9BbEh5"
+                                  "VHZqTTAweWtwSkZuNStiZlF5V2ppOFUyOFBRZTFqUWllaEJ5WnhBdjI2L2VkbXppMHZiUUI1YjQ2dmFld0Mz"
+                                  "Qjd5U0JNSWF4azZ2WVdWMXVTcERDZmJxdWNaY1RONm1iVmZmNVYxbkF4Q29TZG1BSzZyZ3BhQlorcWFzTmZG"
+                                  "c2JrWHZjNWpLbzNsNU5lTDhhb2pvYjNFcFFJT3lCOC9TUis3bTJJbHhFcm5WbGtDT1hJalRXaTNIQ0tNQ3J5"
+                                  "dXZ2ajVoSXFoMHd5QktYUjF5OTVpQWxEeXpYNXFwWTZtVWcwalVRa08ybEExbkttQnhraWY0VVpacjZrbDVV"
+                                  "QkZPVXh1MzhLc0cwc3FYS1BYNGdRWkNlbVpVdTIwZmdTamJQdm1mYzFmUjJTWHUrUng3SlcvVUxHWlh5dkx1"
+                                  "cHdoNlRyMXN4cDl6ek5GSDJTcExUaEpHdlZtY3hFQVlnN1Q1b3BKc09XWkU2TGZKTDQrbzdWVk1vQUFnN0tO"
+                                  "ZzU0NHRnNDVEdUFTRDFkRXR0WDZpNk9SLzdtWkJZeWkvZWdNY3NGbzI3elEzN09sblFQV3BvcHFzNlhwTTc0"
+                                  "cVExYzIrS0h6anF4U0lIRU9YZzBjeHRYZDJkWlE9PQ==",
                 "git_credentials": [{
                     "url": "https://user@github.com",
                     "username": "user",
@@ -65,23 +78,10 @@ class EcosystemWrite(BaseModel):
         }
 
 
-@attributes
-class EcosystemRead(EcosystemWrite):
-    public_ssh_key: Optional[str]
-
-    class Config:
-        schema_extra = {
-            "example": {
-                "public_ssh_key": "",
-                **EcosystemWrite.Config.schema_extra["example"]
-            }
-        }
-
-
 @data
 class EcosystemWriteData(BaseModel):
     type: str = "ecosystems"
-    attributes: EcosystemWrite = Field(default_factory=EcosystemWrite)
+    attributes: Ecosystem = Field(default_factory=Ecosystem)
 
     class Config:
         pass
@@ -107,7 +107,7 @@ ecosystem_relationships = create_relationships("EcosystemRelationships", [
 class EcosystemReadData(BaseModel):
     id: Optional[str]
     type: str = "ecosystems"
-    attributes: EcosystemRead = Field(default_factory=EcosystemRead)
+    attributes: Ecosystem = Field(default_factory=Ecosystem)
     relationships: ecosystem_relationships = Field(default_factory=ecosystem_relationships)
 
     class Config:

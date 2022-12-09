@@ -46,5 +46,5 @@ def patch_ecosystem_item(ecosystem_id: str, ecosystem_item: EcosystemWriteItem, 
     ecosystem = read_ecosystem(session, ecosystem_id)
     if ecosystem is None:
         raise HTTPException(status_code=404, detail="Ecosystem not found")
-    patched_user = update_ecosystem(session, ecosystem, ecosystem_item)
-    return EcosystemReadItem.from_db(patched_user)
+    patched_ecosystem = update_ecosystem(session, ecosystem, ecosystem_item)
+    return EcosystemReadItem.from_db(patched_ecosystem)
