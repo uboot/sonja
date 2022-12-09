@@ -73,7 +73,7 @@ class DockerCredential(Base):
     __tablename__ = 'docker_credential'
 
     id = Column(Integer, primary_key=True)
-    server = Column(String(255), nullable=False)
+    server = Column(String(255))
     username = Column(String(255))
     password = Column(String(255))
     ecosystem_id = Column(Integer, ForeignKey('ecosystem.id'))

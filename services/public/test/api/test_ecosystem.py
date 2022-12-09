@@ -58,6 +58,22 @@ class TestEcosystem(ApiTestCase):
         }, headers=self.user_headers)
         self.assertEqual(200, response.status_code)
         self.assertEqual("test_patch_ecosystem", response.json()["data"]["attributes"]["name"])
+        self.assertEqual("", response.json()["data"]["attributes"]["public_ssh_key"])
+
+    def test_patch_ecosystem_regenerate_ssh_key(self):
+        ecosystem_id = run_create_operation(create_ecosystem, dict())
+        response = client.patch(f"{api_prefix}/ecosystem/{ecosystem_id}", json={
+            "data": {
+                "type": "ecosystems",
+                "attributes": {
+                    "name": "test_patch_ecosystem",
+                    "public_ssh_key": "",
+                }
+            }
+        }, headers=self.user_headers)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual("test_patch_ecosystem", response.json()["data"]["attributes"]["name"])
+        self.assertEqual(968, len(response.json()["data"]["attributes"]["public_ssh_key"]))
 
     def test_delete_ecosystem(self):
         ecosystem_id = run_create_operation(create_ecosystem, dict())

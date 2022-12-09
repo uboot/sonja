@@ -1,5 +1,6 @@
 from sonja.database import Configuration, Session
 from public.schemas.configuration import ConfigurationItem
+from secrets import token_hex
 
 
 def read_configuration(session: Session) -> Configuration:
@@ -8,8 +9,8 @@ def read_configuration(session: Session) -> Configuration:
 
 def update_configuration(session: Session, configuration: Configuration, configuration_item: ConfigurationItem)\
         -> Configuration:
-    data = configuration_item.data.attributes.dict(exclude_unset=True, by_alias=True)
-    for attribute in data:
-        setattr(configuration, attribute, data[attribute])
+    github_secret = configuration_item.data.attributes.github_secret
+    if not github_secret:
+        configuration.github_secret = token_hex(20)
     session.commit()
     return configuration
