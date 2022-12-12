@@ -96,7 +96,7 @@ async def subscribe(channel: str, redis: Redis):
                 logger.warning("Did not send event for unsupported type '%s'", item_type)
 
         if item_json:
-            logger.debug("Send event '%s' received on '%s'", item_json, channel)
+            logger.info("Send event '%s' received on '%s'", item_json, channel)
             yield { "event": "update", "data": item_json }
         else:
             logger.warning("Could not read updated build '%s'", item_id)
