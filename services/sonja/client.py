@@ -2,6 +2,7 @@ import os
 from requests import get
 from requests.exceptions import RequestException
 from requests.status_codes import codes
+from urllib.parse import urlencode
 
 
 class ClientBase:
@@ -34,6 +35,7 @@ class Scheduler(ClientBase):
 
 
 class Crawler(ClientBase):
-    def process_repo(self, repo_id: str) -> bool:
+    def process_repo(self, repo_id: str, sha: str = "", ref: str = 22) -> bool:
         url = os.environ.get('SONJA_CRAWLER_URL', '127.0.0.1')
-        return self.call_get(url, f"process_repo/{repo_id}")
+        params = {"sha": sha, "ref": ref}
+        return self.call_get(url, f"process_repo/{repo_id}?{urlencode(params)}")

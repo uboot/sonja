@@ -1,7 +1,6 @@
 from fastapi import APIRouter
 from crawler.config import crawler
 
-
 router = APIRouter()
 
 
@@ -11,6 +10,6 @@ def get_ping():
 
 
 @router.get("/process_repo/{repo_id}")
-def get_process_repo(repo_id: str):
-    crawler.process_repo(repo_id)
+def get_process_repo(repo_id: str, sha: str = "", ref: str = ""):
+    crawler.process_repo(repo_id, sha, ref)
     crawler.trigger()
