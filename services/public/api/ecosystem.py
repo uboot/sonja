@@ -8,15 +8,16 @@ from sonja.database import get_session, Session, NotFound
 router = APIRouter()
 
 
-@router.get("/ecosystem", response_model=EcosystemReadList, response_model_by_alias=False)
-def get_ecosystem_list(session: Session = Depends(get_session), authorized: bool = Depends(get_read)):
+@router.get("/ecosystem", response_model=EcosystemReadList, response_model_by_alias=False,
+            dependencies=[Depends(get_read)])
+def get_ecosystem_list(session: Session = Depends(get_session)):
     ecosystems = read_ecosystems(session)
     return EcosystemReadList.from_db(ecosystems)
 
 
-@router.get("/ecosystem/{ecosystem_id}", response_model=EcosystemReadItem, response_model_by_alias=False)
-def get_ecosystem_item(ecosystem_id: str, session: Session = Depends(get_session),
-                       authorized: bool = Depends(get_read)):
+@router.get("/ecosystem/{ecosystem_id}", response_model=EcosystemReadItem, response_model_by_alias=False,
+            dependencies=[Depends(get_read)])
+def get_ecosystem_item(ecosystem_id: str, session: Session = Depends(get_session)):
     ecosystem = read_ecosystem(session, ecosystem_id)
     if ecosystem is None:
         raise HTTPException(status_code=404, detail="Ecosystem not found")
@@ -24,16 +25,14 @@ def get_ecosystem_item(ecosystem_id: str, session: Session = Depends(get_session
 
 
 @router.post("/ecosystem", response_model=EcosystemReadItem, response_model_by_alias=False,
-             status_code=status.HTTP_201_CREATED)
-def post_ecosystem_item(ecosystem: EcosystemWriteItem, session: Session = Depends(get_session),
-                   authorized: bool = Depends(get_write)):
+             status_code=status.HTTP_201_CREATED, dependencies=[Depends(get_write)])
+def post_ecosystem_item(ecosystem: EcosystemWriteItem, session: Session = Depends(get_session)):
     new_ecosystem = create_ecosystem(session, ecosystem)
     return EcosystemReadItem.from_db(new_ecosystem)
 
 
-@router.delete("/ecosystem/{ecosystem_id}")
-def delete_ecosystem_item(ecosystem_id: str, session: Session = Depends(get_session),
-                          authorized: bool = Depends(get_write)):
+@router.delete("/ecosystem/{ecosystem_id}", dependencies=[Depends(get_write)])
+def delete_ecosystem_item(ecosystem_id: str, session: Session = Depends(get_session)):
     ecosystem = read_ecosystem(session, ecosystem_id)
     if not ecosystem:
         raise HTTPException(status_code=404, detail="Ecosystem not found")
@@ -41,8 +40,8 @@ def delete_ecosystem_item(ecosystem_id: str, session: Session = Depends(get_sess
 
 
 @router.patch("/ecosystem/{ecosystem_id}", response_model=EcosystemReadItem, response_model_by_alias=False)
-def patch_ecosystem_item(ecosystem_id: str, ecosystem_item: EcosystemWriteItem, session: Session = Depends(get_session),
-                  authorized: bool = Depends(get_write)):
+def patch_ecosystem_item(ecosystem_id: str, ecosystem_item: EcosystemWriteItem,
+                         session: Session = Depends(get_session)):
     ecosystem = read_ecosystem(session, ecosystem_id)
     if ecosystem is None:
         raise HTTPException(status_code=404, detail="Ecosystem not found")

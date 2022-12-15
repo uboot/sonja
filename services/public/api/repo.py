@@ -9,30 +9,32 @@ router = APIRouter()
 crawler = Crawler()
 
 
-@router.post("/repo", response_model=RepoReadItem, response_model_by_alias=False, status_code=status.HTTP_201_CREATED)
-def post_repo_item(repo: RepoWriteItem, session: Session = Depends(get_session),
-                   authorized: bool = Depends(get_write)):
+@router.post("/repo", response_model=RepoReadItem, response_model_by_alias=False, status_code=status.HTTP_201_CREATED,
+             dependencies=[Depends(get_write)])
+def post_repo_item(repo: RepoWriteItem, session: Session = Depends(get_session)):
     new_repo = create_repo(session, repo)
     crawler.process_repo(new_repo.id)
     return RepoReadItem.from_db(new_repo)
 
 
-@router.get("/ecosystem/{ecosystem_id}/repo", response_model=RepoReadList, response_model_by_alias=False)
-def get_repo_list(ecosystem_id: str, session: Session = Depends(get_session), authorized: bool = Depends(get_read)):
+@router.get("/ecosystem/{ecosystem_id}/repo", response_model=RepoReadList, response_model_by_alias=False,
+            dependencies=[Depends(get_read)])
+def get_repo_list(ecosystem_id: str, session: Session = Depends(get_session)):
     return RepoReadList.from_db(read_repos(session, ecosystem_id))
 
 
-@router.get("/repo/{repo_id}", response_model=RepoReadItem, response_model_by_alias=False)
-def get_repo_item(repo_id: str, session: Session = Depends(get_session), authorized: bool = Depends(get_read)):
+@router.get("/repo/{repo_id}", response_model=RepoReadItem, response_model_by_alias=False,
+            dependencies=[Depends(get_read)])
+def get_repo_item(repo_id: str, session: Session = Depends(get_session)):
     repo = read_repo(session, repo_id)
     if repo is None:
         raise HTTPException(status_code=404, detail="Repo not found")
     return RepoReadItem.from_db(repo)
 
 
-@router.patch("/repo/{repo_id}", response_model=RepoReadItem, response_model_by_alias=False)
-def patch_repo_item(repo_id: str, repo_item: RepoWriteItem, session: Session = Depends(get_session),
-                  authorized: bool = Depends(get_write)):
+@router.patch("/repo/{repo_id}", response_model=RepoReadItem, response_model_by_alias=False,
+              dependencies=[Depends(get_write)])
+def patch_repo_item(repo_id: str, repo_item: RepoWriteItem, session: Session = Depends(get_session)):
     repo = read_repo(session, repo_id)
     if repo is None:
         raise HTTPException(status_code=404, detail="Repo not found")
@@ -41,8 +43,8 @@ def patch_repo_item(repo_id: str, repo_item: RepoWriteItem, session: Session = D
     return t
 
 
-@router.delete("/repo/{repo_id}")
-def delete_repo_item(repo_id: str, session: Session = Depends(get_session), authorized: bool = Depends(get_write)):
+@router.delete("/repo/{repo_id}", dependencies=[Depends(get_write)])
+def delete_repo_item(repo_id: str, session: Session = Depends(get_session)):
     repo = read_repo(session, repo_id)
     if not repo:
         raise HTTPException(status_code=404, detail="Repo not found")

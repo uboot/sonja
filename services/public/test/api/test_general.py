@@ -10,6 +10,9 @@ client = TestClient(app)
 
 
 class TestGeneral(ApiTestCase):
+    def SetUp(self):
+        self.crawler_mock.reset_mock()
+
     def test_get_clear_ecosystems(self):
         run_create_operation(create_ecosystem, dict())
         response = client.get(f"{api_prefix}/clear_ecosystems", headers=self.admin_headers)
@@ -28,4 +31,5 @@ class TestGeneral(ApiTestCase):
 
     def test_process_repo(self):
         response = client.get(f"{api_prefix}/process_repo/1", headers=self.user_headers)
-        self.assertEqual(400, response.status_code)
+        self.assertEqual(200, response.status_code)
+        self.crawler_mock.process_repo.assert_called_with("1")

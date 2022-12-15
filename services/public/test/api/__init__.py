@@ -43,11 +43,6 @@ def _header_for_user(user_params: dict()):
 class ApiTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        pass
-        # if not redis_plugin.redis:
-        #     asyncio.run(redis_plugin.init_app(app))
-        #     asyncio.run(redis_plugin.init())
-
         reset_database()
         with session_scope() as session:
             configuration = Configuration()
@@ -64,3 +59,4 @@ class ApiTestCase(unittest.TestCase):
             "user.user_name": "reader",
             "user.permissions": "read"
         })
+        cls.crawler_mock = crawler_mock

@@ -12,14 +12,16 @@ from typing import Optional
 router = APIRouter()
 
 
-@router.get("/log_line", response_model=LogLineReadList, response_model_by_alias=False)
+@router.get("/log_line", response_model=LogLineReadList, response_model_by_alias=False,
+            dependencies=[Depends(get_read)])
 def get_log_line_list(run_id: str, page: Optional[int] = None, per_page:  Optional[int] = None,
-                      session: Session = Depends(get_session), authorized: bool = Depends(get_read)):
+                      session: Session = Depends(get_session)):
     return LogLineReadList.from_db(**read_log_lines(session, run_id, page, per_page))
 
 
-@router.get("/log_line/{log_line_id}", response_model=LogLineReadItem, response_model_by_alias=False)
-def get_log_line_item(log_line_id: str, session: Session = Depends(get_session), authorized: bool = Depends(get_read)):
+@router.get("/log_line/{log_line_id}", response_model=LogLineReadItem, response_model_by_alias=False,
+            dependencies=[Depends(get_read)])
+def get_log_line_item(log_line_id: str, session: Session = Depends(get_session)):
     build = read_log_line(session, log_line_id)
     if build is None:
         raise HTTPException(status_code=404, detail="Log line not found")
