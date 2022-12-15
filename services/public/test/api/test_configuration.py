@@ -2,7 +2,7 @@ from fastapi.testclient import TestClient
 
 from public.config import api_prefix
 from public.main import app
-from sonja.test.api import ApiTestCase
+from public.test.api import ApiTestCase
 from public.crud.configuration import read_configuration
 
 client = TestClient(app)

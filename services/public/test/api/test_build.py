@@ -3,7 +3,7 @@ from fastapi.testclient import TestClient
 from public.config import api_prefix
 from public.main import app
 from sonja.model import BuildStatus
-from sonja.test.api import ApiTestCase
+from public.test.api import ApiTestCase
 from sonja.test.util import create_build, create_ecosystem, run_create_operation
 
 client = TestClient(app)

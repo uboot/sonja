@@ -9,15 +9,15 @@ from public.schemas.build import BuildReadItem
 from public.crud.build import read_build
 from public.schemas.run import RunReadItem
 from public.crud.run import read_run
+from public.client import get_crawler
 from sonja.database import get_session, Session, User, clear_ecosystems, session_scope
 from sonja.demo import populate_database, add_build, add_log_line, add_run
 from sonja.auth import test_password, create_access_token
-from sonja.client import Crawler
 from sonja.config import logger
+from sonja.client import Crawler
 from typing import Union
 
 router = APIRouter()
-crawler = Crawler()
 
 
 @router.get("/ping")
@@ -51,7 +51,7 @@ def get_add_log_line(authorized: bool = Depends(get_admin)):
 
 
 @router.get("/process_repo/{repo_id}")
-def get_process_repo(repo_id: str, authorized: bool = Depends(get_write)):
+def get_process_repo(repo_id: str, crawler: Crawler = Depends(get_crawler), authorized: bool = Depends(get_write)):
     if not crawler.process_repo(repo_id):
         raise HTTPException(status_code=400, detail="Failed")
 

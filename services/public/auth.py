@@ -45,6 +45,9 @@ def get_admin(permissions: List[PermissionEnum] = Depends(get_permissions)) -> b
 
 async def get_github(request: Request, session: Session = Depends(get_session)):
     configuration = read_configuration(session)
+    if "X-Hub-Signature-256" not in request.headers:
+        raise HTTPException(status_code=403, detail="Signature is not valid")
+
     provided_signature = request.headers["X-Hub-Signature-256"].split('sha256=')[-1].strip()
     body = await request.body()
     data_signature = HMAC(key=configuration.github_secret.encode(), msg=body, digestmod=sha256).hexdigest()
