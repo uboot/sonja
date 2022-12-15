@@ -9,12 +9,13 @@ from public.schemas.build import BuildReadItem
 from public.crud.build import read_build
 from public.schemas.run import RunReadItem
 from public.crud.run import read_run
-from public.client import get_crawler
+from public.client import get_crawler, get_redis_client
 from sonja.database import get_session, Session, User, clear_ecosystems, session_scope
 from sonja.demo import populate_database, add_build, add_log_line, add_run
 from sonja.auth import test_password, create_access_token
 from sonja.config import logger
 from sonja.client import Crawler
+from sonja.redis import RedisClient
 from typing import Union
 
 router = APIRouter()
@@ -36,18 +37,18 @@ def get_populate_database():
 
 
 @router.get("/add_build", dependencies=[Depends(get_admin)])
-def get_add_build():
-    add_build()
+def get_add_build(redis_client: RedisClient = Depends(get_redis_client)):
+    add_build(redis_client)
 
 
 @router.get("/add_run", dependencies=[Depends(get_admin)])
-def get_add_run():
-    add_run()
+def get_add_run(redis_client: RedisClient = Depends(get_redis_client)):
+    add_run(redis_client)
 
 
 @router.get("/add_log_line", dependencies=[Depends(get_admin)])
-def get_add_log_line():
-    add_log_line()
+def get_add_log_line(redis_client: RedisClient = Depends(get_redis_client)):
+    add_log_line(redis_client)
 
 
 @router.get("/process_repo/{repo_id}", dependencies=[Depends(get_write)])

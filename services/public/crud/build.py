@@ -7,9 +7,6 @@ from sonja.model import BuildStatus
 from sonja.redis import RedisClient
 
 
-redis = RedisClient()
-
-
 def read_builds(session: Session, ecosystem_id: str, repo_id: Optional[str] = None, channel_id: Optional[str] = None,
                 profile_id: Optional[str] = None, page: Optional[int] = None, per_page:  Optional[int] = None)\
         -> dict:
@@ -57,7 +54,7 @@ def read_build(session: Session, build_id: str) -> Build:
     return session.query(Build).filter(Build.id == build_id).first()
 
 
-def update_build(session: Session, build_id: str, build_item: BuildWriteItem) -> Build:
+def update_build(session: Session, redis_client: RedisClient, build_id: str, build_item: BuildWriteItem) -> Build:
     build = session.query(Build).filter(Build.id == build_id).with_for_update().first()
 
     if build_item.data.attributes.status == StatusEnum.stopping:
@@ -76,6 +73,6 @@ def update_build(session: Session, build_id: str, build_item: BuildWriteItem) ->
             build.missing_packages = []
 
     session.commit()
-    redis.publish_build_update(build)
+    redis_client.publish_build_update(build)
 
     return build

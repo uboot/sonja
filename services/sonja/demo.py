@@ -117,7 +117,7 @@ def populate_database():
         session.commit()
 
 
-def add_build():
+def add_build(redis_client: RedisClient):
     logger.info("Add build")
     with session_scope() as session:
         commit = session.query(Commit).first()
@@ -138,10 +138,10 @@ def add_build():
         session.add(build)
         session.commit()
 
-        RedisClient().publish_build_update(build)
+        redis_client.publish_build_update(build)
 
 
-def add_run():
+def add_run(redis_client: RedisClient):
     logger.info("Add run")
     with session_scope() as session:
         build = session.query(Build).first()
@@ -154,10 +154,10 @@ def add_run():
         session.add(run)
         session.commit()
 
-        RedisClient().publish_run_update(run)
+        redis_client.publish_run_update(run)
 
 
-def add_log_line():
+def add_log_line(redis_client: RedisClient):
     logger.info("Add log line")
     with session_scope() as session:
         run = session.query(Run).first()
@@ -172,7 +172,7 @@ def add_log_line():
         log_line.content = "some logs..."
         session.commit()
 
-        RedisClient().publish_log_line_update(log_line)
+        redis_client.publish_log_line_update(log_line)
 
 
 class DemoDataCreator(object):

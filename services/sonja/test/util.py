@@ -8,6 +8,7 @@ from sonja.model import Permission, Ecosystem, PermissionLabel, Base, User, GitC
 
 import os
 
+
 def run_create_operation(op: Callable[[dict], Base], parameter: dict, ecosystem_id: int = 0) -> int:
     with session_scope() as session:
         if ecosystem_id:
