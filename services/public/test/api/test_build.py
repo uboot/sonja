@@ -17,6 +17,11 @@ class TestBuild(ApiTestCase):
         run_create_operation(create_build, {"ecosystem": ecosystem})
         run_create_operation(create_build, {"ecosystem": ecosystem})
 
+    def setUp(self) -> None:
+        self.linux_agent_mock.reset_mock()
+        self.windows_agent_mock.reset_mock()
+        self.redis_client_mock.reset_mock()
+
     def test_patch_stop_active_build(self):
         build_id = run_create_operation(create_build, {"build.status": BuildStatus.active})
         response = client.patch(f"{api_prefix}/build/{build_id}", json={
@@ -30,6 +35,7 @@ class TestBuild(ApiTestCase):
         self.assertEqual(200, response.status_code)
         attributes = response.json()["data"]["attributes"]
         self.assertEqual("stopping", attributes["status"])
+        self.redis_client_mock.publish_build_update.assert_called_once()
 
     def test_patch_stop_new_build(self):
         build_id = run_create_operation(create_build, {"build.status": BuildStatus.new})
@@ -44,6 +50,7 @@ class TestBuild(ApiTestCase):
         self.assertEqual(200, response.status_code)
         attributes = response.json()["data"]["attributes"]
         self.assertEqual("stopped", attributes["status"])
+        self.redis_client_mock.publish_build_update.assert_called_once()
 
     def test_patch_start_active_build(self):
         build_id = run_create_operation(create_build, {"build.status": BuildStatus.active})
@@ -58,6 +65,9 @@ class TestBuild(ApiTestCase):
         self.assertEqual(200, response.status_code)
         attributes = response.json()["data"]["attributes"]
         self.assertEqual("active", attributes["status"])
+        self.linux_agent_mock.process_builds.assert_called_once()
+        self.windows_agent_mock.process_builds.assert_called_once()
+        self.redis_client_mock.publish_build_update.assert_called_once()
 
     def test_patch_start_stopping_build(self):
         build_id = run_create_operation(create_build, {"build.status": BuildStatus.stopping})
@@ -72,6 +82,9 @@ class TestBuild(ApiTestCase):
         self.assertEqual(200, response.status_code)
         attributes = response.json()["data"]["attributes"]
         self.assertEqual("stopping", attributes["status"])
+        self.linux_agent_mock.process_builds.assert_called_once()
+        self.windows_agent_mock.process_builds.assert_called_once()
+        self.redis_client_mock.publish_build_update.assert_called_once()
 
     def test_get_build(self):
         build_id = run_create_operation(create_build, dict())

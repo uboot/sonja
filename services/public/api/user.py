@@ -40,8 +40,8 @@ def post_user_item(user: UserWriteItem, session: Session = Depends(get_session))
 @router.patch("/user/{user_id}", response_model=UserReadItem, response_model_by_alias=False,
               dependencies=[Depends(get_read)])
 def patch_user_item(user_id: str, user_item: UserWriteItem, session: Session = Depends(get_session),
-                  current_user: User = Depends(get_current_user),
-                  permissions: List[PermissionEnum] = Depends(get_permissions)):
+                    current_user: User = Depends(get_current_user),
+                    permissions: List[PermissionEnum] = Depends(get_permissions)):
     if int(user_id) != current_user.id and PermissionEnum.admin not in permissions:
         raise HTTPException(status_code=403, detail="Non-admins can only update themselves")
 

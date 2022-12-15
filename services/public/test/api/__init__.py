@@ -5,7 +5,7 @@ from starlette.testclient import TestClient
 
 from public.config import api_prefix
 from public.main import app
-from public.client import get_crawler
+from public.client import get_crawler, get_linux_agent, get_windows_agent, get_redis_client
 from unittest.mock import Mock
 
 from sonja.database import session_scope, reset_database
@@ -13,13 +13,32 @@ from sonja.model import Configuration
 from sonja.test import util
 
 crawler_mock = Mock()
+linux_agent_mock = Mock()
+windows_agent_mock = Mock()
+redis_client_mock = Mock()
 
 
 def get_crawler_override():
     return crawler_mock
 
 
+def get_linux_agent_override():
+    return linux_agent_mock
+
+
+def get_windows_agent_override():
+    return windows_agent_mock
+
+
+def get_redis_client_override():
+    return redis_client_mock
+
+
 app.dependency_overrides[get_crawler] = get_crawler_override
+app.dependency_overrides[get_linux_agent] = get_linux_agent_override
+app.dependency_overrides[get_windows_agent] = get_windows_agent_override
+app.dependency_overrides[get_redis_client] = get_redis_client_override
+
 SECRET = "0123467890abcdef0123467890abcdef"
 client = TestClient(app)
 
@@ -60,3 +79,6 @@ class ApiTestCase(unittest.TestCase):
             "user.permissions": "read"
         })
         cls.crawler_mock = crawler_mock
+        cls.linux_agent_mock = linux_agent_mock
+        cls.windows_agent_mock = windows_agent_mock
+        cls.redis_client_mock = redis_client_mock

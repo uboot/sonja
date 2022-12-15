@@ -10,8 +10,9 @@ client = TestClient(app)
 
 
 class TestGeneral(ApiTestCase):
-    def SetUp(self):
+    def setUp(self):
         self.crawler_mock.reset_mock()
+        self.redis_client_mock.reset_mock()
 
     def test_get_clear_ecosystems(self):
         run_create_operation(create_ecosystem, dict())
@@ -28,6 +29,21 @@ class TestGeneral(ApiTestCase):
         populate_database()
         response = client.get(f"{api_prefix}/add_build", headers=self.admin_headers)
         self.assertEqual(200, response.status_code)
+        self.redis_client_mock.publish_build_update.assert_called_once()
+
+    def test_add_run(self):
+        run_create_operation(create_ecosystem, dict())
+        populate_database()
+        response = client.get(f"{api_prefix}/add_run", headers=self.admin_headers)
+        self.assertEqual(200, response.status_code)
+        self.redis_client_mock.publish_run_update.assert_called_once()
+
+    def test_add_log_line(self):
+        run_create_operation(create_ecosystem, dict())
+        populate_database()
+        response = client.get(f"{api_prefix}/add_log_line", headers=self.admin_headers)
+        self.assertEqual(200, response.status_code)
+        self.redis_client_mock.publish_log_line_update.assert_called_once()
 
     def test_process_repo(self):
         response = client.get(f"{api_prefix}/process_repo/1", headers=self.user_headers)
