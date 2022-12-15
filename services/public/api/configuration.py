@@ -7,14 +7,16 @@ from sonja.database import get_session, Session
 router = APIRouter()
 
 
-@router.get("/configuration/current", response_model=ConfigurationItem, response_model_by_alias=False)
-def get_current_configuration_item(session: Session = Depends(get_session), authorized: bool = Depends(get_admin)):
+@router.get("/configuration/current", response_model=ConfigurationItem, response_model_by_alias=False,
+            dependencies=[Depends(get_admin)])
+def get_current_configuration_item(session: Session = Depends(get_session)):
     return ConfigurationItem.from_db(read_configuration(session))
 
 
-@router.patch("/configuration/{configuration_id}", response_model=ConfigurationItem, response_model_by_alias=False)
+@router.patch("/configuration/{configuration_id}", response_model=ConfigurationItem, response_model_by_alias=False,
+              dependencies=[Depends(get_admin)])
 def patch_configuration_item(configuration_id: str, configuration_item: ConfigurationItem,
-                            session: Session = Depends(get_session), authorized: bool = Depends(get_admin)):
+                            session: Session = Depends(get_session)):
     configuration = read_configuration(session)
     if configuration is None:
         raise HTTPException(status_code=404, detail="Configuration not found")

@@ -7,24 +7,25 @@ from sonja.database import get_session, Session
 router = APIRouter()
 
 
-@router.post("/channel", response_model=ChannelReadItem, response_model_by_alias=False, status_code=status.HTTP_201_CREATED)
-def post_channel_item(channel: ChannelWriteItem, session: Session = Depends(get_session),
-                      authorized: bool = Depends(get_write)):
+@router.post("/channel", response_model=ChannelReadItem, response_model_by_alias=False,
+             status_code=status.HTTP_201_CREATED, dependencies=[Depends(get_write)])
+def post_channel_item(channel: ChannelWriteItem, session: Session = Depends(get_session)):
     new_channel = create_channel(session, channel)
     return ChannelReadItem.from_db(new_channel)
 
 
-@router.get("/channel/{channel_id}", response_model=ChannelReadItem, response_model_by_alias=False)
-def get_channel_item(channel_id: str, session: Session = Depends(get_session), authorized: bool = Depends(get_read)):
+@router.get("/channel/{channel_id}", response_model=ChannelReadItem, response_model_by_alias=False,
+            dependencies=[Depends(get_read)])
+def get_channel_item(channel_id: str, session: Session = Depends(get_session)):
     channel = read_channel(session, channel_id)
     if channel is None:
         raise HTTPException(status_code=404, detail="Channel not found")
     return ChannelReadItem.from_db(channel)
 
 
-@router.patch("/channel/{channel_id}", response_model=ChannelReadItem, response_model_by_alias=False)
-def get_channel_item(channel_id: str, channel_item: ChannelWriteItem, session: Session = Depends(get_session),
-                  authorized: bool = Depends(get_write)):
+@router.patch("/channel/{channel_id}", response_model=ChannelReadItem, response_model_by_alias=False,
+              dependencies=[Depends(get_write)])
+def get_channel_item(channel_id: str, channel_item: ChannelWriteItem, session: Session = Depends(get_session)):
     channel = read_channel(session, channel_id)
     if channel is None:
         raise HTTPException(status_code=404, detail="Channel not found")
@@ -33,8 +34,8 @@ def get_channel_item(channel_id: str, channel_item: ChannelWriteItem, session: S
     return t
 
 
-@router.delete("/channel/{channel_id}")
-def delete_channel_item(channel_id: str, session: Session = Depends(get_session), authorized: bool = Depends(get_write)):
+@router.delete("/channel/{channel_id}", dependencies=[Depends(get_write)])
+def delete_channel_item(channel_id: str, session: Session = Depends(get_session)):
     channel = read_channel(session, channel_id)
     if not channel:
         raise HTTPException(status_code=404, detail="Channel not found")

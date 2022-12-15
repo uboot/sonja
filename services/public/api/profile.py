@@ -8,24 +8,24 @@ router = APIRouter()
 
 
 @router.post("/profile", response_model=ProfileReadItem, response_model_by_alias=False,
-             status_code=status.HTTP_201_CREATED)
-def post_profile_item(profile: ProfileWriteItem, session: Session = Depends(get_session),
-                   authorized: bool = Depends(get_write)):
+             status_code=status.HTTP_201_CREATED, dependencies=[Depends(get_write)])
+def post_profile_item(profile: ProfileWriteItem, session: Session = Depends(get_session)):
     new_profile = create_profile(session, profile)
     return ProfileReadItem.from_db(new_profile)
 
 
-@router.get("/profile/{profile_id}", response_model=ProfileReadItem, response_model_by_alias=False)
-def get_profile_item(profile_id: str, session: Session = Depends(get_session), authorized: bool = Depends(get_read)):
+@router.get("/profile/{profile_id}", response_model=ProfileReadItem, response_model_by_alias=False,
+            dependencies=[Depends(get_read)])
+def get_profile_item(profile_id: str, session: Session = Depends(get_session)):
     profile = read_profile(session, profile_id)
     if profile is None:
         raise HTTPException(status_code=404, detail="Profile not found")
     return ProfileReadItem.from_db(profile)
 
 
-@router.patch("/profile/{profile_id}", response_model=ProfileReadItem, response_model_by_alias=False)
-def get_profile_item(profile_id: str, profile_item: ProfileWriteItem, session: Session = Depends(get_session),
-                  authorized: bool = Depends(get_write)):
+@router.patch("/profile/{profile_id}", response_model=ProfileReadItem, response_model_by_alias=False,
+              dependencies=[Depends(get_write)])
+def get_profile_item(profile_id: str, profile_item: ProfileWriteItem, session: Session = Depends(get_session)):
     profile = read_profile(session, profile_id)
     if profile is None:
         raise HTTPException(status_code=404, detail="Profile not found")
@@ -33,8 +33,9 @@ def get_profile_item(profile_id: str, profile_item: ProfileWriteItem, session: S
     return ProfileReadItem.from_db(patched_profile)
 
 
-@router.delete("/profile/{profile_id}")
-def delete_profile_item(profile_id: str, session: Session = Depends(get_session), authorized: bool = Depends(get_write)):
+@router.delete("/profile/{profile_id}",
+               dependencies=[Depends(get_write)])
+def delete_profile_item(profile_id: str, session: Session = Depends(get_session)):
     profile = read_profile(session, profile_id)
     if not profile:
         raise HTTPException(status_code=404, detail="Profile not found")

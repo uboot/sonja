@@ -25,33 +25,33 @@ def get_ping():
     pass
 
 
-@router.get("/clear_ecosystems")
-def get_clear_ecosystems(authorized: bool = Depends(get_admin)):
+@router.get("/clear_ecosystems", dependencies=[Depends(get_admin)])
+def get_clear_ecosystems():
     clear_ecosystems()
 
 
-@router.get("/populate_database")
-def get_populate_database(authorized: bool = Depends(get_admin)):
+@router.get("/populate_database", dependencies=[Depends(get_admin)])
+def get_populate_database():
     populate_database()
 
 
-@router.get("/add_build")
-def get_add_build(authorized: bool = Depends(get_admin)):
+@router.get("/add_build", dependencies=[Depends(get_admin)])
+def get_add_build():
     add_build()
 
 
-@router.get("/add_run")
-def get_add_run(authorized: bool = Depends(get_admin)):
+@router.get("/add_run", dependencies=[Depends(get_admin)])
+def get_add_run():
     add_run()
 
 
-@router.get("/add_log_line")
-def get_add_log_line(authorized: bool = Depends(get_admin)):
+@router.get("/add_log_line", dependencies=[Depends(get_admin)])
+def get_add_log_line():
     add_log_line()
 
 
-@router.get("/process_repo/{repo_id}")
-def get_process_repo(repo_id: str, crawler: Crawler = Depends(get_crawler), authorized: bool = Depends(get_write)):
+@router.get("/process_repo/{repo_id}", dependencies=[Depends(get_write)])
+def get_process_repo(repo_id: str, crawler: Crawler = Depends(get_crawler)):
     if not crawler.process_repo(repo_id):
         raise HTTPException(status_code=400, detail="Failed")
 
