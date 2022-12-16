@@ -22,8 +22,9 @@ class TestGeneral(ApiTestCase):
     def setUpClass(cls):
         ApiTestCase.setUpClass()
         ecosystem_id = run_create_operation(create_ecosystem, dict())
-        run_create_operation(create_repo, dict(), ecosystem_id)
-        run_create_operation(create_repo, {"repo.https": True}, ecosystem_id)
+        run_create_operation(create_repo, {"repo.url": "https://github.com/user/https-repo.git"}, ecosystem_id)
+        run_create_operation(create_repo, {"repo.url": "git@github.com:user/ssh-repo.git"}, ecosystem_id)
+        run_create_operation(create_repo, {"repo.url": "https://dev.azure.com/_git/user/foreign-repo.git"}, ecosystem_id)
 
     def setUp(self):
         self.crawler_mock.reset_mock()
@@ -31,7 +32,7 @@ class TestGeneral(ApiTestCase):
     def test_post_ping(self):
         data = {
             "repository": {
-                "full_name": "uboot/sonja-backend"
+                "full_name": "user/ssh-repo"
             }}
         payload, headers = sign_payload(data)
 
@@ -40,12 +41,12 @@ class TestGeneral(ApiTestCase):
         self.assertEqual(202, response.status_code)
         self.crawler_mock.process_repo.assert_not_called()
 
-    def test_post_push_ssh_repo(self):
+    def test_post_push_https_repo(self):
         data = {
             "after": "10d5538c8b87a74e11c05c119e982b0e999ec77e",
             "ref": "refs/heads/main",
             "repository": {
-                "full_name": "uboot/sonja-backend"
+                "full_name": "user/https-repo"
             }
         }
         payload, headers = sign_payload(data)
@@ -56,12 +57,12 @@ class TestGeneral(ApiTestCase):
         self.crawler_mock.process_repo.assert_called_with("1", "10d5538c8b87a74e11c05c119e982b0e999ec77e",
                                                           "refs/heads/main")
 
-    def test_post_push_https_repo(self):
+    def test_post_push_ssh_repo(self):
         data = {
             "after": "10d5538c8b87a74e11c05c119e982b0e999ec77e",
             "ref": "refs/heads/main",
             "repository": {
-                "full_name": "uboot/conan-packages"
+                "full_name": "user/ssh-repo"
             }
         }
         payload, headers = sign_payload(data)
@@ -71,3 +72,18 @@ class TestGeneral(ApiTestCase):
         self.assertEqual(202, response.status_code)
         self.crawler_mock.process_repo.assert_called_with("2", "10d5538c8b87a74e11c05c119e982b0e999ec77e",
                                                           "refs/heads/main")
+
+    def test_post_push_foreign_repo(self):
+        data = {
+            "after": "10d5538c8b87a74e11c05c119e982b0e999ec77e",
+            "ref": "refs/heads/main",
+            "repository": {
+                "full_name": "user/foreign-repo"
+            }
+        }
+        payload, headers = sign_payload(data)
+
+        response = client.post(f"{api_prefix}/github/push", data=payload, headers=headers)
+
+        self.assertEqual(202, response.status_code)
+        self.crawler_mock.process_repo.assert_not_called()

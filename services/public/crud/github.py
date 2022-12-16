@@ -8,6 +8,13 @@ def process_push(session: Session, crawler: Crawler, payload: PushPayload):
     if not payload.after or not payload.ref:
         return
 
-    repos = session.query(Repo).filter(Repo.url.like(f"%/{payload.repository.full_name}.git")).all()
-    for repo in repos:
+    https_repos = session.query(Repo)\
+        .filter_by(url=f"https://github.com/{payload.repository.full_name}.git")\
+        .all()
+
+    ssh_repos = session.query(Repo)\
+        .filter_by(url=f"git@github.com:{payload.repository.full_name}.git")\
+        .all()
+
+    for repo in https_repos + ssh_repos:
         crawler.process_repo(str(repo.id), payload.after, payload.ref)
