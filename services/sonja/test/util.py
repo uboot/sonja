@@ -71,7 +71,10 @@ def create_repo(parameters):
         repo.ecosystem = parameters["ecosystem"]
     else:
         repo.ecosystem = create_ecosystem(parameters)
-    if parameters.get("repo.invalid", False):
+
+    if parameters.get("repo.url", ""):
+        repo.url = parameters.get("repo.url", "")
+    elif parameters.get("repo.invalid", False):
         repo.url = "https://github.com/uboot/nonsense.git"
     elif parameters.get("repo.https", False):
         repo.url = "https://uboot@github.com/uboot/conan-packages.git"
