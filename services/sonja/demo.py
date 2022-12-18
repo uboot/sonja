@@ -88,7 +88,7 @@ def populate_database():
         channel = Channel()
         channel.ecosystem = ecosystem
         channel.name = "Releases"
-        channel.branch = "main"
+        channel.branch = "heads/main"
         channel.conan_channel = "stable"
         session.add(channel)
 
@@ -216,7 +216,7 @@ class DemoDataCreator(object):
         channel = Channel()
         channel.ecosystem = self.__ecosystem
         channel.name = "Releases"
-        channel.branch = "master"
+        channel.branch = "heads/master"
         channel.conan_channel = ""
         self.__session.add(channel)
 
