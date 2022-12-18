@@ -27,8 +27,8 @@ class TestRepoController(unittest.TestCase):
         controller.create_new_repo("git@github.com:uboot/sonja-backend.git")
         controller.setup_ssh(os.environ.get("SSH_KEY", ""), known_hosts)
         controller.fetch()
-        controller.checkout("main")
-        self.assertTrue(os.path.exists(os.path.join(self.work_dir, "repo", "services")))
+        for _ in controller.checkout_matching_refs("heads/main"):
+            self.assertTrue(os.path.exists(os.path.join(self.work_dir, "repo", "services")))
 
     def test_setup_ssh(self):
         controller = RepoController(self.work_dir)
@@ -42,7 +42,7 @@ class TestRepoController(unittest.TestCase):
         controller.create_new_repo("git@github.com:uboot/conan-packages.git")
         controller.setup_ssh(os.environ.get("SSH_KEY", ""), known_hosts)
         controller.fetch()
-        controller.checkout("change_base_version")
-        self.assertTrue(controller.has_diff("ef89f593ea439d8986aca1a52257e44e7b8fea29", "base/"))
-        self.assertTrue(controller.has_diff("ef89f593ea439d8986aca1a52257e44e7b8fea29", "base"))
-        self.assertFalse(controller.has_diff("ef89f593ea439d8986aca1a52257e44e7b8fea29", "app"))
+        for _ in controller.checkout_matching_refs("heads/change_base_version"):
+            self.assertTrue(controller.has_diff("ef89f593ea439d8986aca1a52257e44e7b8fea29", "base/"))
+            self.assertTrue(controller.has_diff("ef89f593ea439d8986aca1a52257e44e7b8fea29", "base"))
+            self.assertFalse(controller.has_diff("ef89f593ea439d8986aca1a52257e44e7b8fea29", "app"))

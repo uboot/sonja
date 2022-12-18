@@ -69,19 +69,7 @@ class RepoController(object):
 
     def fetch(self):
         repo = git.Repo(self.repo_dir)
-        repo.git.fetch()
-
-    def get_remote_branches(self):
-        repo = git.Repo(self.repo_dir)
-        branches = [b.strip() for b in repo.git.branch('-r').split()]
-        pattern = 'origin/([/\\-\\w]+)'
-        matches = [re.match(pattern, b) for b in branches]
-        return list(set(m.group(1) for m in matches
-                    if m and m.group(1) != 'HEAD'))
-
-    def checkout(self, branch):
-        repo = git.Repo(self.repo_dir)
-        repo.git.reset('--hard', 'origin/{0}'.format(branch))
+        repo.remotes.origin.fetch()
 
     def get_sha(self):
         repo = git.Repo(self.repo_dir)
@@ -122,6 +110,25 @@ class RepoController(object):
                 return True
 
         return False
+
+    def checkout_matching_refs(self, ref_pattern):
+        repo = git.Repo(self.repo_dir)
+        for ref in repo.refs:
+            if isinstance(ref, git.RemoteReference):
+                normalized_ref = f"heads/{ref.name.lstrip('origin/')}"
+            elif isinstance(ref, git.TagReference):
+                normalized_ref = f"tags/{ref.name}"
+            else:
+                continue
+
+            if not re.fullmatch(ref_pattern, normalized_ref):
+                continue
+
+            repo.head.reset(ref, working_tree=True)
+            yield normalized_ref
+
+
+
 
 
 class Crawler(Worker):
@@ -187,15 +194,9 @@ class Crawler(Worker):
                     logger.info("Fetch repo '%s' for URL '%s'", work_dir, repo.url)
                     await loop.run_in_executor(None, controller.fetch)
 
-                    branches = controller.get_remote_branches()
                     for channel in channels:
-                        for branch in branches:
-                            if not re.fullmatch(channel.branch, branch):
-                                continue
-
-                            logger.info("Branch '%s' matches '%s'", branch, channel.branch)
-                            logger.info("Checkout branch '%s'", branch)
-                            controller.checkout(branch)
+                        for ref in controller.checkout_matching_refs(channel.branch):
+                            logger.info("Ref '%s' matches '%s'", ref, channel.branch)
                             sha = controller.get_sha()
 
                             commits = session.query(Commit).filter_by(repo=repo,

@@ -55,7 +55,23 @@ class TestGeneral(ApiTestCase):
 
         self.assertEqual(202, response.status_code)
         self.crawler_mock.process_repo.assert_called_with("1", "10d5538c8b87a74e11c05c119e982b0e999ec77e",
-                                                          "refs/heads/main")
+                                                          "heads/main")
+
+    def test_post_push_https_repo(self):
+        data = {
+            "after": "10d5538c8b87a74e11c05c119e982b0e999ec77e",
+            "ref": "refs/tags/v1",
+            "repository": {
+                "full_name": "user/https-repo"
+            }
+        }
+        payload, headers = sign_payload(data)
+
+        response = client.post(f"{api_prefix}/github/push", data=payload, headers=headers)
+
+        self.assertEqual(202, response.status_code)
+        self.crawler_mock.process_repo.assert_called_with("1", "10d5538c8b87a74e11c05c119e982b0e999ec77e",
+                                                          "tags/v1")
 
     def test_post_push_ssh_repo(self):
         data = {
@@ -71,7 +87,7 @@ class TestGeneral(ApiTestCase):
 
         self.assertEqual(202, response.status_code)
         self.crawler_mock.process_repo.assert_called_with("2", "10d5538c8b87a74e11c05c119e982b0e999ec77e",
-                                                          "refs/heads/main")
+                                                          "heads/main")
 
     def test_post_push_foreign_repo(self):
         data = {

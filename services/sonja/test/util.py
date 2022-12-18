@@ -115,7 +115,7 @@ def create_channel(parameters):
         channel.ecosystem = parameters["ecosystem"]
     else:
         channel.ecosystem = create_ecosystem(parameters)
-    channel.branch = parameters.get("channel.branch", "main")
+    channel.branch = parameters.get("channel.branch", "heads/main")
     channel.name = "Releases"
     channel.conan_channel = "stable"
     return channel
