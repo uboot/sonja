@@ -75,7 +75,7 @@ class TestCrawler(unittest.TestCase):
     def test_start_repo_and_regex_channel(self):
         with session_scope() as session:
             session.add(util.create_repo(dict()))
-            session.add(util.create_channel({"channel.branch": "heads/mai.*"}))
+            session.add(util.create_channel({"channel.ref_pattern": "heads/mai.*"}))
         self.crawler.start()
         time.sleep(5)
         called = self.crawler.query(lambda: self.scheduler.process_commits.called)
@@ -87,7 +87,7 @@ class TestCrawler(unittest.TestCase):
     def test_start_repo_and_tag_channel(self):
         with session_scope() as session:
             session.add(util.create_repo(dict()))
-            session.add(util.create_channel({"channel.branch": "tags/test-tag"}))
+            session.add(util.create_channel({"channel.ref_pattern": "tags/test-tag"}))
         self.crawler.start()
         time.sleep(5)
         called = self.crawler.query(lambda: self.scheduler.process_commits.called)
@@ -99,7 +99,7 @@ class TestCrawler(unittest.TestCase):
     def test_start_repo_and_channel_no_match(self):
         with session_scope() as session:
             session.add(util.create_repo(dict()))
-            session.add(util.create_channel({"channel.branch": "heads/maste"}))
+            session.add(util.create_channel({"channel.ref_pattern": "heads/maste"}))
         self.crawler.start()
         time.sleep(5)
         called = self.crawler.query(lambda: self.scheduler.process_commits.called)

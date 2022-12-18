@@ -173,7 +173,7 @@ class Channel(Base):
     ecosystem = relationship("Ecosystem", backref="channels")
     name = Column(String(255), nullable=False)
     conan_channel = Column(String(255))
-    branch = Column(String(255))
+    ref_pattern = Column(String(255))
 
 
 class Platform(enum.Enum):

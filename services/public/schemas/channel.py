@@ -12,14 +12,14 @@ class Option(BaseModel):
 class Channel(BaseModel):
     name: str = ""
     conan_channel: Optional[str]
-    branch: Optional[str]
+    ref_pattern: Optional[str]
 
     class Config:
         schema_extra = {
             "example": {
                 "name": "Releases",
                 "conan_channel": "stable",
-                "branch": "main"
+                "ref_pattern": "main"
             }
         }
 
