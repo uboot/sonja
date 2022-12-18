@@ -195,8 +195,8 @@ class Crawler(Worker):
                     await loop.run_in_executor(None, controller.fetch)
 
                     for channel in channels:
-                        for ref in controller.checkout_matching_refs(channel.branch):
-                            logger.info("Ref '%s' matches '%s'", ref, channel.branch)
+                        for ref in controller.checkout_matching_refs(channel.ref_pattern):
+                            logger.info("Ref '%s' matches '%s'", ref, channel.ref_pattern)
                             sha = controller.get_sha()
 
                             commits = session.query(Commit).filter_by(repo=repo,
