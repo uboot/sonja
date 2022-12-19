@@ -37,7 +37,7 @@ class Agent(Worker):
         self.__redis_client = redis_client
         self.__manager = Manager(redis_client)
 
-    async def work(self):
+    async def work(self, payload):
         new_builds = True
         while new_builds:
             try:

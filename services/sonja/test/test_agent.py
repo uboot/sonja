@@ -30,6 +30,11 @@ class TestAgent(unittest.TestCase):
                     return build.status
             time.sleep(1)
 
+    def __get_build_status(self):
+        with session_scope() as session:
+            build = session.query(Build).first()
+            return build.status if build else None
+
     def test_start(self):
         self.agent.start()
         self.assertEqual(self.redis_client.publish_build_update.call_count, 0)
@@ -54,7 +59,8 @@ class TestAgent(unittest.TestCase):
         with session_scope() as session:
             session.add(util.create_build(dict()))
         self.agent.start()
-        self.assertEqual(self.__wait_for_build_status(BuildStatus.success, 15), BuildStatus.success)
+        self.agent.try_pause()
+        self.assertEqual(self.__get_build_status(), BuildStatus.success)
         self.assertEqual(self.redis_client.publish_build_update.call_count, 2)
         self.assertEqual(self.redis_client.publish_run_update.call_count, 2)
         self.assertGreater(self.redis_client.publish_log_line_update.call_count, 100)
@@ -66,7 +72,8 @@ class TestAgent(unittest.TestCase):
                 "ecosystem.empty_remote": True
             }))
         self.agent.start()
-        self.assertEqual(self.__wait_for_build_status(BuildStatus.error, 15), BuildStatus.error)
+        self.agent.try_pause()
+        self.assertEqual(self.__get_build_status(), BuildStatus.error)
         with session_scope() as session:
             build = session.query(Build).first()
             self.assertEqual(1, len(build.missing_recipes))
@@ -77,7 +84,8 @@ class TestAgent(unittest.TestCase):
         with session_scope() as session:
             session.add(util.create_build({"repo.https": True}))
         self.agent.start()
-        self.assertEqual(self.__wait_for_build_status(BuildStatus.success, 15), BuildStatus.success)
+        self.agent.try_pause()
+        self.assertEqual(self.__get_build_status(), BuildStatus.success)
         self.assertEqual(self.redis_client.publish_build_update.call_count, 2)
         self.assertEqual(self.redis_client.publish_run_update.call_count, 2)
         self.assertGreater(self.redis_client.publish_log_line_update.call_count, 100)
@@ -91,7 +99,8 @@ class TestAgent(unittest.TestCase):
         with session_scope() as session:
             build = session.query(Build).first()
             build.status = BuildStatus.stopping
-        self.assertEqual(self.__wait_for_build_status(BuildStatus.stopped, 15), BuildStatus.stopped)
+        self.agent.try_pause()
+        self.assertEqual(self.__get_build_status(), BuildStatus.stopped)
         self.assertEqual(self.redis_client.publish_build_update.call_count, 2)
         self.assertEqual(self.redis_client.publish_run_update.call_count, 2)
 

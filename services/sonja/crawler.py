@@ -1,6 +1,6 @@
 from sonja.config import connect_to_database, logger
 from sonja.credential_helper import build_credential_helper
-from sonja.database import session_scope
+from sonja.database import Session, session_scope
 from sonja.model import CommitStatus, Commit, Channel, Repo
 from sonja.ssh import decode
 from sonja.worker import Worker
@@ -18,6 +18,7 @@ import time
 
 CRAWLER_PERIOD_SECONDS = 300
 TIMEOUT = 10
+ALL_REPOS = "all_repos"
 
 
 class RepoController(object):
@@ -70,6 +71,12 @@ class RepoController(object):
     def fetch(self):
         repo = git.Repo(self.repo_dir)
         repo.remotes.origin.fetch()
+
+    def checkout_sha(self, sha: str):
+        logger.info("Checkout '%s'", sha)
+        repo = git.Repo(self.repo_dir)
+        commit = git.Commit.new(repo, sha)
+        repo.head.reset(commit, working_tree=True)
 
     def get_sha(self):
         repo = git.Repo(self.repo_dir)
@@ -124,125 +131,68 @@ class RepoController(object):
             if not re.fullmatch(ref_pattern, normalized_ref):
                 continue
 
+            logger.info("Checkout '%s'", ref)
             repo.head.reset(ref, working_tree=True)
             yield normalized_ref
 
 
-
+class RepoUpdate:
+    def __init__(self, repo_id: str = "", sha: str = "", ref: str = ""):
+        self.repo_id = repo_id
+        self.sha = sha
+        self.ref = ref
 
 
 class Crawler(Worker):
-    def __init__(self, scheduler):
+    def __init__(self, scheduler, periodic: bool = True):
         super().__init__()
         connect_to_database()
+
         self.__data_dir = tempfile.mkdtemp()
-        self.__scheduler = scheduler
-        self.__repos = SimpleQueue()
-        self.__next_crawl = datetime.datetime.now()
         logger.info("Created data directory '%s'", self.__data_dir)
 
-    def process_repo(self, repo_id: str, sha: str = "", ref: str = ""):
-        self.__repos.put(repo_id)
+        self.__scheduler = scheduler
+        self.__repos = SimpleQueue()
+        self.__periodic = periodic
 
-    async def work(self):
-        try:
-            await self.__process_repos()
-        except Exception as e:
-            logger.error("Processing repos failed: %s", e)
-            logger.info("Retry in %i seconds", TIMEOUT)
-            time.sleep(TIMEOUT)
+    def process_repo(self, repo_id: str = "", sha: str = "", ref: str = ""):
+        self.__repos.put(RepoUpdate(repo_id, sha, ref))
+
+    async def work(self, payload):
+        if payload == ALL_REPOS or self.__periodic:
+            self.__periodic = False
+            await self.__process_all_repos()            
+            self.reschedule_internally(CRAWLER_PERIOD_SECONDS, ALL_REPOS)
+
+        else:
+            for repo in self.__get_repos():
+                try:
+                    await self.__process_update(repo)
+                except Exception as e:
+                    logger.error("Processing repos failed: %s", e)
+                    logger.info("Retry in %i seconds", TIMEOUT)
+                    time.sleep(TIMEOUT)
 
     def cleanup(self):
         shutil.rmtree(self.__data_dir)
         logger.info("Removed data directory '%s'", self.__data_dir)
 
-    async def __process_repos(self):
-        logger.info("Start crawling")
-        loop = asyncio.get_running_loop()
+    async def __process_all_repos(self):
+        logger.info("Start crawling all repos")
 
         with session_scope() as session:
-            if datetime.datetime.now() >= self.__next_crawl:
-                logger.info("Crawl all repos")
-                repos = session.query(Repo).all()
-                self.__next_crawl = datetime.datetime.now() + datetime.timedelta(seconds=CRAWLER_PERIOD_SECONDS)
-                self.reschedule_internally(CRAWLER_PERIOD_SECONDS)
-            else:
-                logger.info("Crawl manually triggered repos")
-                repo_ids = [repo for repo in self.__get_repos()]
-                repos = session.query(Repo).filter(Repo.id.in_(repo_ids)).all()
-            channels = session.query(Channel).all()
-            for repo in repos:
-                new_commits = False
-                try:
-                    work_dir = os.path.join(self.__data_dir, str(repo.id))
-                    controller = RepoController(work_dir)
-                    if not controller.is_clone_of(repo.url):
-                        logger.info("Create repo for URL '%s' in '%s'", repo.url, work_dir)
-                        await loop.run_in_executor(None, controller.create_new_repo, repo.url)
-                    logger.info("Setup SSH in '%s'", work_dir)
-                    await loop.run_in_executor(None, controller.setup_ssh, repo.ecosystem.ssh_key,
-                                               repo.ecosystem.known_hosts)
-                    logger.info("Setup HTTP credentials in '%s'", work_dir)
-                    credentials = [
-                        {
-                            "url": c.url,
-                            "username": c.username,
-                            "password": c.password
-                        } for c in repo.ecosystem.git_credentials
-                    ]
-                    await loop.run_in_executor(None, controller.setup_http, credentials)
-                    logger.info("Fetch repo '%s' for URL '%s'", work_dir, repo.url)
-                    await loop.run_in_executor(None, controller.fetch)
+            for repo in session.query(Repo).all():
+                await self.__process_repo(session, repo, "", "")
 
-                    for channel in channels:
-                        for ref in controller.checkout_matching_refs(channel.ref_pattern):
-                            logger.info("Ref '%s' matches '%s'", ref, channel.ref_pattern)
-                            sha = controller.get_sha()
+        logger.info("Finish crawling all repos")
 
-                            commits = session.query(Commit).filter_by(repo=repo,
-                                                                      sha=sha, channel=channel)
+    async def __process_update(self, update: RepoUpdate):
+        logger.info("Start crawling")
 
-                            # continue if this commit has already been stored
-                            if list(commits):
-                                logger.info("Commit '%s' exists", sha[:7])
-                                continue
-
-                            old_commits = session.query(Commit).filter(
-                                Commit.repo == repo,
-                                Commit.channel == channel,
-                                Commit.sha != sha,
-                                Commit.status != CommitStatus.old
-                            )
-
-                            if repo.path and any(old_commits):
-                                if not any([controller.has_diff(commit.sha, repo.path) for commit in old_commits]):
-                                    logger.info("Path '%s' was not changed since previous commits", repo.path)
-                                    continue
-
-                            logger.info("Add commit '%s'", sha[:7])
-                            commit = Commit()
-                            commit.sha = sha
-                            commit.message = controller.get_message()
-                            commit.user_name = controller.get_user_name()
-                            commit.user_email = controller.get_user_email()
-                            commit.repo = repo
-                            commit.channel = channel
-                            commit.status = CommitStatus.new
-                            session.add(commit)
-                            new_commits = True
-
-                            for c in old_commits:
-                                logger.info("Set status of '%s' to 'old'", c.sha[:7])
-                                c.status = CommitStatus.old
-                except git.exc.GitError as e:
-                    logger.error("Failed to process repo '%s' with message '%s'", repo.url, e)
-
-                if new_commits:
-                    logger.info("Finish crawling '%s'", repo.name)
-                    session.commit()
-                    logger.info('Trigger scheduler: process commits')
-                    if not self.__scheduler.process_commits():
-                        logger.error("Failed to trigger scheduler")
+        with session_scope() as session:
+            logger.info("Crawl manually triggered repos")
+            repo = session.query(Repo).filter_by(id=update.repo_id).first()
+            await self.__process_repo(session, repo, update.sha, update.ref)
 
         logger.info("Finish crawling")
 
@@ -252,3 +202,90 @@ class Crawler(Worker):
                 yield self.__repos.get_nowait()
         except Empty:
             pass
+
+    async def __process_repo(self, session: Session, repo: Repo, sha: str, ref: str):        
+        loop = asyncio.get_running_loop()
+        new_commits = False
+        try:
+            work_dir = os.path.join(self.__data_dir, str(repo.id))
+            controller = RepoController(work_dir)
+            if not controller.is_clone_of(repo.url):
+                logger.info("Create repo for URL '%s' in '%s'", repo.url, work_dir)
+                await loop.run_in_executor(None, controller.create_new_repo, repo.url)
+            logger.info("Setup SSH in '%s'", work_dir)
+            await loop.run_in_executor(None, controller.setup_ssh, repo.ecosystem.ssh_key,
+                                        repo.ecosystem.known_hosts)
+            logger.info("Setup HTTP credentials in '%s'", work_dir)
+            credentials = [
+                {
+                    "url": c.url,
+                    "username": c.username,
+                    "password": c.password
+                } for c in repo.ecosystem.git_credentials
+            ]
+            await loop.run_in_executor(None, controller.setup_http, credentials)
+            logger.info("Fetch repo '%s' for URL '%s'", work_dir, repo.url)
+            await loop.run_in_executor(None, controller.fetch)
+
+            for channel in session.query(Channel).all():
+                if sha and ref:
+                    if re.fullmatch(channel.ref_pattern, ref):
+                        logger.info("Ref '%s' matches '%s'", ref, channel.ref_pattern)
+                        controller.checkout_sha(sha)
+                        if self.__process_commit(session, controller, repo, channel):
+                            new_commits = True
+                else:
+                    for ref in controller.checkout_matching_refs(channel.ref_pattern):
+                        logger.info("Ref '%s' matches '%s'", ref, channel.ref_pattern)
+                        if self.__process_commit(session, controller, repo, channel):
+                            new_commits = True
+
+        except git.exc.GitError as e:
+            logger.error("Failed to process repo '%s' with message '%s'", repo.url, e)
+
+        if new_commits:
+            logger.info("Finish crawling '%s'", repo.name)
+            session.commit()
+            logger.info('Trigger scheduler: process commits')
+            if not self.__scheduler.process_commits():
+                logger.error("Failed to trigger scheduler")
+    
+    def __process_commit(self, session: Session, controller: RepoController, repo: Repo, channel: Channel):
+        sha = controller.get_sha()
+
+        commits = session.query(Commit).filter_by(repo=repo,
+                                                  sha=sha, channel=channel)
+
+        # continue if this commit has already been stored
+        if list(commits):
+            logger.info("Commit '%s' exists", sha[:7])
+            return False
+
+        old_commits = session.query(Commit).filter(
+            Commit.repo == repo,
+            Commit.channel == channel,
+            Commit.sha != sha,
+            Commit.status != CommitStatus.old
+        )
+
+        if repo.path and any(old_commits):
+            if not any([controller.has_diff(commit.sha, repo.path) for commit in old_commits]):
+                logger.info("Path '%s' was not changed since previous commits", repo.path)
+                return False
+
+        logger.info("Add commit '%s'", sha[:7])
+        commit = Commit()
+        commit.sha = sha
+        commit.message = controller.get_message()
+        commit.user_name = controller.get_user_name()
+        commit.user_email = controller.get_user_email()
+        commit.repo = repo
+        commit.channel = channel
+        commit.status = CommitStatus.new
+        session.add(commit)
+
+        for c in old_commits:
+            logger.info("Set status of '%s' to 'old'", c.sha[:7])
+            c.status = CommitStatus.old
+
+        return True
