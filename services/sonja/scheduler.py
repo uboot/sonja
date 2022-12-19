@@ -20,7 +20,7 @@ class Scheduler(Worker):
         self.__windows_agent = windows_agent
         self.__redis_client = redis_client
 
-    async def work(self):
+    async def work(self, payload):
         new_commits = True
         while new_commits:
             try:

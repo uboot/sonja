@@ -17,7 +17,7 @@ class Watchdog(Worker):
         self.__windows_agent = windows_agent
         self.__redis_client = redis_client
 
-    async def work(self):
+    async def work(self, payload):
         try:
             self.__process_stalled_runs()
         except Exception as e:

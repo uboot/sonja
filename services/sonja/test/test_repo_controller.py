@@ -30,6 +30,13 @@ class TestRepoController(unittest.TestCase):
         for _ in controller.checkout_matching_refs("heads/main"):
             self.assertTrue(os.path.exists(os.path.join(self.work_dir, "repo", "services")))
 
+    def test_checkout_sha(self):
+        controller = RepoController(self.work_dir)
+        controller.create_new_repo("git@github.com:uboot/conan-packages.git")
+        controller.setup_ssh(os.environ.get("SSH_KEY", ""), known_hosts)
+        controller.fetch()
+        controller.checkout_sha("ef89f593ea439d8986aca1a52257e44e7b8fea29")
+
     def test_setup_ssh(self):
         controller = RepoController(self.work_dir)
         controller.create_new_repo("git@github.com:uboot/sonja-backend.git")

@@ -11,12 +11,17 @@ import unittest
 class TestCrawler(unittest.TestCase):
     def setUp(self):
         self.scheduler = Mock()
-        self.crawler = Crawler(self.scheduler)
         reset_database()
 
     def tearDown(self):
         self.crawler.cancel()
         self.crawler.join()
+
+
+class TestPeriodicCrawler(TestCrawler):
+    def setUp(self):
+        super().setUp()
+        self.crawler = Crawler(self.scheduler)
 
     def test_start(self):
         self.crawler.start()
@@ -30,17 +35,15 @@ class TestCrawler(unittest.TestCase):
         with session_scope() as session:
             session.add(util.create_repo(dict()))
         self.crawler.start()
-        called = self.crawler.query(lambda: self.scheduler.process_commits.called)
-        self.assertFalse(called)
+        self.assertFalse(self.scheduler.process_commits.called)
 
     def test_start_repo_and_channel(self):
         with session_scope() as session:
             session.add(util.create_repo(dict()))
             session.add(util.create_channel(dict()))
         self.crawler.start()
-        time.sleep(5)
-        called = self.crawler.query(lambda: self.scheduler.process_commits.called)
-        self.assertTrue(called)
+        self.crawler.try_pause()
+        self.assertTrue(self.scheduler.process_commits.called)
         with session_scope() as session:
             commit = session.query(Commit).first()
             self.assertEqual(CommitStatus.new, commit.status)
@@ -50,24 +53,8 @@ class TestCrawler(unittest.TestCase):
             session.add(util.create_repo({"repo.https": True}))
             session.add(util.create_channel(dict()))
         self.crawler.start()
-        time.sleep(5)
-        called = self.crawler.query(lambda: self.scheduler.process_commits.called)
-        self.assertTrue(called)
-        with session_scope() as session:
-            commit = session.query(Commit).first()
-            self.assertEqual(CommitStatus.new, commit.status)
-
-    def test_process_repo(self):
-        self.crawler.start()
-        time.sleep(1)
-        with session_scope() as session:
-            session.add(util.create_repo(dict()))
-            session.add(util.create_channel(dict()))
-        self.crawler.process_repo("1")
-        self.crawler.trigger()
-        time.sleep(5)
-        called = self.crawler.query(lambda: self.scheduler.process_commits.called)
-        self.assertTrue(called)
+        self.crawler.try_pause()
+        self.assertTrue(self.scheduler.process_commits.called)
         with session_scope() as session:
             commit = session.query(Commit).first()
             self.assertEqual(CommitStatus.new, commit.status)
@@ -77,9 +64,8 @@ class TestCrawler(unittest.TestCase):
             session.add(util.create_repo(dict()))
             session.add(util.create_channel({"channel.ref_pattern": "heads/mai.*"}))
         self.crawler.start()
-        time.sleep(5)
-        called = self.crawler.query(lambda: self.scheduler.process_commits.called)
-        self.assertTrue(called)
+        self.crawler.try_pause()
+        self.assertTrue(self.scheduler.process_commits.called)
         with session_scope() as session:
             commit = session.query(Commit).first()
             self.assertEqual(CommitStatus.new, commit.status)
@@ -89,9 +75,8 @@ class TestCrawler(unittest.TestCase):
             session.add(util.create_repo(dict()))
             session.add(util.create_channel({"channel.ref_pattern": "tags/test-tag"}))
         self.crawler.start()
-        time.sleep(5)
-        called = self.crawler.query(lambda: self.scheduler.process_commits.called)
-        self.assertTrue(called)
+        self.crawler.try_pause()
+        self.assertTrue(self.scheduler.process_commits.called)
         with session_scope() as session:
             commit = session.query(Commit).first()
             self.assertEqual(CommitStatus.new, commit.status)
@@ -101,17 +86,15 @@ class TestCrawler(unittest.TestCase):
             session.add(util.create_repo(dict()))
             session.add(util.create_channel({"channel.ref_pattern": "heads/maste"}))
         self.crawler.start()
-        time.sleep(5)
-        called = self.crawler.query(lambda: self.scheduler.process_commits.called)
-        self.assertFalse(called)
+        self.crawler.try_pause()
+        self.assertFalse(self.scheduler.process_commits.called)
 
     def test_start_repo_and_old_commits(self):
         with session_scope() as session:
             session.add(util.create_commit({"commit.status": CommitStatus.new}))
         self.crawler.start()
-        time.sleep(5)
-        called = self.crawler.query(lambda: self.scheduler.process_commits.called)
-        self.assertTrue(called)
+        self.crawler.try_pause()
+        self.assertTrue(self.scheduler.process_commits.called)
         with session_scope() as session:
             old_commit = session.query(Commit)\
                 .filter(Commit.status == CommitStatus.old)\
@@ -127,7 +110,38 @@ class TestCrawler(unittest.TestCase):
             session.add(util.create_repo({"repo.invalid": True}))
             session.add(util.create_channel(dict()))
         self.crawler.start()
-        time.sleep(3)
+        self.crawler.try_pause()
         with session_scope() as session:
             commits = session.query(Commit).all()
             self.assertEqual(len(commits), 0)
+
+
+class TestCrawler(TestCrawler):
+    def setUp(self):
+        super().setUp()
+        self.crawler = Crawler(self.scheduler, periodic=False)
+
+    def test_process_repo(self):
+        with session_scope() as session:
+            session.add(util.create_repo(dict()))
+            session.add(util.create_channel(dict()))
+        self.crawler.process_repo("1")
+        self.crawler.start()
+        self.crawler.try_pause()
+        self.assertTrue(self.scheduler.process_commits.called)
+        with session_scope() as session:
+            commit = session.query(Commit).first()
+            self.assertEqual(CommitStatus.new, commit.status)
+
+    def test_process_commit(self):
+        with session_scope() as session:
+            session.add(util.create_repo(dict()))
+            session.add(util.create_channel(dict()))
+        self.crawler.process_repo("1", "ad8b2993326cf501b6b5227edd85fc010c9f919d", "heads/main")
+        self.crawler.start()
+        self.crawler.try_pause()
+        self.assertTrue(self.scheduler.process_commits.called)
+        with session_scope() as session:
+            commit = session.query(Commit).first()
+            self.assertEqual(CommitStatus.new, commit.status)
+            self.assertEqual("ad8b2993326cf501b6b5227edd85fc010c9f919d", commit.sha)
