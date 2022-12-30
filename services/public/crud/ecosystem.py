@@ -1,6 +1,5 @@
 from public.schemas.ecosystem import EcosystemWriteItem
 from sonja.database import Session, Ecosystem
-from sonja.ssh import encode, generate_rsa_key
 from typing import List
 
 
@@ -14,9 +13,6 @@ def read_ecosystem(session: Session, ecosystem_id: str) -> Ecosystem:
 
 def create_ecosystem(session: Session, ecosystem_item: EcosystemWriteItem) -> Ecosystem:
     ecosystem = Ecosystem(**ecosystem_item.data.attributes.dict(exclude_unset=True, by_alias=True))
-    private, public = generate_rsa_key()
-    ecosystem.ssh_key = encode(private)
-    ecosystem.public_ssh_key = encode(public)
     session.add(ecosystem)
     session.commit()
     return ecosystem
@@ -25,12 +21,6 @@ def create_ecosystem(session: Session, ecosystem_item: EcosystemWriteItem) -> Ec
 def update_ecosystem(session: Session, ecosystem: Ecosystem, ecosystem_item: EcosystemWriteItem) -> Ecosystem:
     data = ecosystem_item.data.attributes.dict(exclude_unset=True, by_alias=True)
     for attribute in data:
-        if attribute == "public_ssh_key":
-            if not data["public_ssh_key"]:
-                private, public = generate_rsa_key()
-                ecosystem.ssh_key = encode(private)
-                ecosystem.public_ssh_key = encode(public)
-            continue
         setattr(ecosystem, attribute, data[attribute])
     session.commit()
     return ecosystem

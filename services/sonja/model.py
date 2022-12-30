@@ -9,13 +9,6 @@ import enum
 Base = declarative_base()
 
 
-class Configuration(Base):
-    __tablename__ = 'configuration'
-
-    id = Column(Integer, primary_key=True)
-    github_secret = Column(String(255))
-
-
 class User(Base):
     __tablename__ = 'user'
 
@@ -65,8 +58,8 @@ class GitCredential(Base):
     url = Column(String(255), nullable=False)
     username = Column(String(255))
     password = Column(String(255))
-    ecosystem_id = Column(Integer, ForeignKey('ecosystem.id'))
-    ecosystem = relationship("Ecosystem", backref="git_credentials")
+    configuration_id = Column(Integer, ForeignKey('configuration.id'))
+    configuration = relationship("Configuration", backref="git_credentials")
 
 
 class DockerCredential(Base):
@@ -76,8 +69,18 @@ class DockerCredential(Base):
     server = Column(String(255))
     username = Column(String(255))
     password = Column(String(255))
-    ecosystem_id = Column(Integer, ForeignKey('ecosystem.id'))
-    ecosystem = relationship("Ecosystem", backref="docker_credentials")
+    configuration_id = Column(Integer, ForeignKey('configuration.id'))
+    configuration = relationship("Configuration", backref="docker_credentials")
+
+
+class Configuration(Base):
+    __tablename__ = 'configuration'
+
+    id = Column(Integer, primary_key=True)
+    github_secret = Column(String(255))
+    public_ssh_key = Column(Text())
+    ssh_key = Column(Text())
+    known_hosts = Column(Text())
 
 
 class Ecosystem(Base):
@@ -86,9 +89,6 @@ class Ecosystem(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(255), nullable=False)
     user = Column(String(255))
-    public_ssh_key = Column(Text())
-    ssh_key = Column(Text())
-    known_hosts = Column(Text())
     conan_config_url = Column(String(255))
     conan_config_path = Column(String(255))
     conan_config_branch = Column(String(255))

@@ -26,25 +26,13 @@ class TestEcosystem(ApiTestCase):
             "data": {
                 "type": "ecosystems",
                 "attributes": {
-                    "name": "test_post_ecosystem",
-                    "git_credentials": [{
-                        "url": "https://url",
-                        "username": "user",
-                        "password": "password"
-                    }],
-                    "docker_credentials": [{
-                        "server": "server",
-                        "username": "user",
-                        "password": "password"
-                    }]
+                    "name": "test_post_ecosystem"
                 }
             }
         }, headers=self.user_headers)
         self.assertEqual(201, response.status_code)
         self.assertEqual("test_post_ecosystem", response.json()["data"]["attributes"]["name"])
         attributes = response.json()["data"]["attributes"]
-        self.assertDictEqual({"url": "https://url", "username": "user", "password": "password"},
-                             attributes["git_credentials"][0])
 
     def test_patch_ecosystem(self):
         ecosystem_id = run_create_operation(create_ecosystem, dict())
@@ -58,22 +46,6 @@ class TestEcosystem(ApiTestCase):
         }, headers=self.user_headers)
         self.assertEqual(200, response.status_code)
         self.assertEqual("test_patch_ecosystem", response.json()["data"]["attributes"]["name"])
-        self.assertEqual("", response.json()["data"]["attributes"]["public_ssh_key"])
-
-    def test_patch_ecosystem_regenerate_ssh_key(self):
-        ecosystem_id = run_create_operation(create_ecosystem, dict())
-        response = client.patch(f"{api_prefix}/ecosystem/{ecosystem_id}", json={
-            "data": {
-                "type": "ecosystems",
-                "attributes": {
-                    "name": "test_patch_ecosystem",
-                    "public_ssh_key": "",
-                }
-            }
-        }, headers=self.user_headers)
-        self.assertEqual(200, response.status_code)
-        self.assertEqual("test_patch_ecosystem", response.json()["data"]["attributes"]["name"])
-        self.assertEqual(968, len(response.json()["data"]["attributes"]["public_ssh_key"]))
 
     def test_delete_ecosystem(self):
         ecosystem_id = run_create_operation(create_ecosystem, dict())

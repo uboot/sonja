@@ -4,7 +4,7 @@ from sonja.auth import hash_password
 from sonja.database import session_scope
 from sonja.model import Permission, Ecosystem, PermissionLabel, Base, User, GitCredential, Repo, Option, Label, \
     Commit, CommitStatus, Channel, Profile, Platform, Build, BuildStatus, Recipe, RecipeRevision, Package, Run, \
-    RunStatus, LogLine
+    RunStatus, LogLine, Configuration
 
 import os
 
@@ -38,28 +38,32 @@ def create_user(parameters: dict) -> User:
     return user
 
 
-def create_ecosystem(parameters):
-    ecosystem = Ecosystem()
-    ecosystem.name = "My Ecosystem"
-    ecosystem.user = "sonja"
-    ecosystem.known_hosts = ("Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN"
+def create_configuration(parameters):
+    configuration = Configuration()
+    configuration.known_hosts = ("Z2l0aHViLmNvbSwxNDAuODIuMTIxLjQgc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBQkl3QUFBUUVBcTJBN"
                              "2hSR21kbm05dFVEYk85SURTd0JLNlRiUWErUFhZUENQeTZyYlRyVHR3N1BIa2NjS3JwcDB5VmhwNUhkRUljS3"
                              "I2cExsVkRCZk9MWDlRVXN5Q09WMHd6ZmpJSk5sR0VZc2RsTEppekhoYm4ybVVqdlNBSFFxWkVUWVA4MWVGekx"
                              "RTm5QSHQ0RVZWVWg3VmZERVNVODRLZXptRDVRbFdwWExtdlUzMS95TWYrU2U4eGhIVHZLU0NaSUZJbVd3b0c2"
                              "bWJVb1dmOW56cElvYVNqQit3ZXFxVVVtcGFhYXNYVmFsNzJKK1VYMkIrMlJQVzNSY1QwZU96UWdxbEpMM1JLc"
                              "lRKdmRzakUzSkVBdkdxM2xHSFNaWHkyOEczc2t1YTJTbVZpL3c0eUNFNmdiT0RxblRXbGc3K3dDNjA0eWRHWE"
                              "E4VkppUzVhcDQzSlhpVUZGQWFRPT0K")
-    ecosystem.ssh_key = os.environ.get("SSH_KEY", "")
-    ecosystem.public_ssh_key = os.environ.get("PUBLIC_SSH_KEY", "")
+    configuration.ssh_key = os.environ.get("SSH_KEY", "")
+    configuration.public_ssh_key = os.environ.get("PUBLIC_SSH_KEY", "")
+    git_credential = GitCredential(url="https://uboot@github.com", username="", password=os.environ.get("GIT_PAT", ""))
+    configuration.git_credentials = [git_credential]
+    return configuration
+
+
+def create_ecosystem(parameters):
+    ecosystem = Ecosystem()
+    ecosystem.name = "My Ecosystem"
+    ecosystem.user = "sonja"
     ecosystem.conan_config_url = "git@github.com:uboot/conan-config.git"
     ecosystem.conan_config_path = "empty" if parameters.get("ecosystem.ecosystem.empty_remote", False) else "default"
     ecosystem.conan_config_branch = ""
     ecosystem.conan_remote = "uboot"
     ecosystem.conan_user = "agent"
     ecosystem.conan_password = os.environ.get("CONAN_PASSWORD", "")
-    git_credential = GitCredential(url="https://uboot@github.com", username="",
-                                            password=os.environ.get("GIT_PAT", ""))
-    ecosystem.git_credentials = [git_credential]
     parameters["ecosystem"] = ecosystem
     return ecosystem
 

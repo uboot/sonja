@@ -178,6 +178,11 @@ def add_log_line(redis_client: RedisClient):
 class DemoDataCreator(object):
     def __init__(self, session: Session, ecosystem_id: int):
         self.__session = session
+        configuration = session.query(Ecosystem).first()
+        if not configuration:
+            raise Exception(f"Found no configuration")
+        self.__configuration = configuration
+
         ecosystem = session.query(Ecosystem).filter_by(id=ecosystem_id).first()
         if not ecosystem:
             raise Exception(f"Found no ecosystem with ID={ecosystem_id}")
@@ -185,8 +190,9 @@ class DemoDataCreator(object):
 
     def create(self):
         private, public = generate_rsa_key()
-        self.__ecosystem.ssh_key = encode(private)
-        self.__ecosystem.public_ssh_key = encode(public)
+        self.__configuration.ssh_key = encode(private)
+        self.__configuration.public_ssh_key = encode(public)
+
         self.__ecosystem.user = ""
         self.__ecosystem.conan_config_url = "https://github.com/uboot/conan-config.git"
         self.__ecosystem.conan_config_path = "default"

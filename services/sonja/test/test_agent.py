@@ -14,6 +14,8 @@ class TestAgent(unittest.TestCase):
         self.redis_client = Mock()
         self.agent = Agent(self.scheduler, self.redis_client)
         reset_database()
+        with session_scope() as session:
+            session.add(util.create_configuration(dict()))
 
     def tearDown(self):
         self.agent.cancel()

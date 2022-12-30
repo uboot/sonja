@@ -3,7 +3,7 @@ from typing import List
 
 from sonja.builder import Builder, BuildFailed
 from sonja.config import connect_to_database, logger
-from sonja.database import session_scope
+from sonja.database import session_scope, get_current_configuration
 from sonja.redis import RedisClient
 from sonja.client import Scheduler
 from sonja.manager import Manager
@@ -52,6 +52,7 @@ class Agent(Worker):
         platform = Platform.linux if sonja_os == "Linux" else Platform.windows
         try:
             with session_scope() as session:
+                configuration = get_current_configuration(session)
                 build = session\
                     .query(Build)\
                     .join(Build.profile)\
@@ -97,21 +98,21 @@ class Agent(Worker):
                             "url": c.url,
                             "username": c.username,
                             "password": c.password
-                        } for c in build.profile.ecosystem.git_credentials
+                        } for c in configuration.git_credentials
                     ],
                     "sonja_user": build.profile.ecosystem.user,
                     "channel": build.commit.channel.conan_channel,
                     "version": "" if not build.commit.repo.version else build.commit.repo.version,
                     "path": "./{0}/{1}".format(build.commit.repo.path, "conanfile.py")
                             if build.commit.repo.path != "" else "./conanfile.py",
-                    "ssh_key": build.profile.ecosystem.ssh_key,
-                    "known_hosts": build.profile.ecosystem.known_hosts,
+                    "ssh_key": configuration.ssh_key,
+                    "known_hosts": configuration.known_hosts,
                     "docker_credentials": [
                         {
                             "server": c.server,
                             "username": c.username,
                             "password": c.password
-                        } for c in build.profile.ecosystem.docker_credentials
+                        } for c in configuration.docker_credentials
                     ],
                     "mtu": os.environ.get("SONJA_MTU", "1500")
                 }

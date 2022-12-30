@@ -4,7 +4,6 @@ from sonja.model import Commit, CommitStatus
 from sonja.test import util
 from unittest.mock import Mock
 
-import time
 import unittest
 
 
@@ -12,6 +11,8 @@ class TestCrawler(unittest.TestCase):
     def setUp(self):
         self.scheduler = Mock()
         reset_database()
+        with session_scope() as session:
+            session.add(util.create_configuration(dict()))
 
     def tearDown(self):
         self.crawler.cancel()
