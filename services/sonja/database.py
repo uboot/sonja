@@ -5,6 +5,7 @@ from sonja.auth import hash_password
 from sonja.model import User, Permission, PermissionLabel, Ecosystem, Base, Build, missing_package, missing_recipe, \
     package_requirement, Package, RecipeRevision, Recipe, Commit, Channel, DockerCredential, GitCredential, \
     profile_label, Profile, Label, Repo, Option, repo_label, Run, LogLine, Configuration
+from sonja.ssh import encode, generate_rsa_key
 
 from contextlib import contextmanager
 from secrets import token_hex
@@ -93,6 +94,9 @@ def create_initial_configuration():
 
         if result.lastrowid:
             configuration = session.query(Configuration).filter_by(id=result.lastrowid).first()
+            private, public = generate_rsa_key()
+            configuration.ssh_key = encode(private)
+            configuration.public_ssh_key = encode(public)
             logger.info("Created initial configuration with ID %d", configuration.id)
 
 
@@ -111,6 +115,10 @@ def create_initial_ecosystem(name: str) -> int:
             return ecosystem.id
 
         return 0
+
+
+def get_current_configuration(session: Session) -> Configuration:
+    return session.query(Configuration).first()
 
 
 def remove_but_last_user(session: Session, user_id: str):

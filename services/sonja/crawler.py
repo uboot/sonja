@@ -1,6 +1,6 @@
 from sonja.config import connect_to_database, logger
 from sonja.credential_helper import build_credential_helper
-from sonja.database import Session, session_scope
+from sonja.database import Session, session_scope, get_current_configuration
 from sonja.model import CommitStatus, Commit, Channel, Repo
 from sonja.ssh import decode
 from sonja.worker import Worker
@@ -212,16 +212,17 @@ class Crawler(Worker):
             if not controller.is_clone_of(repo.url):
                 logger.info("Create repo for URL '%s' in '%s'", repo.url, work_dir)
                 await loop.run_in_executor(None, controller.create_new_repo, repo.url)
+            configuration = get_current_configuration(session)
             logger.info("Setup SSH in '%s'", work_dir)
-            await loop.run_in_executor(None, controller.setup_ssh, repo.ecosystem.ssh_key,
-                                        repo.ecosystem.known_hosts)
+            await loop.run_in_executor(None, controller.setup_ssh, configuration.ssh_key,
+                                        configuration.known_hosts)
             logger.info("Setup HTTP credentials in '%s'", work_dir)
             credentials = [
                 {
                     "url": c.url,
                     "username": c.username,
                     "password": c.password
-                } for c in repo.ecosystem.git_credentials
+                } for c in configuration.git_credentials
             ]
             await loop.run_in_executor(None, controller.setup_http, credentials)
             logger.info("Fetch repo '%s' for URL '%s'", work_dir, repo.url)

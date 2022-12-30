@@ -28,6 +28,13 @@ class TestDatabase(unittest.TestCase):
             self.assertEqual(len(configurations), 1)
             self.assertEqual(len(configurations[0].github_secret), 40)
 
+    def test_get_current_configuration(self):
+        database.create_initial_configuration()
+        with database.session_scope() as session:
+            util.create_configuration(dict())
+            configuration = database.get_current_configuration(session)
+            self.assertIsNotNone(configuration)
+
     def test_create_initial_configuration_twice(self):
         database.create_initial_configuration()
         database.create_initial_configuration()
