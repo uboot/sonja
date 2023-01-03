@@ -11,7 +11,7 @@ from public.schemas.run import RunReadItem
 from public.crud.run import read_run
 from public.client import get_crawler, get_redis_client
 from sonja.database import get_session, Session, User, clear_ecosystems, session_scope
-from sonja.demo import populate_database, add_build, add_log_line, add_run
+from sonja.demo import populate_ecosystem, add_build, add_log_line, add_run
 from sonja.auth import test_password, create_access_token
 from sonja.config import logger
 from sonja.client import Crawler
@@ -33,7 +33,7 @@ def get_clear_ecosystems():
 
 @router.get("/populate_database", dependencies=[Depends(get_admin)])
 def get_populate_database():
-    populate_database()
+    populate_ecosystem()
 
 
 @router.get("/add_build", dependencies=[Depends(get_admin)])

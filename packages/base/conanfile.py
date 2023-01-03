@@ -4,13 +4,7 @@ from conans import ConanFile, CMake, tools
 class BaseConan(ConanFile):
     name = "base"
     version = "1.2.3"
-    license = "<Put the package license here>"
-    author = "<Put your name here> <And your email here>"
-    url = "<Package recipe repository url here, for issues about the package>"
-    description = "<Description of Hello here>"
     settings = "os", "compiler", "build_type", "arch"
-    options = {"with_tests": [True, False]}
-    default_options = {"with_tests": False}
     generators = "cmake"
     revision_mode = "scm"
 
