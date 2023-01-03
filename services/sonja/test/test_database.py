@@ -27,6 +27,8 @@ class TestDatabase(unittest.TestCase):
             configurations = session.query(database.Configuration).all()
             self.assertEqual(len(configurations), 1)
             self.assertEqual(len(configurations[0].github_secret), 40)
+            self.assertEqual(len(configurations[0].ssh_key), 4324)
+            self.assertEqual(len(configurations[0].public_ssh_key), 968)
 
     def test_get_current_configuration(self):
         database.create_initial_configuration()

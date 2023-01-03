@@ -3,7 +3,7 @@
 from public.main import app
 from sonja.config import connect_to_database, log_config
 from sonja.database import create_initial_user, create_initial_ecosystem, create_initial_configuration
-from sonja.demo import add_demo_data_to_ecosystem
+from sonja.demo import populate_initial_data
 
 import os
 import uvicorn
@@ -20,7 +20,7 @@ def setup_initial_data():
     if initial_ecosystem:
         ecosystem_id = create_initial_ecosystem(initial_ecosystem)
         if ecosystem_id:
-            add_demo_data_to_ecosystem(ecosystem_id)
+            populate_initial_data(ecosystem_id)
 
 
 if __name__ == '__main__':

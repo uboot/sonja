@@ -82,20 +82,6 @@ class Configuration(Base):
     ssh_key = Column(Text())
     known_hosts = Column(Text())
 
-
-class Ecosystem(Base):
-    __tablename__ = 'ecosystem'
-
-    id = Column(Integer, primary_key=True)
-    name = Column(String(255), nullable=False)
-    user = Column(String(255))
-    conan_config_url = Column(String(255))
-    conan_config_path = Column(String(255))
-    conan_config_branch = Column(String(255))
-    conan_remote = Column(String(255))
-    conan_user = Column(String(255))
-    conan_password = Column(String(255))
-
     @property
     def git_credential_values(self):
         return [{"url": c.url, "username": c.username, "password": c.password} for c in self.git_credentials]
@@ -111,6 +97,20 @@ class Ecosystem(Base):
     @docker_credential_values.setter
     def docker_credential_values(self, value):
         self.docker_credentials = [DockerCredential(**v) for v in value]
+
+
+class Ecosystem(Base):
+    __tablename__ = 'ecosystem'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(255), nullable=False)
+    user = Column(String(255))
+    conan_config_url = Column(String(255))
+    conan_config_path = Column(String(255))
+    conan_config_branch = Column(String(255))
+    conan_remote = Column(String(255))
+    conan_user = Column(String(255))
+    conan_password = Column(String(255))
 
 
 class Label(Base):
