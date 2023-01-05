@@ -19,11 +19,12 @@ sonja_os = os.environ.get("SONJA_AGENT_OS", "Linux")
 TIMEOUT = 10
 
 
-async def _run_build(builder, parameters):
+async def _run_build(builder):
     loop = asyncio.get_running_loop()
-    await loop.run_in_executor(None, builder.pull, parameters)
-    await loop.run_in_executor(None, builder.setup, parameters)
-    await loop.run_in_executor(None, builder.run)
+    await loop.run_in_executor(None, builder.pull_image)
+    await loop.run_in_executor(None, builder.create_build_files)
+    await loop.run_in_executor(None, builder.setup_container)
+    await loop.run_in_executor(None, builder.run_build)
 
 
 class Agent(Worker):
@@ -81,18 +82,21 @@ class Agent(Worker):
                 self.__redis_client.publish_run_update(run)
 
                 container = build.profile.container
+                ecosystem = build.profile.ecosystem
+                profile = build.profile
+                commit = build.commit
+                channel = build.commit.channel
+                repo = build.commit.repo
                 parameters = {
-                    "conan_config_url": build.profile.ecosystem.conan_config_url,
-                    "conan_config_path": build.profile.ecosystem.conan_config_path,
-                    "conan_config_branch": build.profile.ecosystem.conan_config_branch,
-                    "conan_remote": build.profile.ecosystem.conan_remote,
-                    "conan_user": build.profile.ecosystem.conan_user,
-                    "conan_password": build.profile.ecosystem.conan_password,
-                    "conan_profile": build.profile.conan_profile,
+                    "conan_config_url": ecosystem.conan_config_url,
+                    "conan_config_path": ecosystem.conan_config_path,
+                    "conan_config_branch": ecosystem.conan_config_branch,
+                    "conan_remote": channel.conan_remote,
+                    "conan_profile": profile.conan_profile,
                     "conan_options": " ".join(["-o {0}={1}".format(option.key, option.value)
-                                               for option in build.commit.repo.options]),
-                    "git_url": build.commit.repo.url,
-                    "git_sha": build.commit.sha,
+                                               for option in commit.repo.options]),
+                    "git_url": commit.repo.url,
+                    "git_sha": commit.sha,
                     "git_credentials": [
                         {
                             "url": c.url,
@@ -100,11 +104,11 @@ class Agent(Worker):
                             "password": c.password
                         } for c in configuration.git_credentials
                     ],
-                    "sonja_user": build.profile.ecosystem.user,
-                    "channel": build.commit.channel.conan_channel,
-                    "version": "" if not build.commit.repo.version else build.commit.repo.version,
-                    "path": "./{0}/{1}".format(build.commit.repo.path, "conanfile.py")
-                            if build.commit.repo.path != "" else "./conanfile.py",
+                    "sonja_user": ecosystem.user,
+                    "channel": channel.conan_channel,
+                    "version": "" if not repo.version else repo.version,
+                    "path": "./{0}/{1}".format(repo.path, "conanfile.py")
+                            if repo.path != "" else "./conanfile.py",
                     "ssh_key": configuration.ssh_key,
                     "known_hosts": configuration.known_hosts,
                     "docker_credentials": [
@@ -113,6 +117,13 @@ class Agent(Worker):
                             "username": c.username,
                             "password": c.password
                         } for c in configuration.docker_credentials
+                    ],
+                    "conan_credentials": [
+                        {
+                            "remote": c.remote,
+                            "username": c.username,
+                            "password": c.password
+                        } for c in ecosystem.conan_credentials
                     ],
                     "mtu": os.environ.get("SONJA_MTU", "1500")
                 }
@@ -123,9 +134,9 @@ class Agent(Worker):
             return True
 
         try:
-            with Builder(sonja_os, container) as builder:
+            with Builder(sonja_os, container, parameters) as builder:
                 try:
-                    builder_task = asyncio.create_task(_run_build(builder, parameters))
+                    builder_task = asyncio.create_task(_run_build(builder))
                     while True:
                         # wait 10 seconds
                         done, _ = await asyncio.wait({builder_task}, timeout=10)

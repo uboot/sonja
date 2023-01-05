@@ -21,6 +21,7 @@ class TestChannel(ApiTestCase):
                 "type": "channels",
                 "attributes": {
                     "name": "Releases",
+                    "conan_remote": "uboot",
                     "conan_channel": "stable",
                     "ref_pattern": "main"
                 },
@@ -46,7 +47,8 @@ class TestChannel(ApiTestCase):
             "data": {
                 "type": "channels",
                 "attributes": {
-                    "name": "test_patch_channel"
+                    "name": "test_patch_channel",
+                    "conan_remote": "test_remote"
                 }
             }
         }, headers=self.user_headers)

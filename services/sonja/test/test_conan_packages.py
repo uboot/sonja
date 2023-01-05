@@ -6,6 +6,8 @@ import os
 import time
 import unittest
 
+from sonja.model import ConanCredential
+
 
 @unittest.skip("building packages can take very long")
 class TestConanPackages(unittest.TestCase):
@@ -26,9 +28,11 @@ class TestConanPackages(unittest.TestCase):
             ecosystem.conan_config_url = "https://github.com/uboot/conan-config.git"
             ecosystem.conan_config_path = "default"
             ecosystem.conan_config_branch = ""
-            ecosystem.conan_remote = "uboot"
-            ecosystem.conan_user = "agent"
-            ecosystem.conan_password = os.environ.get("CONAN_PASSWORD", "")
+            conan_credential = ConanCredential()
+            conan_credential.remote = "uboot"
+            conan_credential.username = "agent"
+            conan_credential.password = os.environ.get("CONAN_PASSWORD", "")
+            self.__ecosystem.conan_credentials = [conan_credential]
 
             repo = database.Repo()
             repo.name = "My Repo"
@@ -40,6 +44,7 @@ class TestConanPackages(unittest.TestCase):
             channel = database.Channel()
             channel.name = "channel"
             channel.conan_channel = "latest"
+            channel.conan_remote = "uboot"
             channel.ecosystem = ecosystem
 
             commit = database.Commit()

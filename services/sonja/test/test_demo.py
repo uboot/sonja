@@ -14,7 +14,7 @@ class TestDemo(unittest.TestCase):
         demo.populate_initial_data(1)
         with database.session_scope() as session:
             repos = session.query(model.Repo).all()
-            self.assertEqual(4, len(repos))
+            self.assertEqual(5, len(repos))
             ecosystem = session.query(model.Ecosystem).first()
             self.assertEqual("mycompany", ecosystem.user)
             configuration = session.query(model.Configuration).first()
@@ -26,6 +26,4 @@ class TestDemo(unittest.TestCase):
         demo.populate_ecosystem()
         with database.session_scope() as session:
             repos = session.query(model.Repo).all()
-            self.assertEqual(4, len(repos))
-            ecosystem = session.query(model.Ecosystem).first()
-            self.assertIsNone(ecosystem.conan_user)
+            self.assertEqual(5, len(repos))

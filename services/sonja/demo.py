@@ -1,6 +1,6 @@
 from datetime import datetime
 from sonja.model import Ecosystem, Repo, Label, Option, Profile, Platform, Channel, \
-    Commit, Build, BuildStatus, LogLine, Run, RunStatus, DockerCredential
+    Commit, Build, BuildStatus, LogLine, Run, RunStatus, DockerCredential, ConanCredential
 from sonja.database import logger, Session, session_scope, get_current_configuration
 from sonja.redis import RedisClient
 
@@ -94,9 +94,11 @@ class DemoDataCreator(object):
         self.__ecosystem.conan_config_url = "https://github.com/uboot/conan-config.git"
         self.__ecosystem.conan_config_path = "default"
         self.__ecosystem.conan_config_branch = "master"
-        self.__ecosystem.conan_remote = "uboot"
-        self.__ecosystem.conan_user = "agent"
-        self.__ecosystem.conan_password = ""
+        conan_credential = ConanCredential()
+        conan_credential.remote = "uboot"
+        conan_credential.username = "agent"
+        conan_credential.password = ""
+        self.__ecosystem.conan_credentials = [conan_credential]
 
     def create(self):
         hello = Repo()
@@ -183,6 +185,7 @@ class DemoDataCreator(object):
         channel.name = "Releases"
         channel.ref_pattern = "heads/main"
         channel.conan_channel = "stable"
+        channel.conan_remote = "uboot"
         self.__session.add(channel)
 
 

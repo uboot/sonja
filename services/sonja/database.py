@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from sonja.auth import hash_password
 from sonja.model import User, Permission, PermissionLabel, Ecosystem, Base, Build, missing_package, missing_recipe, \
     package_requirement, Package, RecipeRevision, Recipe, Commit, Channel, DockerCredential, GitCredential, \
-    profile_label, Profile, Label, Repo, Option, repo_label, Run, LogLine, Configuration
+    profile_label, Profile, Label, Repo, Option, repo_label, Run, LogLine, Configuration, ConanCredential
 from sonja.ssh import encode, generate_rsa_key
 
 from contextlib import contextmanager
@@ -179,6 +179,7 @@ def clear_database():
 
     _drop_table(GitCredential.__table__)
     _drop_table(DockerCredential.__table__)
+    _drop_table(ConanCredential.__table__)
     _drop_table(Ecosystem.__table__)
     _drop_table(Permission.__table__)
     _drop_table(User.__table__)

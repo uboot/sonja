@@ -4,7 +4,7 @@ from sonja.auth import hash_password
 from sonja.database import session_scope
 from sonja.model import Permission, Ecosystem, PermissionLabel, Base, User, GitCredential, Repo, Option, Label, \
     Commit, CommitStatus, Channel, Profile, Platform, Build, BuildStatus, Recipe, RecipeRevision, Package, Run, \
-    RunStatus, LogLine, Configuration
+    RunStatus, LogLine, Configuration, ConanCredential
 
 import os
 
@@ -59,11 +59,13 @@ def create_ecosystem(parameters):
     ecosystem.name = "My Ecosystem"
     ecosystem.user = "sonja"
     ecosystem.conan_config_url = "git@github.com:uboot/conan-config.git"
-    ecosystem.conan_config_path = "empty" if parameters.get("ecosystem.ecosystem.empty_remote", False) else "default"
+    ecosystem.conan_config_path = "empty" if parameters.get("ecosystem.empty_remote", False) else "default"
     ecosystem.conan_config_branch = ""
-    ecosystem.conan_remote = "uboot"
-    ecosystem.conan_user = "agent"
-    ecosystem.conan_password = os.environ.get("CONAN_PASSWORD", "")
+    conan_credential = ConanCredential()
+    conan_credential.remote = "uboot"
+    conan_credential.username = "agent"
+    conan_credential.password = os.environ.get("CONAN_PASSWORD", "")
+    ecosystem.conan_credentials = [conan_credential]
     parameters["ecosystem"] = ecosystem
     return ecosystem
 
@@ -102,7 +104,7 @@ def create_commit(parameters):
     commit.channel = create_channel(parameters)
 
     if parameters.get("repo.https", False):
-        commit.sha = "ef89f593ea439d8986aca1a52257e44e7b8fea29"
+        commit.sha = "fe73ab663d73ee8084cb739240d033987e708d06"
     else:
         commit.sha = "c25c786b0f4e4b8fcaa247feb4809b68e671522d"
 
@@ -122,6 +124,7 @@ def create_channel(parameters):
     channel.ref_pattern = parameters.get("channel.ref_pattern", "heads/main")
     channel.name = "Releases"
     channel.conan_channel = "stable"
+    channel.conan_remote = "uboot"
     return channel
 
 

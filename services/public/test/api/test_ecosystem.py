@@ -20,6 +20,8 @@ class TestEcosystem(ApiTestCase):
         run_create_operation(create_channel, dict(), ecosystem_id)
         response = client.get(f"{api_prefix}/ecosystem/{ecosystem_id}", headers=self.reader_headers)
         self.assertEqual(200, response.status_code)
+        attributes = response.json()["data"]["attributes"]
+        self.assertEqual(1, len(attributes["conan_credentials"]))
 
     def test_post_ecosystem(self):
         response = client.post(f"{api_prefix}/ecosystem", json={
@@ -31,8 +33,8 @@ class TestEcosystem(ApiTestCase):
             }
         }, headers=self.user_headers)
         self.assertEqual(201, response.status_code)
-        self.assertEqual("test_post_ecosystem", response.json()["data"]["attributes"]["name"])
         attributes = response.json()["data"]["attributes"]
+        self.assertEqual("test_post_ecosystem", attributes["name"])
 
     def test_patch_ecosystem(self):
         ecosystem_id = run_create_operation(create_ecosystem, dict())

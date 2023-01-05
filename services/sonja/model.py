@@ -73,6 +73,17 @@ class DockerCredential(Base):
     configuration = relationship("Configuration", backref="docker_credentials")
 
 
+class ConanCredential(Base):
+    __tablename__ = 'conan_credential'
+
+    id = Column(Integer, primary_key=True)
+    remote = Column(String(255))
+    username = Column(String(255))
+    password = Column(String(255))
+    ecosystem_id = Column(Integer, ForeignKey('ecosystem.id'))
+    ecosystem = relationship("Ecosystem", backref="conan_credentials")
+
+
 class Configuration(Base):
     __tablename__ = 'configuration'
 
@@ -108,9 +119,14 @@ class Ecosystem(Base):
     conan_config_url = Column(String(255))
     conan_config_path = Column(String(255))
     conan_config_branch = Column(String(255))
-    conan_remote = Column(String(255))
-    conan_user = Column(String(255))
-    conan_password = Column(String(255))
+
+    @property
+    def conan_credential_values(self):
+        return [{"remote": c.remote, "username": c.username, "password": c.password} for c in self.conan_credentials]
+
+    @conan_credential_values.setter
+    def conan_credential_values(self, value):
+        self.conan_credentials = [ConanCredential(**v) for v in value]
 
 
 class Label(Base):
@@ -173,6 +189,7 @@ class Channel(Base):
     ecosystem = relationship("Ecosystem", backref="channels")
     name = Column(String(255), nullable=False)
     conan_channel = Column(String(255))
+    conan_remote = Column(String(255))
     ref_pattern = Column(String(255))
 
 
