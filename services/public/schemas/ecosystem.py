@@ -3,6 +3,12 @@ from pydantic import BaseModel, Field
 from typing import List, Optional
 
 
+class ConanCredential(BaseModel):
+    remote: Optional[str]
+    username: Optional[str]
+    password: Optional[str]
+
+
 @attributes
 class Ecosystem(BaseModel):
     name: str = ""
@@ -11,20 +17,21 @@ class Ecosystem(BaseModel):
     conan_config_url: Optional[str]
     conan_config_path: Optional[str]
     conan_config_branch: Optional[str]
-    conan_user: Optional[str]
-    conan_password: Optional[str]
+    conan_credentials: List[ConanCredential] = Field(default_factory=list, alias="conan_credential_values")
 
     class Config:
         schema_extra = {
             "example": {
                 "name": "My Company",
                 "user": "mycompany",
-                "conan_remote": "uboot",
                 "conan_config_url": "git@github.com:uboot/conan-config.git",
                 "conan_config_path": "default",
                 "conan_config_branch": "master",
-                "conan_user": "agent",
-                "conan_password": "Passw0rd"
+                "conan_credentials": [{
+                    "remote": "uboot",
+                    "username": "agent",
+                    "password": "Passw0rd"
+                }],
             }
         }
 

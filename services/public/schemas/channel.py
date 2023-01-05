@@ -12,6 +12,7 @@ class Option(BaseModel):
 class Channel(BaseModel):
     name: str = ""
     conan_channel: Optional[str]
+    conan_remote: Optional[str]
     ref_pattern: Optional[str]
 
     class Config:
@@ -19,6 +20,7 @@ class Channel(BaseModel):
             "example": {
                 "name": "Releases",
                 "conan_channel": "stable",
+                "conan_remote": "uboot",
                 "ref_pattern": "main"
             }
         }

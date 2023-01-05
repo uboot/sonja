@@ -103,7 +103,7 @@ build_script = build_template.substitute(package_path=package_path,
 client = docker.from_env()
 
 if not m.group(3) == ":local":
-    client.images.pull(image)
+    client.images.pull_image(image)
 
 
 f.seek(0)

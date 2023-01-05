@@ -64,13 +64,11 @@ def get_build_parameters(profile, https=False, version="", no_user=False):
         "conan_config_url": "git@github.com:uboot/conan-config.git",
         "conan_config_path": "default",
         "conan_config_branch": "",
-        "conan_remote": "uboot",
-        "conan_user": "agent",
-        "conan_password": os.environ.get("CONAN_PASSWORD", ""),
         "conan_profile": profile,
         "conan_options": "-o base:with_tests=False",
+        "conan_remote": "uboot",
         "git_url": "https://uboot@github.com/uboot/private-packages.git" if https else "git@github.com:uboot/sonja-backend.git",
-        "git_sha": "ef89f593ea439d8986aca1a52257e44e7b8fea29" if https else "47c5d1dfa67726af1e67530d4f47bf2eb77b0b41",
+        "git_sha": "fe73ab663d73ee8084cb739240d033987e708d06" if https else "47c5d1dfa67726af1e67530d4f47bf2eb77b0b41",
         "git_credentials": [{
             "url": "https://uboot@github.com",
             "username": "",
@@ -87,6 +85,11 @@ def get_build_parameters(profile, https=False, version="", no_user=False):
             "username": os.environ.get("DOCKER_USER", ""),
             "password": os.environ.get("DOCKER_PASSWORD", "")
         }],
+        "conan_credentials": [{
+            "remote": "uboot",
+            "username": "agent",
+            "password": os.environ.get("CONAN_PASSWORD", "")
+        }],
         "mtu": "1450"
     }
 
@@ -95,16 +98,41 @@ class TestBuilder(unittest.TestCase):
     def test_pull_invalid_image_linux(self):
         docker_host = os.environ.get("LINUX_DOCKER_HOST", "")
         parameters = get_build_parameters("linux-debug")
-        with environment("DOCKER_HOST", docker_host), Builder("Linux", "uboot/invalid:1.2.3") as builder:
-            self.assertRaises(BuildFailed, builder.pull, parameters)
+        with environment("DOCKER_HOST", docker_host), Builder("Linux", "uboot/invalid:1.2.3", parameters) as builder:
+            self.assertRaises(BuildFailed, builder.pull_image)
+
+    def test_create_build_files_linux(self):
+        parameters = get_build_parameters("linux-debug")
+        parameters["conan_credentials"].append({
+            "remote": "remote",
+            "username": "user",
+            "password": r'pass" \ word'
+        })
+        with environment("DOCKER_HOST", ""), Builder("Linux", "uboot/invalid:1.2.3", parameters) as builder:
+            builder.create_build_files()
+            # with open("build.tar", "wb") as dump:
+            #     dump.write(builder.build_files.read())
+
+    def test_create_build_files_windows(self):
+        parameters = get_build_parameters("windows-debug")
+        parameters["conan_credentials"].append({
+            "remote": "remote",
+            "username": "user",
+            "password": r'pass" \ word'
+        })
+        with environment("DOCKER_HOST", ""), Builder("Windows", "uboot/invalid:1.2.3", parameters) as builder:
+            builder.create_build_files()
+            # with open("build.tar", "wb") as dump:
+            #     dump.write(builder.build_files.read())
 
     def test_run_linux(self):
         docker_host = os.environ.get("LINUX_DOCKER_HOST", "")
         parameters = get_build_parameters("linux-debug")
-        with environment("DOCKER_HOST", docker_host), Builder("Linux", "uboot/gcc9:latest") as builder:
-            builder.pull(parameters)
-            builder.setup(parameters)
-            builder.run()
+        with environment("DOCKER_HOST", docker_host), Builder("Linux", "uboot/gcc9:latest", parameters) as builder:
+            builder.pull_image()
+            builder.create_build_files()
+            builder.setup_container()
+            builder.run_build()
             logs = [line for line in builder.get_log_lines()]
             self.assertGreater(len(logs), 0)
             self.assertTrue("create" in builder.build_output.keys())
@@ -114,10 +142,11 @@ class TestBuilder(unittest.TestCase):
     def test_run_linux_private_registry(self):
         docker_host = os.environ.get("LINUX_DOCKER_HOST", "")
         parameters = get_build_parameters("linux-debug")
-        with environment("DOCKER_HOST", docker_host), Builder("Linux", "uboot/private:latest") as builder:
-            builder.pull(parameters)
-            builder.setup(parameters)
-            builder.run()
+        with environment("DOCKER_HOST", docker_host), Builder("Linux", "uboot/private:latest", parameters) as builder:
+            builder.pull_image()
+            builder.create_build_files()
+            builder.setup_container()
+            builder.run_build()
             logs = [line for line in builder.get_log_lines()]
             self.assertGreater(len(logs), 0)
             self.assertTrue("create" in builder.build_output.keys())
@@ -127,10 +156,11 @@ class TestBuilder(unittest.TestCase):
     def test_run_linux_version(self):
         docker_host = os.environ.get("LINUX_DOCKER_HOST", "")
         parameters = get_build_parameters("linux-debug", version="1.2.3")
-        with environment("DOCKER_HOST", docker_host), Builder("Linux", "uboot/gcc9:latest") as builder:
-            builder.pull(parameters)
-            builder.setup(parameters)
-            builder.run()
+        with environment("DOCKER_HOST", docker_host), Builder("Linux", "uboot/gcc9:latest", parameters) as builder:
+            builder.pull_image()
+            builder.create_build_files()
+            builder.setup_container()
+            builder.run_build()
             logs = [line for line in builder.get_log_lines()]
             self.assertGreater(len(logs), 0)
             self.assertTrue("create" in builder.build_output.keys())
@@ -140,10 +170,11 @@ class TestBuilder(unittest.TestCase):
     def test_run_linux_no_user(self):
         docker_host = os.environ.get("LINUX_DOCKER_HOST", "")
         parameters = get_build_parameters("linux-debug", no_user=True)
-        with environment("DOCKER_HOST", docker_host), Builder("Linux", "uboot/gcc9:latest") as builder:
-            builder.pull(parameters)
-            builder.setup(parameters)
-            builder.run()
+        with environment("DOCKER_HOST", docker_host), Builder("Linux", "uboot/gcc9:latest", parameters) as builder:
+            builder.pull_image()
+            builder.create_build_files()
+            builder.setup_container()
+            builder.run_build()
             logs = [line for line in builder.get_log_lines()]
             self.assertGreater(len(logs), 0)
             self.assertTrue("create" in builder.build_output.keys())
@@ -153,10 +184,11 @@ class TestBuilder(unittest.TestCase):
     def test_run_linux_version_no_user(self):
         docker_host = os.environ.get("LINUX_DOCKER_HOST", "")
         parameters = get_build_parameters("linux-debug", version="1.2.3", no_user=True)
-        with environment("DOCKER_HOST", docker_host), Builder("Linux", "uboot/gcc9:latest") as builder:
-            builder.pull(parameters)
-            builder.setup(parameters)
-            builder.run()
+        with environment("DOCKER_HOST", docker_host), Builder("Linux", "uboot/gcc9:latest", parameters) as builder:
+            builder.pull_image()
+            builder.create_build_files()
+            builder.setup_container()
+            builder.run_build()
             logs = [line for line in builder.get_log_lines()]
             self.assertGreater(len(logs), 0)
             self.assertTrue("create" in builder.build_output.keys())
@@ -166,18 +198,20 @@ class TestBuilder(unittest.TestCase):
     def test_run_linux_wrong_version(self):
         docker_host = os.environ.get("LINUX_DOCKER_HOST", "")
         parameters = get_build_parameters("linux-debug", version="xxx")
-        with environment("DOCKER_HOST", docker_host), Builder("Linux", "uboot/gcc9:latest") as builder:
-            builder.pull(parameters)
-            builder.setup(parameters)
-            self.assertRaises(BuildFailed, builder.run)
+        with environment("DOCKER_HOST", docker_host), Builder("Linux", "uboot/gcc9:latest", parameters) as builder:
+            builder.pull_image()
+            builder.create_build_files()
+            builder.setup_container()
+            self.assertRaises(BuildFailed, builder.run_build)
 
     def test_run_linux_https(self):
         docker_host = os.environ.get("LINUX_DOCKER_HOST", "")
         parameters = get_build_parameters("linux-debug", https=True)
-        with environment("DOCKER_HOST", docker_host), Builder("Linux", "uboot/gcc9:latest") as builder:
-            builder.pull(parameters)
-            builder.setup(parameters)
-            builder.run()
+        with environment("DOCKER_HOST", docker_host), Builder("Linux", "uboot/gcc9:latest", parameters) as builder:
+            builder.pull_image()
+            builder.create_build_files()
+            builder.setup_container()
+            builder.run_build()
             logs = [line for line in builder.get_log_lines()]
             self.assertGreater(len(logs), 0)
             self.assertTrue("create" in builder.build_output.keys())
@@ -188,31 +222,34 @@ class TestBuilder(unittest.TestCase):
         docker_host = os.environ.get("LINUX_DOCKER_HOST", "")
         parameters = get_build_parameters("linux-debug")
         parameters["path"] = "packages/deadlock/conanfile.py"
-        with environment("DOCKER_HOST", docker_host), Builder("Linux", "uboot/gcc9:latest") as builder:
+        with environment("DOCKER_HOST", docker_host), Builder("Linux", "uboot/gcc9:latest", parameters) as builder:
             canceller = cancel_build(builder, 0)
-            builder.pull(parameters)
-            builder.setup(parameters)
-            builder.run()
+            builder.pull_image()
+            builder.create_build_files()
+            builder.setup_container()
+            builder.run_build()
             canceller.join()
 
     def test_cancel_linux(self):
         docker_host = os.environ.get("LINUX_DOCKER_HOST", "")
         parameters = get_build_parameters("linux-debug")
         parameters["path"] = "packages/deadlock/conanfile.py"
-        with environment("DOCKER_HOST", docker_host), Builder("Linux", "uboot/gcc9:latest") as builder:
+        with environment("DOCKER_HOST", docker_host), Builder("Linux", "uboot/gcc9:latest", parameters) as builder:
             canceller = cancel_build(builder, 3)
-            builder.pull(parameters)
-            builder.setup(parameters)
-            builder.run()
+            builder.pull_image()
+            builder.create_build_files()
+            builder.setup_container()
+            builder.run_build()
             canceller.join()
 
     def test_run_windows(self):
         docker_host = os.environ.get("WINDOWS_DOCKER_HOST", "127.0.0.1:2375")
         parameters = get_build_parameters("windows-debug")
-        with environment("DOCKER_HOST", docker_host), Builder("Windows", "msvc15:local") as builder:
-            builder.pull(parameters)
-            builder.setup(parameters)
-            builder.run()
+        with environment("DOCKER_HOST", docker_host), Builder("Windows", "msvc15:local", parameters) as builder:
+            builder.pull_image()
+            builder.create_build_files()
+            builder.setup_container()
+            builder.run_build()
             logs = [line for line in builder.get_log_lines()]
             self.assertGreater(len(logs), 0)
             self.assertTrue("create" in builder.build_output.keys())
@@ -222,10 +259,11 @@ class TestBuilder(unittest.TestCase):
     def test_run_windows_no_user(self):
         docker_host = os.environ.get("WINDOWS_DOCKER_HOST", "127.0.0.1:2375")
         parameters = get_build_parameters("windows-debug", no_user=True)
-        with environment("DOCKER_HOST", docker_host), Builder("Windows", "msvc15:local") as builder:
-            builder.pull(parameters)
-            builder.setup(parameters)
-            builder.run()
+        with environment("DOCKER_HOST", docker_host), Builder("Windows", "msvc15:local", parameters) as builder:
+            builder.pull_image()
+            builder.create_build_files()
+            builder.setup_container()
+            builder.run_build()
             logs = [line for line in builder.get_log_lines()]
             self.assertGreater(len(logs), 0)
             self.assertTrue("create" in builder.build_output.keys())
@@ -235,10 +273,11 @@ class TestBuilder(unittest.TestCase):
     def test_run_windows_version_no_user(self):
         docker_host = os.environ.get("WINDOWS_DOCKER_HOST", "127.0.0.1:2375")
         parameters = get_build_parameters("windows-debug", version="1.2.3", no_user=True)
-        with environment("DOCKER_HOST", docker_host), Builder("Windows", "msvc15:local") as builder:
-            builder.pull(parameters)
-            builder.setup(parameters)
-            builder.run()
+        with environment("DOCKER_HOST", docker_host), Builder("Windows", "msvc15:local", parameters) as builder:
+            builder.pull_image()
+            builder.create_build_files()
+            builder.setup_container()
+            builder.run_build()
             logs = [line for line in builder.get_log_lines()]
             self.assertGreater(len(logs), 0)
             self.assertTrue("create" in builder.build_output.keys())
@@ -248,10 +287,11 @@ class TestBuilder(unittest.TestCase):
     def test_run_windows_version(self):
         docker_host = os.environ.get("WINDOWS_DOCKER_HOST", "127.0.0.1:2375")
         parameters = get_build_parameters("windows-debug", version="1.2.3")
-        with environment("DOCKER_HOST", docker_host), Builder("Windows", "msvc15:local") as builder:
-            builder.pull(parameters)
-            builder.setup(parameters)
-            builder.run()
+        with environment("DOCKER_HOST", docker_host), Builder("Windows", "msvc15:local", parameters) as builder:
+            builder.pull_image()
+            builder.create_build_files()
+            builder.setup_container()
+            builder.run_build()
             logs = [line for line in builder.get_log_lines()]
             self.assertGreater(len(logs), 0)
             self.assertTrue("create" in builder.build_output.keys())
@@ -261,10 +301,11 @@ class TestBuilder(unittest.TestCase):
     def test_run_windows_https(self):
         docker_host = os.environ.get("WINDOWS_DOCKER_HOST", "127.0.0.1:2375")
         parameters = get_build_parameters("windows-debug", https=True)
-        with environment("DOCKER_HOST", docker_host), Builder("Windows", "msvc15:local") as builder:
-            builder.pull(parameters)
-            builder.setup(parameters)
-            builder.run()
+        with environment("DOCKER_HOST", docker_host), Builder("Windows", "msvc15:local", parameters) as builder:
+            builder.pull_image()
+            builder.create_build_files()
+            builder.setup_container()
+            builder.run_build()
             logs = [line for line in builder.get_log_lines()]
             self.assertGreater(len(logs), 0)
             self.assertTrue("create" in builder.build_output.keys())
@@ -275,9 +316,10 @@ class TestBuilder(unittest.TestCase):
         docker_host = os.environ.get("WINDOWS_DOCKER_HOST", "127.0.0.1:2375")
         parameters = get_build_parameters("windows-debug")
         parameters["path"] = "packages/deadlock/conanfile.py"
-        with environment("DOCKER_HOST", docker_host), Builder("Windows", "msvc15:local") as builder:
+        with environment("DOCKER_HOST", docker_host), Builder("Windows", "msvc15:local", parameters) as builder:
             canceller = cancel_build(builder, 3)
-            builder.pull(parameters)
-            builder.setup(parameters)
-            builder.run()
+            builder.pull_image()
+            builder.create_build_files()
+            builder.setup_container()
+            builder.run_build()
             canceller.join()

@@ -22,42 +22,16 @@ class BuildFailed(Exception):
     pass
 
 
-def create_build_tar(script_template_name: str, parameters: dict):
-
-    def add_content(tar_archive, file_name, text_data, is_script = False):
-        tar_info = tarfile.TarInfo("{0}/{1}".format(build_package_dir_name, file_name))
-        content = BytesIO(bytes(text_data, "utf-8"))
-        tar_info.size = len(content.getbuffer())
-        if is_script:
-            tar_info.mode = 0o555
-        tar_archive.addfile(tar_info, content)
-
-    setup_file_path = os.path.join(os.path.dirname(__file__), script_template_name)
-    with open(setup_file_path) as setup_template_file:
-        template = string.Template(setup_template_file.read())
-    script = template.substitute(parameters)
-
-    credential_helper = build_credential_helper(parameters["git_credentials"])
-
-    # place into archive
-    f = BytesIO()
-    tar = tarfile.open(mode="w", fileobj=f, dereference=True)
-    script_name = script_template_name[:-3]
-    add_content(tar, script_name, script)
-    add_content(tar, "credential_helper.sh", credential_helper, is_script=True)
-    add_content(tar, "id_rsa", decode(parameters["ssh_key"]))
-    add_content(tar, "known_hosts", decode(parameters["known_hosts"]))
-    tar.close()
-    f.seek(0)
-
-    # with open("build.tar", "wb") as dump:
-    #     dump.write(f.read())
-    # f.seek(0)
-
-    return f
+def _add_content(tar_archive, file_name, text_data, is_script=False):
+    tar_info = tarfile.TarInfo("{0}/{1}".format(build_package_dir_name, file_name))
+    content = BytesIO(bytes(text_data, "utf-8"))
+    tar_info.size = len(content.getbuffer())
+    if is_script:
+        tar_info.mode = 0o555
+    tar_archive.addfile(tar_info, content)
 
 
-def extract_output_tar(data: FileIO):
+def _extract_output_tar(data: FileIO):
     f = BytesIO()
     for chunk in data:
         f.write(chunk)
@@ -75,15 +49,13 @@ def extract_output_tar(data: FileIO):
 
 
 class Builder(object):
-    def __init__(self, build_os, image):
-        try:
-            self.__client = docker.from_env()
-        except docker.errors.DockerException as e:
-            raise BuildFailed(f"Failed to instantiate docker client: '{e}")
-
+    def __init__(self, build_os: str, image: str, parameters: dict):
+        self.__client = None
+        self.__parameters = parameters
         self.__image = image
         self.__build_os = build_os
         self.__container = None
+        self.__build_tar = None
         self.__container_logs = None
         self.__cancel_lock = threading.Lock()
         self.__cancelled = False
@@ -92,6 +64,10 @@ class Builder(object):
 
     def __enter__(self):
         return self
+
+    @property
+    def build_files(self) -> BytesIO:
+        return self.__build_tar
 
     @property
     def __script_template(self):
@@ -135,7 +111,27 @@ class Builder(object):
         else:
             return 'cmd /s /c "powershell -File {0}\\build.ps1"'.format(self.__build_package_dir)
 
-    def pull(self, parameters):
+    def __setup_conan_users(self, conan_credentials: dict) -> str:
+        commands = []
+        for c in conan_credentials:
+            remote = c["remote"]
+            user = c["username"]
+            if self.__build_os == "Linux":
+                password = c["password"].replace('\\', '\\\\').replace('"', r'\"')
+            else:
+                password = c["password"].replace('"', '""')
+            s = f"conan user -r {remote} -p \"{password}\" {user}"
+            if self.__build_os == "Windows":
+                s += "; ThrowOnNonZero"
+            commands.append(s)
+        return "\n".join(commands)
+
+    def pull_image(self):
+        try:
+            self.__client = docker.from_env()
+        except docker.errors.DockerException as e:
+            raise BuildFailed(f"Failed to instantiate docker client: '{e}")
+
         m = re.match(docker_image_pattern, self.__image)
         if not m:
             raise BuildFailed(f"The image '{self.__image}' is not a valid docker image name")
@@ -147,7 +143,7 @@ class Builder(object):
             return
 
         auth_config = None
-        credentials = next((c for c in parameters['docker_credentials'] if c["server"] == server), None)
+        credentials = next((c for c in self.__parameters['docker_credentials'] if c["server"] == server), None)
         if credentials is not None:
             auth_config = {
                 "username": credentials['username'],
@@ -160,16 +156,10 @@ class Builder(object):
         except docker.errors.APIError as e:
             raise BuildFailed(f"Failed to pull docker container '{self.__image}': {e}")
 
-    def setup(self, parameters):
-        logger.info("Setup docker container")
+    def create_build_files(self):
+        logger.info("Create build tar")
 
-        try:
-            self.__container = self.__client.containers.create(image=self.__image,
-                                                               command=self.__build_command)
-            logger.info("Created docker container '%s'", self.__container.short_id)
-        except docker.errors.APIError as e:
-            raise BuildFailed(f"Failed to create docker container from image '{self.__image}': {e}")
-
+        parameters = self.__parameters
         config_url = "{0} --type=git".format(parameters["conan_config_url"])
         config_branch = "--args \"-b {0}\"".format(parameters["conan_config_branch"])\
             if parameters["conan_config_branch"] else ""
@@ -191,18 +181,48 @@ class Builder(object):
             "build_output_dir": self.__build_output_dir,
             "create_reference": version_user_channel,
             "info_reference": user_channel,
-            "lock_args": " ".join([lock_file_version_arg, lock_file_user_arg])
+            "lock_args": " ".join([lock_file_version_arg, lock_file_user_arg]),
+            "setup_conan_users": self.__setup_conan_users(parameters["conan_credentials"])
         }
-        build_tar = create_build_tar(self.__script_template, patched_parameters)
+
+        setup_file_path = os.path.join(os.path.dirname(__file__), self.__script_template)
+        with open(setup_file_path) as setup_template_file:
+            template = string.Template(setup_template_file.read())
+        script = template.substitute(patched_parameters)
+
+        credential_helper = build_credential_helper(patched_parameters["git_credentials"])
+
+        # place into archive
+        f = BytesIO()
+        tar = tarfile.open(mode="w", fileobj=f, dereference=True)
+        script_name = self.__script_template[:-3]
+        _add_content(tar, script_name, script)
+        _add_content(tar, "credential_helper.sh", credential_helper, is_script=True)
+        _add_content(tar, "id_rsa", decode(parameters["ssh_key"]))
+        _add_content(tar, "known_hosts", decode(parameters["known_hosts"]))
+        tar.close()
+        f.seek(0)
+
+        self.__build_tar = f
+
+    def setup_container(self):
+        logger.info("Setup docker container")
 
         try:
-            self.__container.put_archive(self.__root_dir, data=build_tar)
+            self.__container = self.__client.containers.create(image=self.__image,
+                                                               command=self.__build_command)
+            logger.info("Created docker container '%s'", self.__container.short_id)
+        except docker.errors.APIError as e:
+            raise BuildFailed(f"Failed to create docker container from image '{self.__image}': {e}")
+
+        try:
+            self.__container.put_archive(self.__root_dir, data=self.__build_tar)
             logger.info("Copied build files to container '%s'", self.__container.short_id)
         except docker.errors.APIError as e:
             raise BuildFailed("Failed to copy build files to container '{0}': {1}"\
                               .format(self.__container.short_id, e))
 
-    def run(self):
+    def run_build(self):
         with self.__cancel_lock:
             if self.__cancelled:
                 logger.info("Build was cancelled")
@@ -228,7 +248,7 @@ class Builder(object):
 
         try:
             data, _ = self.__container.get_archive(self.__build_output_dir)
-            self.build_output = extract_output_tar(data)
+            self.build_output = _extract_output_tar(data)
         except docker.errors.APIError as e:
             raise BuildFailed(f"Failed to obtain build output from container '{self.__container.short_id}': e")
 

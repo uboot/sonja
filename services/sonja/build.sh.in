@@ -13,8 +13,8 @@ git config --global credential.helper $build_package_dir/credential_helper.sh
 echo '### Setup Conan ###'
 conan config install $conan_config_args
 
-echo '# Setup Conan user'
-conan user -r $conan_remote -p $conan_password $conan_user
+echo '# Setup Conan users'
+$setup_conan_users
 
 echo '### Clone repository ###'
 mkdir sonja
