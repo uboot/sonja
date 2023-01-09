@@ -6,7 +6,6 @@ class TreeConan(ConanFile):
     version = "1.2.3"
     settings = "os", "compiler", "build_type", "arch"
     requires = ("base/1.2.3@mycompany/stable", "core/1.2.3@mycompany/stable")
-    build_requires = ("app/1.2.3@mycompany/stable",)
     generators = "cmake"
     revision_mode = "scm"
 
