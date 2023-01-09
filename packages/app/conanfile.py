@@ -5,16 +5,16 @@ class AppConan(ConanFile):
     name = "app"
     version = "1.2.3"
     settings = "os", "compiler", "build_type", "arch"
-    default_options = {"hello:shared": True}
     generators = "cmake"
     revision_mode = "scm"
 
     def requirements(self):
         self.requires("tree/1.2.3@mycompany/stable")
         self.requires("core/1.2.3@mycompany/stable")
-        if self.settings.os != "windows":
+        if self.settings.os != "Windows":
             self.requires("hello/1.2.3@mycompany/stable")
-    
+            self.options['hello'].shared = True
+
     def source(self):
         self.run("git clone https://github.com/conan-io/hello.git")
         # This small hack might be useful to guarantee proper /MT /MD linkage
