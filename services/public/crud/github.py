@@ -17,4 +17,4 @@ def process_push(session: Session, crawler: Crawler, payload: PushPayload):
         .all()
 
     for repo in https_repos + ssh_repos:
-        crawler.process_repo(str(repo.id), payload.after, payload.ref.lstrip("refs/"))
+        crawler.process_repo(str(repo.id), payload.after, payload.ref.removeprefix("refs/"))

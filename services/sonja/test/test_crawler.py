@@ -71,6 +71,17 @@ class TestPeriodicCrawler(TestCrawler):
             commit = session.query(Commit).first()
             self.assertEqual(CommitStatus.new, commit.status)
 
+    def test_start_repo_and_channel(self):
+        with session_scope() as session:
+            session.add(util.create_repo(dict()))
+            session.add(util.create_channel({"channel.ref_pattern": "heads/run"}))
+        self.crawler.start()
+        self.crawler.try_pause()
+        self.assertTrue(self.scheduler.process_commits.called)
+        with session_scope() as session:
+            commit = session.query(Commit).first()
+            self.assertEqual(CommitStatus.new, commit.status)
+
     def test_start_repo_and_tag_channel(self):
         with session_scope() as session:
             session.add(util.create_repo(dict()))

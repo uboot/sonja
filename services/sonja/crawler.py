@@ -122,7 +122,7 @@ class RepoController(object):
         repo = git.Repo(self.repo_dir)
         for ref in repo.refs:
             if isinstance(ref, git.RemoteReference):
-                normalized_ref = f"heads/{ref.name.lstrip('origin/')}"
+                normalized_ref = f"heads/{ref.name.removeprefix('origin/')}"
             elif isinstance(ref, git.TagReference):
                 normalized_ref = f"tags/{ref.name}"
             else:
