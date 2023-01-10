@@ -81,7 +81,7 @@ def create_repo(parameters):
     elif parameters.get("repo.invalid", False):
         repo.url = "https://github.com/uboot/nonsense.git"
     elif parameters.get("repo.https", False):
-        repo.url = "https://uboot@github.com/uboot/conan-packages.git"
+        repo.url = "https://uboot@github.com/uboot/private-packages.git"
         repo.path = "base"
     else:
         repo.url = "https://github.com/uboot/sonja-backend.git"
