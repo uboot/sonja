@@ -102,8 +102,8 @@ class DemoDataCreator(object):
         hello = Repo()
         hello.name = "Hello"
         hello.ecosystem = self.__ecosystem
-        hello.url = "https://github.com/uboot/sonja-backend.git"
-        hello.path = "packages/hello"
+        hello.url = "https://github.com/uboot/conan-packages.git"
+        hello.path = "hello"
         hello.exclude = [
             Label(value="windows")
         ]
@@ -115,29 +115,29 @@ class DemoDataCreator(object):
         base = Repo()
         base.name = "Base"
         base.ecosystem = self.__ecosystem
-        base.url = "https://github.com/uboot/sonja-backend.git"
-        base.path = "packages/base"
+        base.url = "https://github.com/uboot/conan-packages.git"
+        base.path = "base"
         self.__session.add(base)
 
         core = Repo()
         core.name = "Core"
         core.ecosystem = self.__ecosystem
-        core.url = "https://github.com/uboot/sonja-backend.git"
-        core.path = "packages/core"
+        core.url = "https://github.com/uboot/conan-packages.git"
+        core.path = "core"
         self.__session.add(core)
 
         tree = Repo()
         tree.name = "Tree"
         tree.ecosystem = self.__ecosystem
-        tree.url = "https://github.com/uboot/sonja-backend.git"
-        tree.path = "packages/tree"
+        tree.url = "https://github.com/uboot/conan-packages.git"
+        tree.path = "tree"
         self.__session.add(base)
 
         app = Repo()
         app.name = "App"
         app.ecosystem = self.__ecosystem
-        app.url = "https://github.com/uboot/sonja-backend.git"
-        app.path = "packages/app"
+        app.url = "https://github.com/uboot/conan-packages.git"
+        app.path = "app"
         self.__session.add(app)
 
         linux_release = Profile()
