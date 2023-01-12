@@ -1,6 +1,6 @@
 from datetime import datetime
 from sonja.model import Ecosystem, Repo, Label, Option, Profile, Platform, Channel, \
-    Commit, Build, BuildStatus, LogLine, Run, RunStatus, DockerCredential, ConanCredential
+    Commit, Build, BuildStatus, LogLine, Run, RunStatus, DockerCredential, ConanCredential, CommitStatus
 from sonja.database import logger, Session, session_scope, get_current_configuration
 from sonja.redis import RedisClient
 
@@ -8,8 +8,15 @@ from sonja.redis import RedisClient
 def add_build(redis_client: RedisClient):
     logger.info("Add build")
     with session_scope() as session:
-        commit = session.query(Commit).first()
         profile = session.query(Profile).first()
+        repo = session.query(Repo).first()
+        channel = session.query(Channel).first()
+
+        commit = Commit()
+        commit.sha = "1234567890abcdef"
+        commit.status = CommitStatus.new
+        commit.repo = repo
+        commit.channel = channel
 
         build = Build()
         build.commit = commit
