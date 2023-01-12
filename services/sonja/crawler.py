@@ -1,3 +1,5 @@
+import gitdb.exc
+
 from sonja.config import connect_to_database, logger
 from sonja.credential_helper import build_credential_helper
 from sonja.database import Session, session_scope, get_current_configuration
@@ -72,11 +74,15 @@ class RepoController(object):
         repo = git.Repo(self.repo_dir)
         repo.remotes.origin.fetch()
 
-    def checkout_sha(self, sha: str):
+    def checkout_sha(self, sha: str) -> bool:
         logger.info("Checkout '%s'", sha)
         repo = git.Repo(self.repo_dir)
-        commit = git.Commit.new(repo, sha)
-        repo.head.reset(commit, working_tree=True)
+        try:
+            commit = git.Commit.new(repo, sha)
+            repo.head.reset(commit, working_tree=True)
+            return True
+        except gitdb.exc.BadName:
+            return False
 
     def get_sha(self):
         repo = git.Repo(self.repo_dir)
@@ -108,7 +114,12 @@ class RepoController(object):
     def has_diff(self, commit_sha: str, path: str):
         repo = git.Repo(self.repo_dir)
         this_commit = repo.head.commit
-        past_commit = repo.commit(commit_sha)
+        try:
+            past_commit = repo.commit(commit_sha)
+        except gitdb.exc.BadName:
+            logger.debug("Commit '%s' can not be found, assume a diff", commit_sha)
+            return True
+
         diffs = this_commit.diff(past_commit)
         for d in diffs:
             if os.path.commonprefix((d.a_path, path)) == path:
@@ -159,19 +170,19 @@ class Crawler(Worker):
         self.__repos.put(RepoUpdate(repo_id, sha, ref))
 
     async def work(self, payload):
-        if payload == ALL_REPOS or self.__periodic:
-            self.__periodic = False
-            await self.__process_all_repos()            
-            self.reschedule_internally(CRAWLER_PERIOD_SECONDS, ALL_REPOS)
+        try:
+            if payload == ALL_REPOS or self.__periodic:
+                self.__periodic = False
+                await self.__process_all_repos()
+                self.reschedule_internally(CRAWLER_PERIOD_SECONDS, ALL_REPOS)
 
-        else:
-            for repo in self.__get_repos():
-                try:
+            else:
+                for repo in self.__get_repos():
                     await self.__process_update(repo)
-                except Exception as e:
-                    logger.error("Processing repos failed: %s", e)
-                    logger.info("Retry in %i seconds", TIMEOUT)
-                    time.sleep(TIMEOUT)
+        except Exception as e:
+            logger.error("Processing repos failed: %s", e)
+            logger.info("Retry in %i seconds", TIMEOUT)
+            time.sleep(TIMEOUT)
 
     def cleanup(self):
         shutil.rmtree(self.__data_dir)
@@ -232,7 +243,9 @@ class Crawler(Worker):
                 if sha and ref:
                     if re.fullmatch(channel.ref_pattern, ref):
                         logger.info("Ref '%s' matches '%s'", ref, channel.ref_pattern)
-                        controller.checkout_sha(sha)
+                        if not controller.checkout_sha(sha):
+                            logger.info("Can not checkout commit '%s'", sha)
+                            continue
                         if self.__process_commit(session, controller, repo, channel):
                             new_commits = True
                 else:
