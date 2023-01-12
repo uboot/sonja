@@ -26,33 +26,33 @@ def get_ping():
     pass
 
 
-@router.get("/clear_ecosystems", dependencies=[Depends(get_admin)])
-def get_clear_ecosystems():
+@router.post("/clear_ecosystems", dependencies=[Depends(get_admin)])
+def post_clear_ecosystems():
     clear_ecosystems()
 
 
-@router.get("/populate_database", dependencies=[Depends(get_admin)])
-def get_populate_database():
+@router.post("/populate_database", dependencies=[Depends(get_admin)])
+def post_populate_database():
     populate_ecosystem()
 
 
-@router.get("/add_build", dependencies=[Depends(get_admin)])
-def get_add_build(redis_client: RedisClient = Depends(get_redis_client)):
+@router.post("/add_build", dependencies=[Depends(get_admin)])
+def post_add_build(redis_client: RedisClient = Depends(get_redis_client)):
     add_build(redis_client)
 
 
-@router.get("/add_run", dependencies=[Depends(get_admin)])
-def get_add_run(redis_client: RedisClient = Depends(get_redis_client)):
+@router.post("/add_run", dependencies=[Depends(get_admin)])
+def post_add_run(redis_client: RedisClient = Depends(get_redis_client)):
     add_run(redis_client)
 
 
-@router.get("/add_log_line", dependencies=[Depends(get_admin)])
-def get_add_log_line(redis_client: RedisClient = Depends(get_redis_client)):
+@router.post("/add_log_line", dependencies=[Depends(get_admin)])
+def post_add_log_line(redis_client: RedisClient = Depends(get_redis_client)):
     add_log_line(redis_client)
 
 
-@router.get("/process_repo/{repo_id}", dependencies=[Depends(get_write)])
-def get_process_repo(repo_id: str, crawler: Crawler = Depends(get_crawler)):
+@router.post("/process_repo/{repo_id}", dependencies=[Depends(get_write)])
+def post_process_repo(repo_id: str, crawler: Crawler = Depends(get_crawler)):
     if not crawler.process_repo(repo_id):
         raise HTTPException(status_code=400, detail="Failed")
 
