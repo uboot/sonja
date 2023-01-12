@@ -49,7 +49,36 @@ class TestRepoController(unittest.TestCase):
         controller.create_new_repo("git@github.com:uboot/conan-packages.git")
         controller.setup_ssh(os.environ.get("SSH_KEY", ""), known_hosts)
         controller.fetch()
+        matched_a_branch = False
         for _ in controller.checkout_matching_refs("heads/change_base_version"):
-            self.assertTrue(controller.has_diff("ef89f593ea439d8986aca1a52257e44e7b8fea29", "base/"))
-            self.assertTrue(controller.has_diff("ef89f593ea439d8986aca1a52257e44e7b8fea29", "base"))
-            self.assertFalse(controller.has_diff("ef89f593ea439d8986aca1a52257e44e7b8fea29", "app"))
+            matched_a_branch = True
+            self.assertTrue(controller.has_diff("d4e6245faa52440bd4386ed431ab723993fdb1d6", "base/"))
+            self.assertTrue(controller.has_diff("d4e6245faa52440bd4386ed431ab723993fdb1d6", "base"))
+            self.assertFalse(controller.has_diff("d4e6245faa52440bd4386ed431ab723993fdb1d6", "app/"))
+            self.assertFalse(controller.has_diff("d4e6245faa52440bd4386ed431ab723993fdb1d6", "app"))
+        self.assertTrue(matched_a_branch)
+
+    def test_has_diff_invalid_sha(self):
+        controller = RepoController(self.work_dir)
+        controller.create_new_repo("git@github.com:uboot/conan-packages.git")
+        controller.setup_ssh(os.environ.get("SSH_KEY", ""), known_hosts)
+        controller.fetch()
+        matched_a_branch = False
+        for _ in controller.checkout_matching_refs("heads/change_base_version"):
+            matched_a_branch = True
+            self.assertTrue(controller.has_diff("1234567890abcdef", "base"))
+        self.assertTrue(matched_a_branch)
+
+    def test_checkout_sha(self):
+        controller = RepoController(self.work_dir)
+        controller.create_new_repo("git@github.com:uboot/conan-packages.git")
+        controller.setup_ssh(os.environ.get("SSH_KEY", ""), known_hosts)
+        controller.fetch()
+        self.assertTrue(controller.checkout_sha("d4e6245faa52440bd4386ed431ab723993fdb1d6"))
+
+    def test_checkout_invalid_sha(self):
+        controller = RepoController(self.work_dir)
+        controller.create_new_repo("git@github.com:uboot/conan-packages.git")
+        controller.setup_ssh(os.environ.get("SSH_KEY", ""), known_hosts)
+        controller.fetch()
+        self.assertFalse(controller.checkout_sha("1234567890abcdef"))
