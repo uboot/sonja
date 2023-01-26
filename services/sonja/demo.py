@@ -113,9 +113,6 @@ class DemoDataCreator(object):
         hello.ecosystem = self.__ecosystem
         hello.url = "https://github.com/uboot/conan-packages.git"
         hello.path = "hello"
-        hello.exclude = [
-            Label(value="windows")
-        ]
         hello.options = [
             Option(key="hello:shared", value="True")
         ]
@@ -147,6 +144,9 @@ class DemoDataCreator(object):
         app.ecosystem = self.__ecosystem
         app.url = "https://github.com/uboot/conan-packages.git"
         app.path = "app"
+        app.exclude = [
+            Label(value="windows")
+        ]
         self.__session.add(app)
 
         linux_release = Profile()
