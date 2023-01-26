@@ -39,7 +39,8 @@ def delete_ecosystem_item(ecosystem_id: str, session: Session = Depends(get_sess
     delete_ecosystem(session, ecosystem)
 
 
-@router.patch("/ecosystem/{ecosystem_id}", response_model=EcosystemReadItem, response_model_by_alias=False)
+@router.patch("/ecosystem/{ecosystem_id}", response_model=EcosystemReadItem, response_model_by_alias=False,
+              dependencies=[Depends(get_write)])
 def patch_ecosystem_item(ecosystem_id: str, ecosystem_item: EcosystemWriteItem,
                          session: Session = Depends(get_session)):
     ecosystem = read_ecosystem(session, ecosystem_id)
