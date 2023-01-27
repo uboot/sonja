@@ -121,8 +121,8 @@ class Builder(object):
             else:
                 password = c["password"].replace('"', '""')
             s = f"conan user -r {remote} -p \"{password}\" {user}"
-            if self.__build_os == "Windows":
-                s += "; ThrowOnNonZero"
+            if self.__build_os == "Linux":
+                s += " || true"
             commands.append(s)
         return "\n".join(commands)
 

@@ -23,7 +23,10 @@ git config --global credential.helper $escaped_build_package_dir/credential_help
 echo '### Setup Conan ###'
 conan config install $conan_config_args; ThrowOnNonZero
 
-echo '# Setup Conan users'
+echo '### Enable Conan remote ###'
+conan remote enable $conan_remote; ThrowOnNonZero
+
+echo '### Setup Conan users ###'
 $setup_conan_users
 
 echo '### Clone repository ###'
