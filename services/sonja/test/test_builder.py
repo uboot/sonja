@@ -66,7 +66,7 @@ def get_build_parameters(profile, https=False, version="", no_user=False):
         "conan_config_branch": "",
         "conan_profile": profile,
         "conan_options": "-o base:with_tests=False",
-        "conan_remote": "uboot",
+        "conan_remote": "default",
         "git_url": "https://uboot@github.com/uboot/private-packages.git" if https else "git@github.com:uboot/sonja-backend.git",
         "git_sha": "fe73ab663d73ee8084cb739240d033987e708d06" if https else "47c5d1dfa67726af1e67530d4f47bf2eb77b0b41",
         "git_credentials": [{
@@ -86,7 +86,7 @@ def get_build_parameters(profile, https=False, version="", no_user=False):
             "password": os.environ.get("DOCKER_PASSWORD", "")
         }],
         "conan_credentials": [{
-            "remote": "uboot",
+            "remote": "default",
             "username": "agent",
             "password": os.environ.get("CONAN_PASSWORD", "")
         }],

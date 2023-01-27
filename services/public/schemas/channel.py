@@ -20,7 +20,7 @@ class Channel(BaseModel):
             "example": {
                 "name": "Releases",
                 "conan_channel": "stable",
-                "conan_remote": "uboot",
+                "conan_remote": "default",
                 "ref_pattern": "main"
             }
         }

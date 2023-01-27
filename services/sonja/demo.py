@@ -101,11 +101,15 @@ class DemoDataCreator(object):
         self.__ecosystem.conan_config_url = "https://github.com/uboot/conan-config.git"
         self.__ecosystem.conan_config_path = "default"
         self.__ecosystem.conan_config_branch = "master"
-        conan_credential = ConanCredential()
-        conan_credential.remote = "uboot"
-        conan_credential.username = "agent"
-        conan_credential.password = ""
-        self.__ecosystem.conan_credentials = [conan_credential]
+        default = ConanCredential()
+        default.remote = "default"
+        default.username = "agent"
+        default.password = ""
+        testing = ConanCredential()
+        testing.remote = "testing"
+        testing.username = "agent"
+        testing.password = ""
+        self.__ecosystem.conan_credentials = [default, testing]
 
     def create(self):
         hello = Repo()
@@ -187,13 +191,21 @@ class DemoDataCreator(object):
         ]
         self.__session.add(windows_debug)
 
-        channel = Channel()
-        channel.ecosystem = self.__ecosystem
-        channel.name = "Releases"
-        channel.ref_pattern = "heads/main"
-        channel.conan_channel = "stable"
-        channel.conan_remote = "uboot"
-        self.__session.add(channel)
+        stable = Channel()
+        stable.ecosystem = self.__ecosystem
+        stable.name = "Stable"
+        stable.ref_pattern = "heads/main"
+        stable.conan_channel = "stable"
+        stable.conan_remote = "default"
+        self.__session.add(stable)
+
+        develop = Channel()
+        develop.ecosystem = self.__ecosystem
+        develop.name = "Develop"
+        develop.ref_pattern = "heads/develop"
+        develop.conan_channel = "stable"
+        develop.conan_remote = "testing"
+        self.__session.add(develop)
 
 
 def populate_initial_data(ecosystem_id: int):
