@@ -62,7 +62,7 @@ def create_ecosystem(parameters):
     ecosystem.conan_config_path = "empty" if parameters.get("ecosystem.empty_remote", False) else "default"
     ecosystem.conan_config_branch = ""
     conan_credential = ConanCredential()
-    conan_credential.remote = "uboot"
+    conan_credential.remote = "default"
     conan_credential.username = "agent"
     conan_credential.password = os.environ.get("CONAN_PASSWORD", "")
     ecosystem.conan_credentials = [conan_credential]
@@ -124,7 +124,7 @@ def create_channel(parameters):
     channel.ref_pattern = parameters.get("channel.ref_pattern", "heads/main")
     channel.name = "Releases"
     channel.conan_channel = "stable"
-    channel.conan_remote = "uboot"
+    channel.conan_remote = "default"
     return channel
 
 

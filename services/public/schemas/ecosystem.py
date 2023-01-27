@@ -28,7 +28,7 @@ class Ecosystem(BaseModel):
                 "conan_config_path": "default",
                 "conan_config_branch": "master",
                 "conan_credentials": [{
-                    "remote": "uboot",
+                    "remote": "default",
                     "username": "agent",
                     "password": "Passw0rd"
                 }],

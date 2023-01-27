@@ -29,7 +29,7 @@ class TestConanPackages(unittest.TestCase):
             ecosystem.conan_config_path = "default"
             ecosystem.conan_config_branch = ""
             conan_credential = ConanCredential()
-            conan_credential.remote = "uboot"
+            conan_credential.remote = "default"
             conan_credential.username = "agent"
             conan_credential.password = os.environ.get("CONAN_PASSWORD", "")
             self.__ecosystem.conan_credentials = [conan_credential]
@@ -44,7 +44,7 @@ class TestConanPackages(unittest.TestCase):
             channel = database.Channel()
             channel.name = "channel"
             channel.conan_channel = "latest"
-            channel.conan_remote = "uboot"
+            channel.conan_remote = "default"
             channel.ecosystem = ecosystem
 
             commit = database.Commit()

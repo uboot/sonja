@@ -21,7 +21,7 @@ class TestChannel(ApiTestCase):
                 "type": "channels",
                 "attributes": {
                     "name": "Releases",
-                    "conan_remote": "uboot",
+                    "conan_remote": "default",
                     "conan_channel": "stable",
                     "ref_pattern": "main"
                 },
