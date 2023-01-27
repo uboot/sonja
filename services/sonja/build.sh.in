@@ -13,7 +13,10 @@ git config --global credential.helper $build_package_dir/credential_helper.sh
 echo '### Setup Conan ###'
 conan config install $conan_config_args
 
-echo '# Setup Conan users'
+echo '### Enable Conan remote ###'
+conan remote enable $conan_remote
+
+echo '### Setup Conan users ###'
 $setup_conan_users
 
 echo '### Clone repository ###'
